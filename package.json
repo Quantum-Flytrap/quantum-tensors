@@ -1,0 +1,16 @@
+{
+  "name": "quantum-tensors",
+  "version": "0.0.1",
+  "description": "Tensors for quantum information and quantum optics.",
+  "main": "index.js",
+  "repository": "https://github.com/stared/quantum-tensors",
+  "author": "Piotr Migdal",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.6.2"
+  },
+  "scripts": {
+    "start": "tsc --outDir ./build && node ./build/main.js",
+    "build": "tsc --pretty --outDir ./build"
+  }
+}
