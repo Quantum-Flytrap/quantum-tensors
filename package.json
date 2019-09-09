@@ -1,16 +1,36 @@
 {
   "name": "quantum-tensors",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Tensors for quantum information and quantum optics.",
   "main": "index.js",
   "repository": "https://github.com/stared/quantum-tensors",
   "author": "Piotr Migdal",
   "license": "MIT",
   "devDependencies": {
+    "jest": "^25.0.0",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.8.0",
     "typescript": "^3.6.2"
   },
   "scripts": {
     "start": "tsc --outDir ./build && node ./build/main.js",
-    "build": "tsc --pretty --outDir ./build"
+    "build": "tsc --pretty --outDir ./build",
+    "test": "tsc --noEmit -p . && jest --no-cache"
+  },
+  "dependencies": {
+    "@types/jest": "^21.1.10",
+    "@types/mathjs": "^5.0.1",
+    "mathjs": "^5.10.3"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
   }
 }
