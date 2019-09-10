@@ -8,33 +8,68 @@
 // conjugate
 // permute
 
-import SparseCell from './SparseCell'
 import Complex from './Complex'
+import SparseCell from './SparseCell'
 import Dimension from './Dimension'
 
 export default class Vector {
     cells: SparseCell[]
     dimensions: Dimension[]
-
-    constructor(cells: SparseCell[], dimensions: Dimension[]) {
-        this.cells = cells              // assume ordered?
+    sizes: number[]
+    names: string[]
+    coordNames: string[][]
+    
+    constructor(cells: SparseCell[], dimensions: Dimension[], sizes: number[] = [], names: string[] = [], coordNames: string[][] = [[]] ) {
+        // TODO: assume the cells are ordered
+        this.cells = cells
         this.dimensions = dimensions
+        this.sizes = sizes
+        this.names = names
+        this.coordNames = coordNames
+        
         // TODO: validation check
+        // this.dimensions.forEach((dimension) => {
+        //     this.sizes.push(dimension.size)
+        //     this.names.push(dimension.name)
+        //     this.coordNames.push(dimension.coordNames)
+        // })
+    }
+
+    // Get sizes of dimensions
+    getSizes() {
+        return this.dimensions.map((dimension) => {
+            dimension.size
+        })
+    }
+
+    // Get sizes of dimensions
+    getNames() {
+        return this.dimensions.map((dimension) => {
+            dimension.name
+        })
+    }
+
+    // Get sizes of dimensions
+    getCoordNames() {
+        return this.dimensions.map((dimension) => {
+            dimension.coordNames
+        })
     }
 
     // Outer product of vectors
     outer(v2: Vector): Vector {
         const v1 = this;
-        const size = (v1.dimension.length).concat(v2.size)
-        const dimNames = (v1.dimNames).concat(v2.dimNames)
-        const coordNames = (v1.coordNames).concat(v2.coordNames)
+        // const sizes      = v1.sizes.concat(v2.sizes)
+        // const dimNames   = v1.names.concat(v2.names)
+        // const coordNames = v1.coordNames.concat(v2.coordNames)
+        v1.dimensions.map
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
         const cells = (v1.cells).flatMap((cell1: SparseCell) =>
             (v2.cells).map((cell2: SparseCell) =>
                 cell1.outer(cell2)
             )
         )
-        return new Vector(cells, size, dimNames, coordNames)
+        return new Vector(cells, sizes, dimNames, coordNames)
     }
 
     // Override toString() method
