@@ -64,24 +64,14 @@ export default class Vector {
     // Outer product of vectors
     outer(v2: Vector): Vector {
         const v1 = this;
-        // const sizes      = v1.sizes.concat(v2.sizes)
-        // const dimNames   = v1.names.concat(v2.names)
-        // const coordNames = v1.coordNames.concat(v2.coordNames)
-        let newDims: Dimension[] = []
-        v1.dimensions.forEach((d1) => {
-            v2.dimensions.forEach((d2) => {
-                const newDim = d1.concat(d2)
-                newDims.push(newDim)
-            })
-        })
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
+        const dimensions: Dimension[] = v1.dimensions.concat(v2.dimensions)
         const cells: SparseCell[] = []
         v1.cells.forEach((cell1: SparseCell) =>
             (v2.cells).forEach((cell2: SparseCell) =>
                 cells.push(cell1.outer(cell2))
             )
         )
-        return new Vector(cells, newDims)
+        return new Vector(cells, dimensions)
     }
 
     // Override toString() method

@@ -45,16 +45,6 @@ const vector2 = new Vector([cell3, cell4, cell4], dims2)
 console.log(vector1.toString())
 console.log(vector2.toString())
 
-console.log("\nTest mathjs matrix conversion:")
-// const matrix = math.sparse(vector1.size)
-const matrix = math.matrix(math.zeros(vector1.sizes))
-vector1.cells.forEach((cell) => {
-    matrix.set(cell.coord, cell.value)
-})
-console.log(matrix.toString())
-
 console.log("\nTesting vector outer product:")
 const outerVector1 = vector1.outer(vector2)
-const outerVector2 = vector2.outer(vector1)
 console.log(outerVector1.toString())
-console.log(outerVector2.toString())
