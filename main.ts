@@ -24,6 +24,8 @@ const cell4 = new SparseCell([0, 2, 1], complex4)
 console.log(cell1.toString())
 console.log(cell2.toString())
 
+
+
 console.log("\nTesting sparse cell outer product:")
 const outerCell = cell1.outer(cell2)
 console.log(outerCell.toString())

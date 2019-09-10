@@ -10,25 +10,22 @@
 
 import SparseCell from './SparseCell'
 import Complex from './Complex'
+import Dimension from './Dimension'
 
 export default class Vector {
     cells: SparseCell[]
-    size: number[]
-    dimNames: string[]
-    coordNames: string[][]
+    dimensions: Dimension[]
 
-    constructor(cells: SparseCell[], size: number[], dimNames: string[], coordNames: string[][]) {
-        this.cells = cells            // assume ordered?
-        this.dimNames = dimNames        // make optional
-        this.coordNames = coordNames    // make optional
-        this.size = size                // infer?
+    constructor(cells: SparseCell[], dimensions: Dimension[]) {
+        this.cells = cells              // assume ordered?
+        this.dimensions = dimensions
         // TODO: validation check
     }
 
     // Outer product of vectors
     outer(v2: Vector): Vector {
         const v1 = this;
-        const size = (v1.size).concat(v2.size)
+        const size = (v1.dimension.length).concat(v2.size)
         const dimNames = (v1.dimNames).concat(v2.dimNames)
         const coordNames = (v1.coordNames).concat(v2.coordNames)
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
