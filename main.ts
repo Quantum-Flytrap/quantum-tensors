@@ -4,6 +4,7 @@ import * as math from "mathjs"
 import Complex from "./src/Complex"
 import SparseCell from "./src/SparseCell"
 import Vector from "./src/Vector"
+import Dimension from "./src/Dimension"
 
 const complex1 = new Complex(3, -1)
 const complex2 = new Complex(2, 0)
@@ -24,21 +25,29 @@ const cell4 = new SparseCell([0, 2, 1], complex4)
 console.log(cell1.toString())
 console.log(cell2.toString())
 
-
-
 console.log("\nTesting sparse cell outer product:")
 const outerCell = cell1.outer(cell2)
 console.log(outerCell.toString())
 
+console.log("\nTesting dimensions:")
+const dim1 = Dimension.polarization()
+const dim2 = Dimension.spin()
+const dim3 = Dimension.direction()
+const dims1 = [dim1, dim2, dim3]
+const dims2 = [dim1, dim2, dim3]
+console.log(dim1.toString())
+console.log(dim2.toString())
+console.log(dim3.toString())
+
 console.log("\nTesting vector:")
-const vector1 = new Vector([cell1, cell2, cell1], [5, 5, 5], ["x", "y", "z"], [["a1", "a2", "a3"], ["b1", "b2", "b3"], ["c1", "c2", "c3"]])
-const vector2 = new Vector([cell3, cell4, cell4], [5, 5, 5], ["x", "y", "z"], [["d1", "d2", "d3"], ["e1", "e2", "e3"], ["f1", "f2", "f3"]])
+const vector1 = new Vector([cell1, cell2, cell1], dims1)
+const vector2 = new Vector([cell3, cell4, cell4], dims2)
 console.log(vector1.toString())
 console.log(vector2.toString())
 
 console.log("\nTest mathjs matrix conversion:")
 // const matrix = math.sparse(vector1.size)
-const matrix = math.matrix(math.zeros(vector1.size))
+const matrix = math.matrix(math.zeros(vector1.sizes))
 vector1.cells.forEach((cell) => {
     matrix.set(cell.coord, cell.value)
 })

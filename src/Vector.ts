@@ -19,7 +19,12 @@ export default class Vector {
     names: string[]
     coordNames: string[][]
     
-    constructor(cells: SparseCell[], dimensions: Dimension[], sizes: number[] = [], names: string[] = [], coordNames: string[][] = [[]] ) {
+    constructor(
+        cells: SparseCell[],
+        dimensions: Dimension[],
+        sizes: number[] = [],
+        names: string[] = [],
+        coordNames: string[][] = [[]] ) {
         // TODO: assume the cells are ordered
         this.cells = cells
         this.dimensions = dimensions
@@ -29,30 +34,30 @@ export default class Vector {
         
         // TODO: validation check
         // this.dimensions.forEach((dimension) => {
-        //     this.sizes.push(dimension.size)
+        //     this.sizes.push(dimension.size)i
         //     this.names.push(dimension.name)
         //     this.coordNames.push(dimension.coordNames)
         // })
     }
 
     // Get sizes of dimensions
-    getSizes() {
+    getSizes(dimensions: Dimension[] = this.dimensions) {
         return this.dimensions.map((dimension) => {
-            dimension.size
+            return dimension.size
         })
     }
 
     // Get sizes of dimensions
-    getNames() {
+    getNames(dimensions: Dimension[] = this.dimensions) {
         return this.dimensions.map((dimension) => {
-            dimension.name
+            return dimension.name
         })
     }
 
     // Get sizes of dimensions
-    getCoordNames() {
+    getCoordNames(dimensions: Dimension[] = this.dimensions) {
         return this.dimensions.map((dimension) => {
-            dimension.coordNames
+            return dimension.coordNames
         })
     }
 
@@ -62,26 +67,36 @@ export default class Vector {
         // const sizes      = v1.sizes.concat(v2.sizes)
         // const dimNames   = v1.names.concat(v2.names)
         // const coordNames = v1.coordNames.concat(v2.coordNames)
-        v1.dimensions.map
+        let newDims: Dimension[] = []
+        v1.dimensions.forEach((d1) => {
+            v2.dimensions.forEach((d2) => {
+                const newDim = d1.concat(d2)
+                newDims.push(newDim)
+            })
+        })
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
-        const cells = (v1.cells).flatMap((cell1: SparseCell) =>
-            (v2.cells).map((cell2: SparseCell) =>
-                cell1.outer(cell2)
+        const cells: SparseCell[] = []
+        v1.cells.forEach((cell1: SparseCell) =>
+            (v2.cells).forEach((cell2: SparseCell) =>
+                cells.push(cell1.outer(cell2))
             )
         )
-        return new Vector(cells, sizes, dimNames, coordNames)
+        return new Vector(cells, newDims)
     }
 
     // Override toString() method
     toString(): string {
-        const introStr = `Vector of max size [${this.size}] with dimensions [${this.dimNames}]`
-        const valueStr = this.cells
-            .map((cell) => {
-                const coordStr = (cell.coord).map((i: number, dim: number) => this.coordNames[dim][i])
-                return `${cell.value.toString()} |${coordStr}⟩`
-            })
-            .join(" + ")
-        return `${introStr}\n${valueStr}`
+        const introStr = `--- Vector of max size [${this.getSizes()}] with dimensions [${this.getNames()}] ---`
+        
+        let cellsStr = `\nThere are ${this.cells.length} cells in the vector:\n`
+        this.cells.map((cell) => {
+            cellsStr += `- ${cell.toString()}\n`
+        })
+        let dimensionsStr = `\nThere are ${this.dimensions.length} dimensions in the vector:\n`
+        this.dimensions.map((dimension) => {
+            dimensionsStr += `- ${dimension.toString()}\n`
+        })
+        return `${introStr}\n${cellsStr}\n${dimensionsStr}`
     }
 
     // Constructor from array of numbers

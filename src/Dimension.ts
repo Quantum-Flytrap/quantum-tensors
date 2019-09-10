@@ -39,4 +39,8 @@ export default class Dimension {
         return new Dimension("x", [size], coordNames)
     }
 
+    toString() {
+        return `#Dimension [${this.name}] of size [${this.size.toString()}] has coordinates named: [${this.coordNames}]`
+    }
+
 }
