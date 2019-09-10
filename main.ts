@@ -45,6 +45,9 @@ const vector2 = new Vector([cell3, cell4, cell4], dims2)
 console.log(vector1.toString())
 console.log(vector2.toString())
 
+console.log("\nLoading vector from dense matrix sequential list.")
+const vector3 = Vector.fromArray([complex1, complex2, complex3, complex4], [dim1, dim2])
+
 console.log("\nTesting vector outer product:")
 const outerVector1 = vector1.outer(vector2)
 console.log(outerVector1.toString())

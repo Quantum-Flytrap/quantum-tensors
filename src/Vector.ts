@@ -11,54 +11,27 @@
 import Complex from './Complex'
 import SparseCell from './SparseCell'
 import Dimension from './Dimension'
+import _ from 'lodash'
 
 export default class Vector {
     cells: SparseCell[]
     dimensions: Dimension[]
-    sizes: number[]
-    names: string[]
-    coordNames: string[][]
     
-    constructor(
-        cells: SparseCell[],
-        dimensions: Dimension[],
-        sizes: number[] = [],
-        names: string[] = [],
-        coordNames: string[][] = [[]] ) {
-        // TODO: assume the cells are ordered
+    // TODO: assume the cells are ordered
+    constructor(cells: SparseCell[], dimensions: Dimension[]) {
         this.cells = cells
         this.dimensions = dimensions
-        this.sizes = sizes
-        this.names = names
-        this.coordNames = coordNames
-        
-        // TODO: validation check
-        // this.dimensions.forEach((dimension) => {
-        //     this.sizes.push(dimension.size)i
-        //     this.names.push(dimension.name)
-        //     this.coordNames.push(dimension.coordNames)
-        // })
     }
 
-    // Get sizes of dimensions
-    getSizes(dimensions: Dimension[] = this.dimensions) {
-        return this.dimensions.map((dimension) => {
-            return dimension.size
-        })
+    // Getters for dimensions
+    get sizes() {
+        return this.dimensions.map((dimension) => dimension.size)
     }
-
-    // Get sizes of dimensions
-    getNames(dimensions: Dimension[] = this.dimensions) {
-        return this.dimensions.map((dimension) => {
-            return dimension.name
-        })
+    get names() {
+        return this.dimensions.map((dimension) => dimension.name)
     }
-
-    // Get sizes of dimensions
-    getCoordNames(dimensions: Dimension[] = this.dimensions) {
-        return this.dimensions.map((dimension) => {
-            return dimension.coordNames
-        })
+    get coordNames() {
+        return this.dimensions.map((dimension) => dimension.coordNames)
     }
 
     // Outer product of vectors
@@ -75,8 +48,9 @@ export default class Vector {
     }
 
     // Override toString() method
+    // Recover piotr ket formalism
     toString(): string {
-        const introStr = `--- Vector of max size [${this.getSizes()}] with dimensions [${this.getNames()}] ---`
+        const introStr = `--- Vector of max size [${this.sizes}] with dimensions [${this.names}] ---`
         
         let cellsStr = `\nThere are ${this.cells.length} cells in the vector:\n`
         this.cells.map((cell) => {
@@ -89,27 +63,17 @@ export default class Vector {
         return `${introStr}\n${cellsStr}\n${dimensionsStr}`
     }
 
-    // Constructor from array of numbers
-    // static fromArray(arr: Complex[], size: number[], dimNames: string[], coordNames: string[][]): Vector {
-    //     const sizeRev = [...size]
-    //     sizeRev.reverse()
-
-    //     const cells: SparseCell[] = arr
-    //         .map((val: Complex, i: number) => [val, i])
-    //         .filter((d: [Complex, number]) => { return !d[0].isZero() })
-    //         .map((d: [Complex, number]) => {
-    //             const cell = d[0]
-    //             const coord: number[] = []
-    //             let x: number = d[1]
-    //             sizeRev.forEach((d) => {
-    //                 const r = x % d
-    //                 coord.push(r)
-    //                 x = (x - r) / d
-    //             })
-    //             return new SparseCell(coord, cell)
-    //         })
-    //     arr.forEach((v: Complex, i: number) => {
-    //     })
-    //     return new Vector(cells, size, dimNames, coordNames)
-    // }
+    // Loading from dense array list of cells
+    static fromArray(denseArray: Complex[], dimensions: Dimension[]): Vector {
+        // Precompute sizes
+        const size = dimensions.map((dimension) => dimension.size).reverse()
+        // Map valyes to cells indices in a dense representation
+        const filteredCells: SparseCell[] = []
+        denseArray.forEach((value: Complex, index: number) => {
+            if (!value.isZero()) {
+                filteredCells.push(SparseCell.fromIndex(index, size, value))
+            }
+        })
+        return new Vector(filteredCells, dimensions)
+    }
 }

@@ -27,8 +27,21 @@ export default class SparseCell {
         )
     }
     
-    // Override toString() method
+    // Override toString() methodi
     toString() {
-        return `Sparse matrix cell @ [${this.coord.toString()}] has value ${this.value.toString()}`
+        return `Sparse vector entry [${this.coord.toString()}] has value ${this.value.toString()}`
+    }
+
+    // Generate coordinates from dense matrix indices and size of those matrices
+    static fromIndex(index: number, sizes: number[], value: Complex): SparseCell {
+        // Convert index to coordinate system in the size dimensions
+        let i = index
+        const coords: number[] = []        
+        sizes.forEach((dimSize) => {
+            const coord = i % dimSize
+            coords.push(coord)
+            i = (i - coord) / dimSize
+        })
+        return new SparseCell(coords, value)
     }
 }
