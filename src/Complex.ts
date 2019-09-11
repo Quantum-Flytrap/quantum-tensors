@@ -1,4 +1,9 @@
 // COMPLEX NUMBER CLASS
+
+export function Cx(re: number, im: number = 0): Complex {
+    return new Complex(re, im)
+}
+
 export default class Complex {
     re : number
     im : number
@@ -51,6 +56,6 @@ export default class Complex {
     
     // Override toString() method
     toString(): string {
-        return `{${this.re.toFixed(2)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(2)}i}`
+        return `${this.re.toFixed(2)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(2)}i`
     }
 }

@@ -14,7 +14,7 @@ import _ from 'lodash'
 export default class Vector {
     cells: SparseCell[]
     dimensions: Dimension[]
-    
+
     // TODO: assume the cells are ordered
     constructor(cells: SparseCell[], dimensions: Dimension[]) {
         this.cells = cells
@@ -22,8 +22,11 @@ export default class Vector {
     }
 
     // Getters for dimensions
-    get shape() {
-        return this.dimensions.map((dimension) => dimension.shape)
+    get size() {
+        return this.dimensions.map((dimension) => dimension.size)
+    }
+    get total() {
+        return this.size.reduce((a, b) => a * b)
     }
     get names() {
         return this.dimensions.map((dimension) => dimension.name)
@@ -52,33 +55,57 @@ export default class Vector {
         return new Vector(cells, dimensions)
     }
 
-    // Override toString() method
-    // TODO: Recover piotr ket formalism
-    toString(): string {
-        const introStr = `--- Vector of max size [${this.shape}] with dimensions [${this.names}] ---`
-        
-        let cellsStr = `\nThere are ${this.cells.length} cells in the vector:\n`
-        this.cells.map((cell) => {
-            cellsStr += `- ${cell.toString()}\n`
-        })
-        let dimensionsStr = `\nThere are ${this.dimensions.length} dimensions in the vector:\n`
-        this.dimensions.map((dimension) => {
-            dimensionsStr += `- ${dimension.toString()}\n`
-        })
-        return `${introStr}\n${cellsStr}\n${dimensionsStr}`
+    // TODO: Dense matrix visualisation
+    toString(dense: boolean = false): string {
+        let introStr = ""
+        let valueStr = ""
+        if (!dense) {
+            introStr += `Vector of max size [${this.size}] with dimensions [${this.names}]`
+            valueStr += this.cells
+                .map((cell) => {
+                    const coordStr = (cell.coord).map((i: number, dim: number) => this.coordNames[dim][i])
+                    return `(${cell.value.toString()}) |${coordStr}⟩`
+                })
+                .join(" + ")
+        } else {
+            introStr += `Vector of max size [${this.size}] with dimensions [${this.names}]`
+            valueStr += this.cells
+                .map((cell) => {
+                    const coordStr = (cell.coord).map((i: number, dim: number) => this.coordNames[dim][i])
+                    return `(${cell.value.toString()}) |${coordStr}⟩`
+                })
+                .join("\n")
+        }
+        return `${introStr}\n${valueStr}\n`
     }
 
     // Loading from dense array list of cells
-    static fromArray(denseArray: Complex[], dimensions: Dimension[]): Vector {
-        // Precompute sizes
-        const shape = dimensions.map((dimension) => dimension.size).reverse()
-        // Map valyes to cells indices in a dense representation
-        const filteredCells: SparseCell[] = []
-        denseArray.forEach((value: Complex, index: number) => {
-            if (!value.isZero()) {
-                filteredCells.push(SparseCell.fromIndex(index, shape, value))
-            }
-        })
-        return new Vector(filteredCells, dimensions)
+    // TODO: if length array != product of dimension then error throw error
+    static fromArray(denseArray: Complex[], dimensions: Dimension[], sparse: boolean = true): Vector {
+
+        // Get size vector from dimensions
+        const sizes = dimensions.map((dimension) => dimension.size)
+        const total = sizes.reduce((a, b) => a * b)
+        if (denseArray.length !== total) {
+            throw new Error(`Dimension inconsistency: cell count ${denseArray.length} != total: ${total}`)
+        }
+
+        // Map values to cells indices in a dense representation
+        const cells: SparseCell[] = []
+        // Output sparse
+        if (sparse) {
+            denseArray.forEach((value: Complex, index: number) => {
+                if (!value.isZero()) {
+                    cells.push(SparseCell.fromIndex(index, sizes, value))
+                }
+            })
+            // Output dense matrix 
+        } else {
+            denseArray.forEach((value: Complex, index: number) => {
+                cells.push(SparseCell.fromIndex(index, sizes, value))
+            })
+        }
+
+        return new Vector(cells, dimensions)
     }
 }
