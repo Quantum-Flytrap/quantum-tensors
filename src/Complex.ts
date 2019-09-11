@@ -1,5 +1,7 @@
 // COMPLEX NUMBER CLASS
 
+const TAU = 2 * Math.PI
+
 export function Cx(re: number, im: number = 0): Complex {
     return new Complex(re, im)
 }
@@ -12,6 +14,14 @@ export default class Complex {
         this.re = re
         this.im = im
     }
+    
+    get r() : number {
+        return this.abs()
+    }
+
+    get phi() : number {
+        return this.arg()
+    }
 
     abs2(): number {
         return Math.pow(this.re, 2) + Math.pow(this.im, 2)
@@ -19,6 +29,14 @@ export default class Complex {
 
     abs(): number {
         return Math.sqrt(Math.pow(this.re, 2) + Math.pow(this.im, 2))
+    }
+
+    arg(): number {
+        let arg = Math.atan2(this.im, this.re)
+        if (arg < 0) {
+            arg += 2 * Math.PI
+        }
+        return arg
     }
     
     // Addition 
@@ -55,7 +73,18 @@ export default class Complex {
     }
     
     // Override toString() method
-    toString(): string {
-        return `${this.re.toFixed(2)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(2)}i`
+    toString(precision = 2): string {
+        return `${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i`
     }
+
+    toStringRadial(precision = 2): string {
+        return `${this.r.toFixed(precision)} exp(${this.phi.toFixed(precision)}i)`
+    }
+
+    toStringRadialTau(precision = 2): string {
+        const rot = this.phi / TAU
+        return `${this.r.toFixed(precision)} exp(${rot.toFixed(precision)}τi)`
+    }
+
+
 }

@@ -15,6 +15,18 @@ console.log(complex2.toString())
 console.log(complex3.toString())
 console.log(complex4.toString())
 
+console.log("Testing complex radial:")
+console.log(complex1.toStringRadial())
+console.log(complex2.toStringRadial())
+console.log(complex3.toStringRadial())
+console.log(complex4.toStringRadial())
+
+console.log("Testing complex radial with TAU:")
+console.log(complex1.toStringRadialTau())
+console.log(complex2.toStringRadialTau())
+console.log(complex3.toStringRadialTau())
+console.log(complex4.toStringRadialTau())
+
 console.log("\nTesting sparse cell:")
 const cell1 = new SparseCell([2, 1, 2], complex1)
 const cell2 = new SparseCell([2, 0, 2], complex2)
