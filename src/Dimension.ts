@@ -9,8 +9,11 @@ export default class Dimension {
 
     constructor(name: string, size: number, coordNames: string[]) {
         this.name = name
-        this.coordNames = coordNames
+        this.coordNames = coordNames  // later, we may make it optional
         this.size = size
+        if (this.size !== this.coordNames.length) {
+            throw new Error(`Coordinates ${coordNames} array is of length ${coordNames.length} is not ${size}.`)
+        }
     }
     
     static polarization(): Dimension {
@@ -25,9 +28,9 @@ export default class Dimension {
         return new Dimension("spin", 2, ["u", "d"])
     }
     
-    static positionX(size: number): Dimension {
+    static position(size: number, name = 'x'): Dimension {
         const coordNames = _.range(size).map((i: number) => i.toString())
-        return new Dimension("x", size, coordNames)
+        return new Dimension(name, size, coordNames)
     }
     
     toString() {
@@ -35,11 +38,3 @@ export default class Dimension {
     }
     
 }
-// // Concatenate two dimensions
-// concat(d2: Dimension): Dimension {
-//     const d1 = this
-//     const name = `${d1.name},${d2.name}`
-//     const size = d1.size.concat(d2.size)
-//     const coordNames = d1.coordNames.concat(d2.coordNames)
-//     return new Dimension(name, size, coordNames)
-// }
