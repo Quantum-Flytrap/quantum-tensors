@@ -1,5 +1,3 @@
-// TODO: Discuss about something better for dims, size
-// TODO: See if cell can hold the dimension and vector inherit it
 import * as math from "mathjs"
 import Complex from "./src/Complex"
 import SparseCell from "./src/SparseCell"

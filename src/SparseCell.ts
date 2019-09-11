@@ -1,11 +1,5 @@
 // SPARSE MATRIX CELL
 // Contains the path to a cell and its value.
-// TODO: toLaTeX
-// TODO: add
-// TODO: outer
-// TODO: conj
-// TODO: permute
-// TODO: mul?
 
 import Complex from "./Complex"
 
@@ -33,6 +27,7 @@ export default class SparseCell {
     }
 
     // Generate coordinates from dense matrix indices and size of those matrices
+    // TODO: Check that values are good
     static fromIndex(index: number, sizes: number[], value: Complex): SparseCell {
         // Convert index to coordinate system in the size dimensions
         let i = index
