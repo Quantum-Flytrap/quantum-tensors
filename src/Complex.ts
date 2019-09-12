@@ -73,15 +73,37 @@ export default class Complex {
     }
     
     // Override toString() method
-    toString(precision = 2): string {
-        return `${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i`
+    toString(complexFormat : string = "cartesian", precision = 2) : string {
+        switch (complexFormat) {
+            case "cartesian":
+                return this.toStringCartesian(precision)
+            case "polar":
+                return this.toStringPolar(precision)
+            case "polarTau":
+                return this.toStringPolarTau(precision)
+            default:
+                throw new Error(`complexFormat '${complexFormat}' is not in ['cartesian', 'polar', 'polarTau'].`)
+
+        }
+
+        // NOTE: one below is not favoured by TypeScript
+        // const mapping = {
+        //     "cartesian": this.toStringCartesian,
+        //     "radial": this.toStringPolar,
+        //     "radialTau": this.toStringPolarTau,
+        // }
+        // return mapping[complexFormat](precision)
     }
 
-    toStringRadial(precision = 2): string {
+    toStringCartesian(precision = 2): string {
+        return `(${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i)`
+    }
+
+    toStringPolar(precision = 2): string {
         return `${this.r.toFixed(precision)} exp(${this.phi.toFixed(precision)}i)`
     }
 
-    toStringRadialTau(precision = 2): string {
+    toStringPolarTau(precision = 2): string {
         const rot = this.phi / TAU
         return `${this.r.toFixed(precision)} exp(${rot.toFixed(precision)}τi)`
     }

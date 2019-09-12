@@ -1,5 +1,4 @@
 import { Cx } from "./src/Complex"
-import { VectorEntry }  from "./src/Entry"
 import Dimension from "./src/Dimension"
 import Vector from "./src/Vector"
 
@@ -19,4 +18,6 @@ console.log(vector2.toString())
 
 // Outer product
 const outerVec = vector1.outer(vector2)
-console.log(outerVec.toString(true))
+console.log(outerVec.toString("cartesian", 2, "\n"))
+console.log(outerVec.toString("polar", 2, "\n"))
+console.log(outerVec.toString("polarTau", 2, "\n"))

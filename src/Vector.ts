@@ -25,7 +25,7 @@ export default class Vector {
     get size() {
         return this.dimensions.map((dimension) => dimension.size)
     }
-    get total() {
+    get totalSize() {
         return this.size.reduce((a, b) => a * b)
     }
     get names() {
@@ -37,9 +37,9 @@ export default class Vector {
 
     // Conjugate
     conjugate() {
-        return this.cells.map((cell) => {
-            return new VectorEntry(cell.coord, cell.value.conj())
-        })
+        return this.cells.map((cell) =>
+            new VectorEntry(cell.coord, cell.value.conj())
+        )
     }
 
     // Outer product of vectors
@@ -56,55 +56,37 @@ export default class Vector {
     }
 
     // TODO: Dense matrix visualisation
-    toString(dense: boolean = false): string {
-        let introStr = ""
-        let valueStr = ""
-        if (!dense) {
-            introStr += `Vector of max size [${this.size}] with dimensions [${this.names}]`
-            valueStr += this.cells
-                .map((cell) => {
-                    const coordStr = (cell.coord).map((i: number, dim: number) => this.coordNames[dim][i])
-                    return `(${cell.value.toString()}) |${coordStr}⟩`
-                })
-                .join(" + ")
-        } else {
-            introStr += `Vector of max size [${this.size}] with dimensions [${this.names}]`
-            valueStr += this.cells
-                .map((cell) => {
-                    const coordStr = (cell.coord).map((i: number, dim: number) => this.coordNames[dim][i])
-                    return `(${cell.value.toString()}) |${coordStr}⟩`
-                })
-                .join("\n")
-        }
+    toString(complexFormat = "cartesian", precision = 2, separator = " + "): string {
+
+        const introStr = `Vector of max size [${this.size}] with dimensions [${this.names}]`
+        let valueStr = this.cells
+            .map((cell) => {
+                const coordStr = (cell.coord).map((i: number, dim: number) => this.coordNames[dim][i])
+                return `${cell.value.toString(complexFormat, precision)} |${coordStr}⟩`
+            })
+            .join(separator);
+
         return `${introStr}\n${valueStr}\n`
     }
 
     // Loading from dense array list of cells
-    // TODO: if length array != product of dimension then error throw error
-    static fromArray(denseArray: Complex[], dimensions: Dimension[], sparse: boolean = true): Vector {
+    static fromArray(denseArray: Complex[], dimensions: Dimension[], removeZeros: boolean = true): Vector {
 
         // Get size vector from dimensions
         const sizes = dimensions.map((dimension) => dimension.size)
-        const total = sizes.reduce((a, b) => a * b)
-        if (denseArray.length !== total) {
-            throw new Error(`Dimension inconsistency: cell count ${denseArray.length} != total: ${total}`)
+        const totalSize = sizes.reduce((a, b) => a * b)
+        if (denseArray.length !== totalSize) {
+            throw new Error(`Dimension inconsistency: cell count ${denseArray.length} != total: ${totalSize}`)
         }
 
         // Map values to cells indices in a dense representation
-        const cells: VectorEntry[] = []
-        // Output sparse
-        if (sparse) {
-            denseArray.forEach((value: Complex, index: number) => {
-                if (!value.isZero()) {
-                    cells.push(VectorEntry.fromIndexValue(index, sizes, value))
-                }
-            })
-            // Output dense matrix 
-        } else {
-            denseArray.forEach((value: Complex, index: number) => {
-                cells.push(VectorEntry.fromIndexValue(index, sizes, value))
-            })
-        }
+        const cells: VectorEntry[] = denseArray
+            .map((value: Complex, index: number): [number, Complex] =>
+                [index, value])
+            .filter(([index, value]: [number, Complex]): boolean =>
+                !removeZeros || !value.isZero())
+            .map(([index, value]: [number, Complex]): VectorEntry =>
+                VectorEntry.fromIndexValue(index, sizes, value))
 
         return new Vector(cells, dimensions)
     }

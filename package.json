@@ -15,6 +15,7 @@
   },
   "scripts": {
     "start": "tsc --outDir ./build && node ./build/main.js",
+    "try-tensor": "tsc --outDir ./build && node ./build/tensor.js",
     "build": "tsc --pretty --outDir ./build",
     "test": "tsc --noEmit -p . && jest --no-cache"
   },
