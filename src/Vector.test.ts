@@ -1,5 +1,5 @@
 import Complex from "./Complex"
-import SparseCell from "./SparseCell"
+import { VectorEntry } from "./Entry"
 
 // Coordinates testing
 describe('Complex', () => {
@@ -11,10 +11,10 @@ describe('Complex', () => {
 })
 
 // Sparse cell testing
-describe('SparseCell', () => {
+describe('VectorEntry', () => {
     it('should convert from index (uid) to coordinates of dimension array', () => {
         const complex = new Complex(4, -4)
-        const cell = SparseCell.fromIndex(23, [2, 4, 2], complex)
+        const cell = VectorEntry.fromIndexValue(23, [2, 4, 2], complex)
         expect(cell.coord).toEqual("")
     })
 })

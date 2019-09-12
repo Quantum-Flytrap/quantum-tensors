@@ -7,16 +7,16 @@
 // permute
 
 import Complex from './Complex'
-import SparseCell from './SparseCell'
+import { VectorEntry } from './Entry'
 import Dimension from './Dimension'
 import _ from 'lodash'
 
 export default class Vector {
-    cells: SparseCell[]
+    cells: VectorEntry[]
     dimensions: Dimension[]
 
     // TODO: assume the cells are ordered
-    constructor(cells: SparseCell[], dimensions: Dimension[]) {
+    constructor(cells: VectorEntry[], dimensions: Dimension[]) {
         this.cells = cells
         this.dimensions = dimensions
     }
@@ -38,7 +38,7 @@ export default class Vector {
     // Conjugate
     conjugate() {
         return this.cells.map((cell) => {
-            return new SparseCell(cell.coord, cell.value.conj())
+            return new VectorEntry(cell.coord, cell.value.conj())
         })
     }
 
@@ -46,9 +46,9 @@ export default class Vector {
     outer(v2: Vector): Vector {
         const v1 = this;
         const dimensions: Dimension[] = v1.dimensions.concat(v2.dimensions)
-        const cells: SparseCell[] = []
-        v1.cells.forEach((cell1: SparseCell) =>
-            (v2.cells).forEach((cell2: SparseCell) =>
+        const cells: VectorEntry[] = []
+        v1.cells.forEach((cell1: VectorEntry) =>
+            (v2.cells).forEach((cell2: VectorEntry) =>
                 cells.push(cell1.outer(cell2))
             )
         )
@@ -91,18 +91,18 @@ export default class Vector {
         }
 
         // Map values to cells indices in a dense representation
-        const cells: SparseCell[] = []
+        const cells: VectorEntry[] = []
         // Output sparse
         if (sparse) {
             denseArray.forEach((value: Complex, index: number) => {
                 if (!value.isZero()) {
-                    cells.push(SparseCell.fromIndex(index, sizes, value))
+                    cells.push(VectorEntry.fromIndexValue(index, sizes, value))
                 }
             })
             // Output dense matrix 
         } else {
             denseArray.forEach((value: Complex, index: number) => {
-                cells.push(SparseCell.fromIndex(index, sizes, value))
+                cells.push(VectorEntry.fromIndexValue(index, sizes, value))
             })
         }
 

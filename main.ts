@@ -1,6 +1,6 @@
 import * as math from "mathjs"
 import Complex from "./src/Complex"
-import SparseCell from "./src/SparseCell"
+import { VectorEntry } from "./src/Entry"
 import Vector from "./src/Vector"
 import Dimension from "./src/Dimension"
 
@@ -28,10 +28,10 @@ console.log(complex3.toStringRadialTau())
 console.log(complex4.toStringRadialTau())
 
 console.log("\nTesting sparse cell:")
-const cell1 = new SparseCell([2, 1, 2], complex1)
-const cell2 = new SparseCell([2, 0, 2], complex2)
-const cell3 = new SparseCell([0, 1, 2], complex3)
-const cell4 = new SparseCell([0, 2, 1], complex4)
+const cell1 = new VectorEntry([2, 1, 2], complex1)
+const cell2 = new VectorEntry([2, 0, 2], complex2)
+const cell3 = new VectorEntry([0, 1, 2], complex3)
+const cell4 = new VectorEntry([0, 2, 1], complex4)
 console.log(cell1.toString())
 console.log(cell2.toString())
 

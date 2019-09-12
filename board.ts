@@ -1,5 +1,5 @@
-import {Cx} from "./src/Complex"
-import SparseCell from "./src/SparseCell"
+import { Cx } from "./src/Complex"
+import { VectorEntry }  from "./src/Entry"
 import Dimension from "./src/Dimension"
 import Vector from "./src/Vector"
 

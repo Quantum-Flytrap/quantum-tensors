@@ -1,9 +1,27 @@
 // SPARSE MATRIX CELL
 // Contains the path to a cell and its value.
 
+// coordinate as an abstracted entry?
+// MultiIndex 
+
+// VectoryEntry
+// MatrixEntry
+
 import Complex from "./Complex"
 
-export default class SparseCell {
+export function CoordsFromIndex(index: number, sizes: number[]): number[] {
+    // Convert index to coordinate system in the size dimensions
+    // TODO: Check that values are good
+    let i = index
+    const coords = sizes.map((dimSize) => {
+        const coord = i % dimSize
+        i = (i - coord) / dimSize
+        return coord
+    })
+    return coords
+}
+
+export class VectorEntry {
     coord: number[]
     value: Complex
 
@@ -13,9 +31,9 @@ export default class SparseCell {
     }
     
     // Compute outer product with another sparse cell
-    outer(e2: SparseCell): SparseCell {
+    outer(e2: VectorEntry): VectorEntry {
         const e1 = this
-        return new SparseCell(
+        return new VectorEntry(
             (e1.coord).concat(e2.coord),
             (e1.value).mul(e2.value)
         )
@@ -27,16 +45,9 @@ export default class SparseCell {
     }
 
     // Generate coordinates from dense matrix indices and size of those matrices
-    // TODO: Check that values are good
-    static fromIndex(index: number, sizes: number[], value: Complex): SparseCell {
+    static fromIndexValue(index: number, sizes: number[], value: Complex): VectorEntry {
         // Convert index to coordinate system in the size dimensions
-        let i = index
-        const coords: number[] = []        
-        sizes.forEach((dimSize) => {
-            const coord = i % dimSize
-            coords.push(coord)
-            i = (i - coord) / dimSize
-        })
-        return new SparseCell(coords, value)
+        const coords = CoordsFromIndex(index, sizes)
+        return new VectorEntry(coords, value)
     }
 }
