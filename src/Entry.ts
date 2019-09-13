@@ -51,3 +51,41 @@ export class VectorEntry {
         return new VectorEntry(coords, value)
     }
 }
+
+export class OperatorEntry {
+    coordOut: number[]
+    coordIn: number[]
+    value: Complex
+
+    constructor(coordOut: number[], coordIn: number[], value: Complex) {
+        this.coordOut = coordOut
+        this.coordIn = coordIn
+        this.value = value
+    }
+    
+    // Compute outer product with another sparse cell
+    outer(e2: OperatorEntry): OperatorEntry {
+        const e1 = this
+        return new OperatorEntry(
+            (e1.coordOut).concat(e2.coordOut),
+            (e1.coordIn).concat(e2.coordIn),
+            (e1.value).mul(e2.value)
+        )
+    }
+    
+    // Override toString() methodi
+    toString() {
+        return `Sparse operator entry [${this.coordOut.toString()}, ${this.coordIn.toString()}] has value ${this.value.toString()}`
+    }
+
+    // Generate coordinates from dense matrix indices and size of those matrices
+    static fromIndexIndexValue(indexOut: number, indexIn: number, sizesOut: number[], sizesIn: number[], value: Complex): OperatorEntry {
+        // Convert index to coordinate system in the size dimensions
+        const coordOut = CoordsFromIndex(indexOut, sizesOut)
+        const coordIn = CoordsFromIndex(indexIn, sizesIn)
+        return new OperatorEntry(coordOut, coordIn, value)
+    }
+}
+
+
+

@@ -6,7 +6,7 @@
 // dot product
 // permute
 
-import Complex from './Complex'
+import Complex, { Cx } from './Complex'
 import { VectorEntry } from './Entry'
 import Dimension from './Dimension'
 import _ from 'lodash'
@@ -36,10 +36,55 @@ export default class Vector {
     }
 
     // Conjugate
-    conjugate() {
-        return this.cells.map((cell) =>
-            new VectorEntry(cell.coord, cell.value.conj())
+    conj() {
+        const entries = this.cells.map((cell) =>
+            new VectorEntry([...cell.coord], cell.value.conj())
         )
+        return new Vector(entries, this.dimensions)
+    }
+
+    add(v2: Vector) {
+
+        // NOTE: may be overengineered for adding 2 vectors with this map-reduce approach
+
+        const v1 = this
+        // TODO: check dimensions here
+        const entries = _
+            .chain(v1.cells.concat(v2.cells))
+            .groupBy((entry: VectorEntry) => entry.coord.toString())
+            .values()
+            .map((grouped: VectorEntry[]) => {
+                const coord = [...grouped[0].coord]
+                const value = grouped
+                    .map((entry) => entry.value)
+                    .reduce((a, b) => a.add(b))
+                return new VectorEntry(coord, value)
+            })
+            .value()
+
+        return new Vector(entries, v1.dimensions)
+
+    }
+
+    dot(v2: Vector): Complex {
+        const v1 = this
+        // TODO: check dimensions here
+        const result = _
+            .chain(v1.cells.concat(v2.cells))
+            .groupBy((entry: VectorEntry) => entry.coord.toString())
+            .values()
+            .map((grouped: VectorEntry[]) => {
+                if (grouped.length === 2) {
+                    return (grouped[0].value).mul(grouped[1].value)
+                } else {
+                    return Cx(0, 0)
+                }
+            })
+            .reduce((a, b) => a.add(b))
+            .value()
+
+        return result
+
     }
 
     // Outer product of vectors

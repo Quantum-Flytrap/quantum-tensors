@@ -21,3 +21,18 @@ const outerVec = vector1.outer(vector2)
 console.log(outerVec.toString("cartesian", 2, "\n"))
 console.log(outerVec.toString("polar", 2, "\n"))
 console.log(outerVec.toString("polarTau", 2, "\n"))
+
+
+// Add
+console.log("Add")
+const vector3 = Vector.fromArray([Cx(0, 1), Cx(0), Cx(-1, 2), Cx(0)], [dim1], false)
+console.log(vector1.toString())
+console.log(vector3.toString())
+console.log(vector1.add(vector3).toString())
+
+// Dot
+console.log("Dot")
+console.log(vector1.dot(vector3).toString())
+
+// Conj
+console.log(vector1.conj().toString())
