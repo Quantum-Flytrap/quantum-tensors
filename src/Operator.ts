@@ -7,7 +7,8 @@
 // permute
 
 import Complex, { Cx } from './Complex'
-import { OperatorEntry } from './Entry'
+import { VectorEntry, OperatorEntry } from './Entry'
+import Vector from './Vector'
 import Dimension from './Dimension'
 import _ from 'lodash'
 
@@ -110,9 +111,80 @@ export default class Operator {
         return new Operator(entries, dimensionsOut, dimensionsIn)
     }
 
-    // To add: add
-    // To multiply: multiply for op-op and op-vec
+    add(m2: Operator) {
 
+        // NOTE: may be overengineered for adding 2 vectors with this map-reduce approach
+
+        const m1 = this
+        // TODO: check dimensions here
+        const entries = _
+            .chain(m1.entries.concat(m2.entries))
+            .groupBy((entry: OperatorEntry) => `${entry.coordOut.toString()}-${entry.coordIn.toString()} ` )
+            .values()
+            .map((grouped: OperatorEntry[]) => {
+                const coordOut = [...grouped[0].coordOut]
+                const coordIn = [...grouped[0].coordIn]
+                const value = grouped
+                    .map((entry) => entry.value)
+                    .reduce((a, b) => a.add(b))
+                return new OperatorEntry(coordOut, coordIn, value)
+            })
+            .value()
+
+        return new Operator(entries, m1.dimensionsOut, m1.dimensionsIn)
+
+    }
+
+    mulVec(v: Vector): Vector {
+        const m: Operator = this
+        // TODO: check dimensions here
+
+        const vValueMap = new Map<string, Complex>()
+        v.cells.forEach((entry) => {
+            vValueMap.set(entry.coord.toString(), entry.value)
+        })
+
+        const entries = _
+            .chain(m.entries)
+            .groupBy((entry: OperatorEntry) => entry.coordOut.toString())
+            .values()
+            .map((entries: OperatorEntry[]): VectorEntry => {
+                const coordOut = entries[0].coordOut
+                const sum = entries
+                    .map((entry) => {
+                        const coordInStr = entry.coordIn.toString()
+                        const val = vValueMap.get(coordInStr) || Cx(0)
+                        return (entry.value).mul(val)
+                    })
+                    .reduce((a, b) => a.add(b))
+                return new VectorEntry(coordOut, sum)
+            })
+            .value()
+
+        return new Vector(entries, m.dimensionsOut)
+
+    }
+
+    // mulOp(m2: Operator): Operator {
+    //     const m1 = this
+    //     // TODO: check dimensions here
+    //     const result = _
+    //         .chain(v1.cells.concat(v2.cells))
+    //         .groupBy((entry: VectorEntry) => entry.coord.toString())
+    //         .values()
+    //         .map((grouped: VectorEntry[]) => {
+    //             if (grouped.length === 2) {
+    //                 return (grouped[0].value).mul(grouped[1].value)
+    //             } else {
+    //                 return Cx(0, 0)
+    //             }
+    //         })
+    //         .reduce((a, b) => a.add(b))
+    //         .value()
+
+    //     return result
+
+    // }
 
     // TODO: Dense matrix visualisation
     toString(complexFormat = "cartesian", precision = 2, separator = " + "): string {

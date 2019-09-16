@@ -62,3 +62,14 @@ const spinX = Operator.fromArray([[Cx(0), Cx(1)], [Cx(1), Cx(0)]], [Dimension.sp
 console.log(spinX.toString())
 console.log("Tensor of above ")
 console.log(spinY.outer(spinX).toString())
+
+console.log("Op vec mul")
+console.log(vector2.toString())
+console.log(spinY.mulVec(vector2).toString())
+console.log(spinX.mulVec(vector2).toString())
+
+console.log("Hadamard")
+const isrt2 = 1 / Math.sqrt(2)
+const spinH = Operator.fromArray([[Cx(isrt2), Cx(isrt2)], [Cx(isrt2), Cx(-isrt2)]], [Dimension.spin()], [Dimension.spin()])
+console.log(spinH.toString())
+console.log(spinH.mulVec(vector2).toString())
