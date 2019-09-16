@@ -1,6 +1,7 @@
 import { Cx } from "./src/Complex"
 import Dimension from "./src/Dimension"
 import Vector from "./src/Vector"
+import Operator from "./src/Operator"
 
 const complex1 = Cx(1)
 const complex2 = Cx(0)
@@ -36,3 +37,28 @@ console.log(vector1.dot(vector3).toString())
 
 // Conj
 console.log(vector1.conj().toString())
+
+// Operators
+console.log("Operators")
+
+console.log("Identity")
+const idPolDir = Operator.identity([Dimension.polarization(), Dimension.direction()]) 
+console.log(idPolDir.toString())
+
+console.log("Pieces and a tensor product")
+const idPol = Operator.identity([Dimension.polarization()]) 
+console.log(idPol.toString())
+const idDir = Operator.identity([Dimension.spin()]) 
+console.log(idDir.toString())
+
+console.log(idPol.outer(idDir).toString())
+console.log(idDir.outer(idPol).toString())
+
+console.log("From array")
+
+const spinY = Operator.fromArray([[Cx(0), Cx(0, -1)], [Cx(0, 1), Cx(0)]], [Dimension.spin()], [Dimension.spin()])
+console.log(spinY.toString())
+const spinX = Operator.fromArray([[Cx(0), Cx(1)], [Cx(1), Cx(0)]], [Dimension.spin()], [Dimension.spin()])
+console.log(spinX.toString())
+console.log("Tensor of above ")
+console.log(spinY.outer(spinX).toString())
