@@ -159,6 +159,7 @@ export default class Operator {
                     .reduce((a, b) => a.add(b))
                 return new VectorEntry(coordOut, sum)
             })
+            .filter((entry) => !entry.value.isZero())
             .value()
 
         return new Vector(entries, m.dimensionsOut)
@@ -214,6 +215,20 @@ export default class Operator {
         return new Operator(entries, dimensions, dimensions)
     }
 
+    // https://en.wikipedia.org/wiki/Shift_matrix
+    static shift(dimension: Dimension, shift: number) {
+
+        const start = Math.max(0, -shift)
+        const end = Math.min(dimension.size, dimension.size - shift) 
+
+        const entries = _
+            .range(start, end)
+            .map((index) => 
+                OperatorEntry.fromIndexIndexValue(index + shift, index, [dimension.size], [dimension.size], Cx(1, 0))
+            )
+        return new Operator(entries, [dimension], [dimension])
+    }
+
     static zeros(dimensionsOut: Dimension[], dimensionsIn: Dimension[]) {
         return new Operator([], dimensionsOut, dimensionsIn)
     }
@@ -260,4 +275,34 @@ export default class Operator {
 
         return new Operator(entries, dimensionsOut, dimensionsIn)
     }
+
+    // a operator with only one 1 on one diagonal element, rest zeros
+    static indicator(dimensions: Dimension[], which: string[]): Operator {
+
+        if (dimensions.length !== which.length) {
+            throw `dimensions.length (${dimensions.length}) !== which.length (${which.length})`;   
+        }
+
+        const coords = _.range(dimensions.length).map((i) => {
+            const pos = dimensions[i].coordNames.indexOf(which[i])
+            if (pos < 0) {
+                throw `${which[i]} not in ${dimensions[i].coordNames}`
+            }
+            return pos
+        })
+
+        const entries = [new OperatorEntry(coords, coords, Cx(1))]
+        return new Operator(entries, dimensions, dimensions)
+    } 
+
+    // outer product for more
+    static outer(ops: Operator[]): Operator {
+        return ops.reduce((acc, x) => acc.outer(x))
+    }
+
+    // (can be optimized if needed)
+    static add(ops: Operator[]): Operator {
+        return ops.reduce((acc, x) => acc.add(x))
+    } 
+
 }

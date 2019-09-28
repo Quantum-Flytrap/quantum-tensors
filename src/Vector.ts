@@ -135,4 +135,34 @@ export default class Vector {
 
         return new Vector(cells, dimensions)
     }
+
+    // a vector with only one 1, rest zeros
+    static indicator(dimensions: Dimension[], which: string[]): Vector {
+    
+        if (dimensions.length !== which.length) {
+            throw `dimensions.length (${dimensions.length}) !== which.length (${which.length})`;   
+        }
+
+        const coords = _.range(dimensions.length).map((i) => {
+            const pos = dimensions[i].coordNames.indexOf(which[i])
+            if (pos < 0) {
+                throw `${which[i]} not in ${dimensions[i].coordNames}`
+            }
+            return pos
+        })
+
+        const cells = [new VectorEntry(coords, Cx(1))]
+        return new Vector(cells, dimensions)
+    } 
+
+    // outer product for more
+    static outer(vectors: Vector[]): Vector {
+        return vectors.reduce((acc, x) => acc.outer(x))
+    }
+
+    // add for more (can be optimized)
+    static add(vectors: Vector[]): Vector {
+        return vectors.reduce((acc, x) => acc.add(x))
+    }
+
 }
