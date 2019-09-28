@@ -116,7 +116,10 @@ export default class Operator {
         // NOTE: may be overengineered for adding 2 vectors with this map-reduce approach
 
         const m1 = this
-        // TODO: check dimensions here
+        
+        Dimension.checkDimensions(m1.dimensionsIn, m2.dimensionsIn)
+        Dimension.checkDimensions(m1.dimensionsOut, m2.dimensionsOut)
+
         const entries = _
             .chain(m1.entries.concat(m2.entries))
             .groupBy((entry: OperatorEntry) => `${entry.coordOut.toString()}-${entry.coordIn.toString()} ` )
@@ -137,7 +140,8 @@ export default class Operator {
 
     mulVec(v: Vector): Vector {
         const m: Operator = this
-        // TODO: check dimensions here
+        
+        Dimension.checkDimensions(m.dimensionsIn, v.dimensions)
 
         const vValueMap = new Map<string, Complex>()
         v.cells.forEach((entry) => {

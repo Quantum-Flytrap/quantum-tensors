@@ -73,3 +73,7 @@ const isrt2 = 1 / Math.sqrt(2)
 const spinH = Operator.fromArray([[Cx(isrt2), Cx(isrt2)], [Cx(isrt2), Cx(-isrt2)]], [Dimension.spin()], [Dimension.spin()])
 console.log(spinH.toString())
 console.log(spinH.mulVec(vector2).toString())
+
+console.log("And now a place for an error")
+const vector4 = Vector.fromArray([Cx(0, 1), Cx(0), Cx(-1, 2), Cx(0)], [Dimension.spin(), Dimension.polarization()], false)
+console.log(spinY.outer(spinX).mulVec(vector4).toString())

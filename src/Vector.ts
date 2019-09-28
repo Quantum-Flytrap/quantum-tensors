@@ -48,7 +48,9 @@ export default class Vector {
         // NOTE: may be overengineered for adding 2 vectors with this map-reduce approach
 
         const v1 = this
-        // TODO: check dimensions here
+
+        Dimension.checkDimensions(v1.dimensions, v2.dimensions)
+        
         const entries = _
             .chain(v1.cells.concat(v2.cells))
             .groupBy((entry: VectorEntry) => entry.coord.toString())
@@ -68,7 +70,9 @@ export default class Vector {
 
     dot(v2: Vector): Complex {
         const v1 = this
-        // TODO: check dimensions here
+        
+        Dimension.checkDimensions(v1.dimensions, v2.dimensions)
+
         const result = _
             .chain(v1.cells.concat(v2.cells))
             .groupBy((entry: VectorEntry) => entry.coord.toString())
