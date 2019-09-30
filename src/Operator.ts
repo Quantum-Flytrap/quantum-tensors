@@ -138,9 +138,20 @@ export default class Operator {
 
     }
 
+    mulConstant(c: Complex): Operator {
+        const entries = this.entries.map((entry) =>
+            new OperatorEntry(entry.coordOut, entry.coordIn, entry.value.mul(c))
+        )
+        return new Operator(entries, this.dimensionsOut, this.dimensionsIn)
+    }
+
+    sub(m2: Operator) {
+        return this.add(m2.mulConstant(Cx(-1)))
+    }
+
     mulVec(v: Vector): Vector {
         const m: Operator = this
-        
+
         Dimension.checkDimensions(m.dimensionsIn, v.dimensions)
 
         const vValueMap = new Map<string, Complex>()
@@ -167,6 +178,73 @@ export default class Operator {
             .value()
 
         return new Vector(entries, m.dimensionsOut)
+
+    }
+
+    mulVecPartial(coordIndices: number[], v: Vector) {
+        // for now, the inside part is much from mulVec
+        
+        const m = this
+
+        // we can relax the sorted considtion later
+        // it will involve some transposes
+        // or maybe we can relax the sorted condition?
+        if (!_.chain(coordIndices).sortBy().sortedUniq().isEqual(coordIndices)) {
+            throw `Entries of coordIndices ${coordIndices} are not sorted unique.`
+        }
+
+        Dimension.checkDimensions(m.dimensionsIn, _.at(v.dimensions, coordIndices))
+
+        const complementIndices = _
+            .range(v.dimensions.length) 
+            .filter((i) => _.includes(coordIndices, i))
+
+        // if m.dimensionsOut !== m.dimensionsIn
+        const newDimensions = _.cloneDeep(v.dimensions)
+        _.range(coordIndices.length)
+            .forEach((i) => newDimensions[coordIndices[i]] = m.dimensionsOut[i])
+
+        const newEntries = _
+            .chain(v.cells)
+            .groupBy((entry) => _.at(entry.coord, complementIndices))
+            .values()
+            .map((vecEntries) => {
+                const vValueMap = new Map<string, Complex>()
+                vecEntries.forEach((entry) => {
+                    const reducedCoords = _.at(entry.coord, coordIndices)
+                    vValueMap.set(reducedCoords.toString(), entry.value)
+                })
+        
+                return _
+                    .chain(m.entries)
+                    .groupBy((entry: OperatorEntry) => entry.coordOut.toString())
+                    .values()
+                    .map((opEntries: OperatorEntry[]): VectorEntry => {
+                        
+                        // we need to create a full out coord
+                        // now it is lightly haky
+                        const coordOutPart = opEntries[0].coordOut
+                        const coordOut = [...vecEntries[0].coord]
+                        _.range(coordIndices.length)
+                            .forEach((i) => coordOut[coordIndices[i]] = coordOutPart[i])
+
+                        const sum = opEntries
+                            .map((entry) => {
+                                const coordInStr = entry.coordIn.toString()
+                                const val = vValueMap.get(coordInStr) || Cx(0)
+                                return (entry.value).mul(val)
+                            })
+                            .reduce((a, b) => a.add(b))
+                        return new VectorEntry(coordOut, sum)
+                    })
+                    .filter((entry) => !entry.value.isZero())
+                    .value()
+            })
+            .flatten()
+            .value()
+
+        console.log('blah, blah')
+        return new Vector(newEntries, v.dimensions)
 
     }
 

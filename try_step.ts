@@ -11,4 +11,8 @@ console.log(propagator.toString())
 console.log("Propagated:")
 console.log(propagator.outer(Operator.identity([Dimension.polarization()])).mulVec(photon).toString())
 
-// NOTE: dim checking is crucial
+console.log("Propagated with partial:")
+const propagated = propagator.mulVecPartial([0, 1, 2], photon)
+console.log(propagated.toString())
+
+// check cells while creating
