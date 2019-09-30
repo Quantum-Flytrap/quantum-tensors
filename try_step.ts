@@ -1,18 +1,22 @@
-import {createPhoton, propagatePhotonOp} from "./src/Step"
+import Photons from "./src/Step"
 import Operator from "./src/Operator"
 import Dimension from "./src/Dimension"
 
-const photon = createPhoton(3, 3, 0, 2, '>', 'V')
-console.log(photon.toString())
+const sizeX = 3
+const sizeY = 5
+const state = new Photons(sizeX, sizeY)
 
-const propagator = propagatePhotonOp(3, 3)
-console.log(propagator.toString())
+state.addPhotonIndicator(0, 2, '>', 'V')
+console.log(state.vector.toString())
 
 console.log("Propagated:")
-console.log(propagator.outer(Operator.identity([Dimension.polarization()])).mulVec(photon).toString())
+state.propagatePhotons()
+console.log(state.vector.toString())
 
-console.log("Propagated with partial:")
-const propagated = propagator.mulVecPartial([0, 1, 2], photon)
-console.log(propagated.toString())
+console.log("Add:")
+state.addPhotonIndicator(sizeX - 1, sizeY - 1, '^', 'H')
+console.log(state.vector.toString())
 
-// check cells while creating
+console.log("Propagated 2:")
+state.propagatePhotons()
+console.log(state.vector.toString())

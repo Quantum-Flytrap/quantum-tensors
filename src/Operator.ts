@@ -243,7 +243,6 @@ export default class Operator {
             .flatten()
             .value()
 
-        console.log('blah, blah')
         return new Vector(newEntries, v.dimensions)
 
     }

@@ -50,7 +50,7 @@ export default class Vector {
         const v1 = this
 
         Dimension.checkDimensions(v1.dimensions, v2.dimensions)
-        
+
         const entries = _
             .chain(v1.cells.concat(v2.cells))
             .groupBy((entry: VectorEntry) => entry.coord.toString())
@@ -66,6 +66,17 @@ export default class Vector {
 
         return new Vector(entries, v1.dimensions)
 
+    }
+
+    mulConstant(c: Complex): Vector {
+        const entries = this.cells.map((entry) =>
+            new VectorEntry(entry.coord, entry.value.mul(c))
+        )
+        return new Vector(entries, this.dimensions)
+    }
+
+    sub(v2: Vector) {
+        return this.add(v2.mulConstant(Cx(-1)))
     }
 
     dot(v2: Vector): Complex {
