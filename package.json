@@ -10,15 +10,20 @@
     "@types/jest": "^21.1.10",
     "jest": "^24.0.0",
     "ts-jest": "^24.0.2",
-    "tslint": "^5.8.0"
+    "tslint": "^5.8.0",
+    "typescript": "^3.6.3"
   },
   "scripts": {
     "start": "tsc --outDir ./build && node ./build/main.js",
+    "try-simple": "tsc --outDir ./build && node ./build/simple.js",
     "try-tensor": "tsc --outDir ./build && node ./build/tensor.js",
     "try-step": "tsc --outDir ./build && node ./build/try_step.js",
     "build": "tsc --pretty --outDir ./build",
     "test": "tsc --noEmit -p . && jest --no-cache"
   },
+  "files": [
+    "build/**/*"
+  ],
   "dependencies": {
     "@types/lodash": "^4.14.138",
     "@types/mathjs": "^5.0.1",
