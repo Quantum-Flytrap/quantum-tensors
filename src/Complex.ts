@@ -2,14 +2,31 @@
 
 const TAU = 2 * Math.PI
 
+/**
+ * Syntactic sugar for `new Complex(re, im)`
+ *
+ * @param re - The first input number
+ * @param im - The second input number
+ * @returns Creates a complex number `z = z.re + i * z.im `
+ */
 export function Cx(re: number, im: number = 0): Complex {
     return new Complex(re, im)
 }
 
+/**
+ * A complex number class
+ */
 export default class Complex {
     re : number
     im : number
 
+    /**
+     * Creates a complex number
+     *
+     * @param re - The first input number
+     * @param im - The second input number
+     * @returns Creates a complex number `z = z.re + i z.im `
+     */
     constructor(re : number, im: number = 0) {
         this.re = re
         this.im = im
