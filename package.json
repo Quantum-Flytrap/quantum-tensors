@@ -2,7 +2,7 @@
   "name": "quantum-tensors",
   "version": "0.0.2",
   "description": "Tensors for quantum information and quantum optics.",
-  "main": "main.ts",
+  "main": "build/main.js",
   "repository": "https://github.com/stared/quantum-tensors",
   "author": "Piotr Migdal",
   "license": "MIT",
@@ -19,7 +19,9 @@
     "try-tensor": "tsc --outDir ./build && node ./build/tensor.js",
     "try-step": "tsc --outDir ./build && node ./build/try_step.js",
     "build": "tsc --pretty --outDir ./build",
-    "test": "tsc --noEmit -p . && jest --no-cache"
+    "test": "tsc --noEmit -p . && jest --no-cache",
+    "docs": "typedoc --out docs src",
+    "build-defs": "tsc --declaration --outDir . --emitDeclarationOnly"
   },
   "files": [
     "build/**/*"
