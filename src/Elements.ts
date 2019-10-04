@@ -33,6 +33,14 @@ export function sugarSolution(rot: number) {
     ])
 }
 
+export function amplitudeIntensity(r: number, rot: number) {
+    return Operator
+        .outer([
+            idDir,
+            idPol
+        ])
+        .mulConstant(Complex.fromPolar(r, TAU * rot))
+}
 
 
 

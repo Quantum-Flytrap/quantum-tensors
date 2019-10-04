@@ -125,5 +125,8 @@ export default class Complex {
         return `${this.r.toFixed(precision)} exp(${rot.toFixed(precision)}τi)`
     }
 
+    static fromPolar(r: number, phi: number): Complex {
+        return new Complex(r * Math.cos(phi), r * Math.sin(phi))
+    }
 
 }
