@@ -21,7 +21,8 @@
     "build": "tsc --pretty --outDir ./build",
     "test": "tsc --noEmit -p . && jest --no-cache",
     "docs": "typedoc --out docs src",
-    "build-defs": "tsc --declaration --outDir . --emitDeclarationOnly"
+    "build-defs": "tsc --declaration --outDir . --emitDeclarationOnly",
+    "postinstall": "tsc --outDir ./build"
   },
   "files": [
     "build/**/*"
