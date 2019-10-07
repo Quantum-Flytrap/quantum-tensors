@@ -2,13 +2,13 @@
 // loop of
 // - make it pass through U
 // - propagate
-// - note detection ptobabilities
+// - note detection probabilities
 
 import _ from 'lodash'
 import Vector from "./Vector"
 import Operator from "./Operator"
 import Dimension from "./Dimension"
-import Complex, { Cx } from './Complex'
+import { Cx } from './Complex'
 
 
 export default class Photons {
