@@ -1,4 +1,4 @@
-import Photons from "./src/Step"
+import Photons from "./src/Photons"
 import Operator from "./src/Operator"
 import Dimension from "./src/Dimension"
 
