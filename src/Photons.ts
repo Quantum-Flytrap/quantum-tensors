@@ -9,6 +9,7 @@ import Vector from "./Vector"
 import Operator from "./Operator"
 import Dimension from "./Dimension"
 import { Cx } from './Complex'
+import { Complex } from '../main'
 
 
 export default class Photons {
@@ -107,6 +108,33 @@ export default class Photons {
         _.range(this.nPhotons).forEach((i) => {
             this.vector = singlePhotonInteraction.mulVecPartial([4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3], this.vector)
         })
+    }
+
+    /**
+     * List of [x, y, dir, H amplitude, V amplitude]
+     * Right now kind od dirty, but should work 
+     */
+    aggregatePolarization(): [number, number, number, Complex, Complex][] {
+        if (this.nPhotons !== 1) {
+            throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
+        }
+        const aggregated = _
+            .chain(this.vector.cells)
+            .groupBy((entry) => _.at(entry.coord, [0, 1, 2]))
+            .values()
+            .map((entries) => {
+                const first = entries[0]
+                const [x, y, dir, _pol] = first.coord
+                const result: [number, number, number, Complex, Complex] = [x, y, dir, Cx(0), Cx(0)]
+                entries.forEach((entry) => {
+                    result[3 + entry.coord[3]] = entry.value
+                })
+                return result
+            })
+            .value()
+
+        return aggregated
+        
     }
 
 }
