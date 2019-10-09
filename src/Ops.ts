@@ -1,10 +1,8 @@
 import _ from 'lodash'
 import Complex, { Cx } from './Complex'
-import Vector from "./Vector"
 import Operator from "./Operator"
 import Dimension from "./Dimension"
 import {TAU} from "./Constants"
-import {OperatorEntry} from "./Entry"
 
 const dimPol = Dimension.polarization()
 const dimDir = Dimension.direction()
@@ -15,7 +13,7 @@ const cos = (alpha: number) => Cx(Math.cos(alpha), 0)
 const sin = (alpha: number) => Cx(Math.sin(alpha), 0)
 
 // not as fast as this one: https://en.wikipedia.org/wiki/Fast_inverse_square_root
-const isqrt2 = Cx(Math.SQRT1_2) 
+export const isqrt2 = Cx(Math.SQRT1_2) 
 
 // TODO: 
 // - How to make sure dimensions are OK?

@@ -1,7 +1,8 @@
-import * as ops from './Ops'
-import Operator from "./Operator"
+import Complex, {Cx} from "./Complex"
 import Dimension from "./Dimension"
+import Operator from "./Operator"
 import {TAU} from "./Constants"
+import * as ops from './Ops'
 
 const dimPol = Dimension.polarization()
 const dimDir = Dimension.direction()
@@ -27,5 +28,84 @@ export function glassSlab() {
     return ops.amplitudeIntensity(0, +0.25)
 }
 
+/**
+ * 0: -, 1: /, 2: |, 3: \ 
+*/ 
+export function mirror(rotState: number) {
+    const reflections: [string, string, Complex][][] = [
+        [   // 0: -
+            ['v', '^', Cx(1)],
+            ['^', 'V', Cx(1)],
+        ],
+        [   // 1: /
+            ['^', '>', Cx(1)],
+            ['>', '^', Cx(1)],
+            ['v', '<', Cx(1)],
+            ['<', 'v', Cx(1)],
+        ],
+        [   // 2: |
+            ['<', '>', Cx(1)],
+            ['>', '<', Cx(1)],
+        ],
+        [   // 3: \
+            ['v', '>', Cx(1)],
+            ['>', 'v', Cx(1)],
+            ['^', '<', Cx(1)],
+            ['<', '^', Cx(1)],
+        ]
+    ]
 
+    return Operator.outer([
+        Operator.fromSparseCoordNames(reflections[rotState], [dimDir]),
+        ops.reflectPhaseFromDenser()
+    ])
+}
 
+export function beamSplitter(rotState: number) {
+    const reflections: [string, string, Complex][][] = [
+        [   // 0: -
+            ['v', '^', Cx(1)],
+            ['^', 'V', Cx(1)],
+        ],
+        [   // 1: /
+            ['^', '>', Cx(1)],
+            ['>', '^', Cx(1)],
+            ['v', '<', Cx(1)],
+            ['<', 'v', Cx(1)],
+        ],
+        [   // 2: |
+            ['<', '>', Cx(1)],
+            ['>', '<', Cx(1)],
+        ],
+        [   // 3: \
+            ['v', '>', Cx(1)],
+            ['>', 'v', Cx(1)],
+            ['^', '<', Cx(1)],
+            ['<', '^', Cx(1)],
+        ]
+    ]
+
+    const passageDir = [
+        Operator.fromSparseCoordNames([
+            ['^', '^', Cx(1)],
+            ['v', 'v', Cx(1)],
+        ], [dimDir]),
+        Operator.identity([dimDir]),
+        Operator.fromSparseCoordNames([
+            ['>', '>', Cx(1)],
+            ['<', '<', Cx(1)],
+        ], [dimDir]),
+        Operator.identity([dimDir]),
+    ]
+
+    return Operator
+        .outer([
+            Operator.fromSparseCoordNames(reflections[rotState], [Dimension.direction()]),
+            ops.reflectPhaseFromDenser()
+        ])
+        .mulConstant(Cx(0, 1))  // TODO: check phase here
+        .add(passageDir[rotState].outer(idPol))
+        .mulConstant(ops.isqrt2)
+}
+
+// TODO: add projection in opts, on a subspace?
