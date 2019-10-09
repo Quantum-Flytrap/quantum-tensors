@@ -152,20 +152,8 @@ export default class Vector {
     }
 
     // a vector with only one 1, rest zeros
-    static indicator(dimensions: Dimension[], which: string[]): Vector {
-    
-        if (dimensions.length !== which.length) {
-            throw `dimensions.length (${dimensions.length}) !== which.length (${which.length})`;   
-        }
-
-        const coords = _.range(dimensions.length).map((i) => {
-            const pos = dimensions[i].coordNames.indexOf(which[i])
-            if (pos < 0) {
-                throw `${which[i]} not in ${dimensions[i].coordNames}`
-            }
-            return pos
-        })
-
+    static indicator(dimensions: Dimension[], coordNames: string[]): Vector {
+        const coords = Dimension.stringToCoordIndices(coordNames, dimensions)
         const cells = [new VectorEntry(coords, Cx(1))]
         return new Vector(cells, dimensions)
     } 

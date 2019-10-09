@@ -358,20 +358,9 @@ export default class Operator {
     }
 
     // a operator with only one 1 on one diagonal element, rest zeros
-    static indicator(dimensions: Dimension[], which: string[]): Operator {
+    static indicator(dimensions: Dimension[], coordNames: string | string[]): Operator {
 
-        if (dimensions.length !== which.length) {
-            throw `dimensions.length (${dimensions.length}) !== which.length (${which.length})`;   
-        }
-
-        const coords = _.range(dimensions.length).map((i) => {
-            const pos = dimensions[i].coordNames.indexOf(which[i])
-            if (pos < 0) {
-                throw `${which[i]} not in ${dimensions[i].coordNames}`
-            }
-            return pos
-        })
-
+        const coords = Dimension.stringToCoordIndices(coordNames, dimensions)
         const entries = [new OperatorEntry(coords, coords, Cx(1))]
         return new Operator(entries, dimensions, dimensions)
     } 

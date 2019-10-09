@@ -42,6 +42,15 @@ export default class Dimension {
         return dim1.name === dim2.name && dim1.size === dim2.size && _.isEqual(dim1.coordNames, dim2.coordNames)
     }
 
+    coordNameToIndex(coordName: string): number {
+        const idx = this.coordNames.indexOf(coordName)
+        if (idx < 0) {
+            throw `${coordName} not in ${this.coordNames}`
+        } else {
+            return idx
+        }
+    }
+
     static checkDimensions(dims1: Dimension[], dims2: Dimension[]): void {
         if (dims1.length !== dims2.length) {
             throw `Dimensions with unequal number of components ${dims1.length} !== ${dims2.length}.\n
@@ -59,4 +68,14 @@ export default class Dimension {
         
     }
     
+    // Also string[]?
+    static stringToCoordIndices(s: string | string[], dimensions: Dimension[]): number[] {
+        if (dimensions.length !== s.length) {
+            throw `dimensions.length (${dimensions.length}) !== string.length (${s.length})`;   
+        }
+        return _.range(dimensions.length).map((i) =>
+            dimensions[i].coordNameToIndex(s[i])
+        )
+    }
+
 }
