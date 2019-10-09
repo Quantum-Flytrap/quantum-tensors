@@ -19,7 +19,7 @@ console.log(state.aggregatePolarization())
 console.log("Apply:")
 const operations: [number, number, Operator][] = [
     [1, 2, el.sugarSolution(0.125)],
-    [2, 2, el.amplitudeIntensity(0.5, 0)]
+    [2, 2, el.attenuator()]
 ]
 console.log(state.actOnSinglePhotons(operations))
 
