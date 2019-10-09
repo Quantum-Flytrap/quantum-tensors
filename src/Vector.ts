@@ -158,6 +158,13 @@ export default class Vector {
         return new Vector(cells, dimensions)
     } 
 
+    static fromSparseCoordNames(stringedEntries: [string, Complex][], dimensions: Dimension[]): Vector {
+        const entries = stringedEntries.map(([coordNameStr, value]) =>
+            new VectorEntry(Dimension.stringToCoordIndices(coordNameStr, dimensions), value)
+        )
+        return new Vector(entries, dimensions)
+    } 
+
     // outer product for more
     static outer(vectors: Vector[]): Vector {
         return vectors.reduce((acc, x) => acc.outer(x))

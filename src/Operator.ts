@@ -365,6 +365,17 @@ export default class Operator {
         return new Operator(entries, dimensions, dimensions)
     } 
 
+    static fromSparseCoordNames(stringedEntries: [string, string, Complex][], dimensionsOut: Dimension[], dimensionsIn: Dimension[]): Operator {
+        const entries = stringedEntries.map(([coordNameStrOut, coordNameStrIn, value]) =>
+            new OperatorEntry(
+                Dimension.stringToCoordIndices(coordNameStrOut, dimensionsOut),
+                Dimension.stringToCoordIndices(coordNameStrIn, dimensionsIn),
+                value
+            )
+        )
+        return new Operator(entries, dimensionsOut, dimensionsIn)
+    } 
+
     // outer product for more
     static outer(ops: Operator[]): Operator {
         return ops.reduce((acc, x) => acc.outer(x))

@@ -17,6 +17,14 @@ const vector2 = Vector.fromArray([Cx(0, 0.5), Cx(1)], [dim2], false)
 console.log(vector1.toString())
 console.log(vector2.toString())
 
+console.log("Vector from sparse names")
+const vecFromSparse = Vector.fromSparseCoordNames([
+    ['uH', Cx(0, 2)],
+    ['dH', Cx(-1, -1)],
+    ['dV', Cx(0.5, 2.5)]
+], [Dimension.spin(), Dimension.polarization()])
+console.log(vecFromSparse.toString())
+
 // Outer product
 const outerVec = vector1.outer(vector2)
 console.log(outerVec.toString("cartesian", 2, "\n"))
@@ -55,13 +63,23 @@ console.log(idPol.outer(idDir).toString())
 console.log(idDir.outer(idPol).toString())
 
 console.log("From array")
-
 const spinY = Operator.fromArray([[Cx(0), Cx(0, -1)], [Cx(0, 1), Cx(0)]], [Dimension.spin()], [Dimension.spin()])
 console.log(spinY.toString())
 const spinX = Operator.fromArray([[Cx(0), Cx(1)], [Cx(1), Cx(0)]], [Dimension.spin()], [Dimension.spin()])
 console.log(spinX.toString())
-console.log("Tensor of above ")
+
+console.log("From sparse names")
+const opFromSparse = Operator.fromSparseCoordNames([
+    ['uH', 'uH', Cx(0, 2)],
+    ['dH', 'uV', Cx(-1, -1)],
+    ['dV', 'dH', Cx(0.5, 2.5)]
+], [Dimension.spin(), Dimension.polarization()], [Dimension.spin(), Dimension.polarization()])
+console.log(opFromSparse.toString())
+
+console.log("Tensor spinY and spinX")
 console.log(spinY.outer(spinX).toString())
+
+
 
 console.log("Op vec mul")
 console.log(vector2.toString())
