@@ -18,7 +18,7 @@ export default class Operator {
     dimensionsIn: Dimension[]
 
     // TODO: assume the entries are ordered
-    constructor(entries: OperatorEntry[], dimensionsOut: Dimension[], dimensionsIn: Dimension[]) {
+    constructor(entries: OperatorEntry[], dimensionsOut: Dimension[], dimensionsIn: Dimension[] = dimensionsOut) {
         this.entries = entries
         this.dimensionsOut = dimensionsOut
         this.dimensionsIn = dimensionsIn
@@ -310,12 +310,12 @@ export default class Operator {
         return new Operator(entries, [dimension], [dimension])
     }
 
-    static zeros(dimensionsOut: Dimension[], dimensionsIn: Dimension[]) {
+    static zeros(dimensionsOut: Dimension[], dimensionsIn: Dimension[] = dimensionsOut) {
         return new Operator([], dimensionsOut, dimensionsIn)
     }
 
     // Loading from dense array list of cells
-    static fromArray(denseArray: Complex[][], dimensionsOut: Dimension[], dimensionsIn: Dimension[], removeZeros: boolean = true): Operator {
+    static fromArray(denseArray: Complex[][], dimensionsOut: Dimension[], dimensionsIn: Dimension[] = dimensionsOut, removeZeros: boolean = true): Operator {
 
         // Get size vector from dimensions
         const sizesOut = dimensionsOut.map((dimension) => dimension.size)
@@ -365,7 +365,7 @@ export default class Operator {
         return new Operator(entries, dimensions, dimensions)
     } 
 
-    static fromSparseCoordNames(stringedEntries: [string, string, Complex][], dimensionsOut: Dimension[], dimensionsIn: Dimension[]): Operator {
+    static fromSparseCoordNames(stringedEntries: [string, string, Complex][], dimensionsOut: Dimension[], dimensionsIn: Dimension[] = dimensionsOut): Operator {
         const entries = stringedEntries.map(([coordNameStrOut, coordNameStrIn, value]) =>
             new OperatorEntry(
                 Dimension.stringToCoordIndices(coordNameStrOut, dimensionsOut),
