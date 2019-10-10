@@ -61,16 +61,17 @@ export default class Photons {
 
     }
 
-    createPhotonPropagator() {
+    createPhotonPropagator(yDirMeansUp = false) {
         const dir =  Dimension.direction()
         const dimX = this.dimX
         const dimY = this.dimY
+        const s = yDirMeansUp ? 1 : -1
     
         return Operator.add([
             Operator.outer([Operator.shift(dimX, +1), Operator.identity([dimY]), Operator.indicator([dir], ['>'])]),
             Operator.outer([Operator.shift(dimX, -1), Operator.identity([dimY]), Operator.indicator([dir], ['<'])]),
-            Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, +1), Operator.indicator([dir], ['v'])]),
-            Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, -1), Operator.indicator([dir], ['^'])]),
+            Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, +s), Operator.indicator([dir], ['v'])]),
+            Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, -s), Operator.indicator([dir], ['^'])]),
         ])
     }
 
