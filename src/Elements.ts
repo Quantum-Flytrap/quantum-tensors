@@ -35,7 +35,7 @@ export function mirror(rotState: number) {
     const reflections: [string, string, Complex][][] = [
         [   // 0: -
             ['v', '^', Cx(1)],
-            ['^', 'V', Cx(1)],
+            ['^', 'v', Cx(1)],
         ],
         [   // 1: /
             ['^', '>', Cx(1)],
@@ -65,7 +65,7 @@ export function beamSplitter(rotState: number) {
     const reflections: [string, string, Complex][][] = [
         [   // 0: -
             ['v', '^', Cx(1)],
-            ['^', 'V', Cx(1)],
+            ['^', 'v', Cx(1)],
         ],
         [   // 1: /
             ['^', '>', Cx(1)],

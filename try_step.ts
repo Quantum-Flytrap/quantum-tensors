@@ -18,7 +18,8 @@ console.log(state.vector.toString())
 
 console.log("Apply:")
 const operations: [number, number, Operator][] = [
-    [1, 2, el.sugarSolution(0.125)],
+    [3, 2, el.sugarSolution(0.125)],
+    [1, 2, el.mirror(3)],
     [2, 3, el.attenuator()]
 ]
 state.actOnSinglePhotons(operations)
