@@ -74,10 +74,16 @@ export default class Photons {
         ])
     }
 
+    // UGLY AS FCK BUT, HAD SOME ERRORS
     propagatePhotons() {
+        if (this.nPhotons !== 1) {
+            /// SEE COMMENT ABOVE
+            throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
+        }
         const photonPropagator = this.createPhotonPropagator()
         _.range(this.nPhotons).forEach((i) => {
-            this.vector = photonPropagator.mulVecPartial([4 * i, 4 * i + 1, 4 * i + 2], this.vector)
+            //this.vector = photonPropagator.mulVecPartial([4 * i, 4 * i + 1, 4 * i + 2], this.vector)
+            this.vector = photonPropagator.outer(Operator.identity([Dimension.polarization()])).mulVec(this.vector)
         })
     }
 
