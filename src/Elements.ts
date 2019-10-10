@@ -90,22 +90,35 @@ export function beamSplitter(rotState: number) {
             ['^', '^', Cx(1)],
             ['v', 'v', Cx(1)],
         ], [dimDir]),
-        Operator.identity([dimDir]),
+        idDir,
         Operator.fromSparseCoordNames([
             ['>', '>', Cx(1)],
             ['<', '<', Cx(1)],
         ], [dimDir]),
-        Operator.identity([dimDir]),
+        idDir
     ]
 
     return Operator
         .outer([
-            Operator.fromSparseCoordNames(reflections[rotState], [Dimension.direction()]),
+            Operator.fromSparseCoordNames(reflections[rotState], [dimDir]),
             ops.reflectPhaseFromDenser()
         ])
         .mulConstant(Cx(0, 1))  // TODO: check phase here
         .add(passageDir[rotState].outer(idPol))
         .mulConstant(ops.isqrt2)
+}
+
+export function cornerCube() {
+    return Operator
+        .outer([
+            Operator.fromSparseCoordNames([
+                ['<', '>', Cx(1)],
+                ['v', '^', Cx(1)],
+                ['>', '<', Cx(1)],
+                ['^', 'v', Cx(1)],
+            ], [dimDir]),
+            idPol
+        ])
 }
 
 // TODO: add projection in opts, on a subspace?
