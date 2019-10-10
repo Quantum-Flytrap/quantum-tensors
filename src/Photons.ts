@@ -111,8 +111,9 @@ export default class Photons {
     }
 
     /**
-     * List of [x, y, dir, H amplitude, V amplitude]
      * Right now kind od dirty, but should work 
+     * Angles 0-360, starting from --> and moving counterclockwise
+     * |psi> = (are + i aim) |H> + (bre + i bim) |V>
      */
     aggregatePolarization(): {x: number, y: number, direction: number, are: number, aim: number, bre: number, bim: number}[] {
         if (this.nPhotons !== 1) {
@@ -143,6 +144,34 @@ export default class Photons {
 
         return aggregated
         
+    }
+
+    totalIntensityPerTile(): {x: number, y: number, probability: number}[] {
+        if (this.nPhotons !== 1) {
+            throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
+        }
+     
+        const aggregated = _
+            .chain(this.vector.cells)
+            .groupBy((entry) => _.at(entry.coord, [0, 1]))
+            .values()
+            .map((entries) => {
+                const first = entries[0]
+                const [x, y, _dir, _pol] = first.coord
+                const probability = entries
+                    .map((entry) => entry.value.abs2())
+                    .reduce((a, b) => a + b)
+
+                return {
+                    'x': x,
+                    'y': y,
+                    'probability': probability
+                }
+            })
+            .value()
+
+        return aggregated
+
     }
 
 }
