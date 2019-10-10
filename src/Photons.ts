@@ -114,7 +114,7 @@ export default class Photons {
      * List of [x, y, dir, H amplitude, V amplitude]
      * Right now kind od dirty, but should work 
      */
-    aggregatePolarization(): [number, number, number, Complex, Complex][] {
+    aggregatePolarization(): {x: number, y: number, direction: number, are: number, aim: number, bre: number, bim: number}[] {
         if (this.nPhotons !== 1) {
             throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
         }
@@ -125,11 +125,19 @@ export default class Photons {
             .map((entries) => {
                 const first = entries[0]
                 const [x, y, dir, _pol] = first.coord
-                const result: [number, number, number, Complex, Complex] = [x, y, dir, Cx(0), Cx(0)]
+                const amplitudes: [Complex, Complex] = [Cx(0), Cx(0)]
                 entries.forEach((entry) => {
-                    result[3 + entry.coord[3]] = entry.value
+                    amplitudes[entry.coord[3]] = entry.value
                 })
-                return result
+                return {
+                    'x': x,
+                    'y': y,
+                    'direction': 90 * dir,
+                    'are': amplitudes[0].re,
+                    'aim': amplitudes[0].im,
+                    'bre': amplitudes[1].re,
+                    'bim': amplitudes[1].im,
+                }
             })
             .value()
 
