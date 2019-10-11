@@ -61,11 +61,11 @@ export default class Photons {
 
     }
 
-    createPhotonPropagator(yDirMeansUp = true) {
+    createPhotonPropagator(yDirMeansDown = true) {
         const dir =  Dimension.direction()
         const dimX = this.dimX
         const dimY = this.dimY
-        const s = yDirMeansUp ? 1 : -1
+        const s = yDirMeansDown ? 1 : -1
     
         return Operator.add([
             Operator.outer([Operator.shift(dimX, +1), Operator.identity([dimY]), Operator.indicator([dir], ['>'])]),
@@ -76,12 +76,12 @@ export default class Photons {
     }
 
     // UGLY AS FCK BUT, HAD SOME ERRORS
-    propagatePhotons(yDirMeansUp = true) {
+    propagatePhotons(yDirMeansDown = true) {
         if (this.nPhotons !== 1) {
             /// SEE COMMENT ABOVE
             throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
         }
-        const photonPropagator = this.createPhotonPropagator(yDirMeansUp)
+        const photonPropagator = this.createPhotonPropagator(yDirMeansDown)
         _.range(this.nPhotons).forEach((i) => {
             //this.vector = photonPropagator.mulVecPartial([4 * i, 4 * i + 1, 4 * i + 2], this.vector)
             this.vector = photonPropagator.outer(Operator.identity([Dimension.polarization()])).mulVec(this.vector)
