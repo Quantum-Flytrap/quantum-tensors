@@ -118,7 +118,7 @@ export default class Vector {
     // TODO: Dense matrix visualisation
     toString(complexFormat = "cartesian", precision = 2, separator = " + "): string {
 
-        const introStr = `Vector of max size [${this.size}] with dimensions [${this.names}]`
+        const introStr = `Vector with ${this.cells.length} entries of max size [${this.size}] with dimensions [${this.names}]`
         let valueStr = this.cells
             .map((cell) => {
                 const coordStr = (cell.coord).map((i: number, dim: number) => this.coordNames[dim][i])
