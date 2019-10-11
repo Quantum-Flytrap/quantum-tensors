@@ -1,6 +1,6 @@
-import Photons from "./src/Photons"
-import Operator from "./src/Operator"
-import * as el from "./src/Elements"
+import Photons from "../src/Photons"
+import Operator from "../src/Operator"
+import * as el from "../src/Elements"
 
 const sizeX = 7
 const sizeY = 5

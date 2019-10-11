@@ -1,7 +1,7 @@
-import { Cx } from "./src/Complex"
-import Dimension from "./src/Dimension"
-import Vector from "./src/Vector"
-import Operator from "./src/Operator"
+import { Cx } from "../src/Complex"
+import Dimension from "../src/Dimension"
+import Vector from "../src/Vector"
+import Operator from "../src/Operator"
 
 const complex1 = Cx(1)
 const complex2 = Cx(0)

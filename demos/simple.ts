@@ -1,8 +1,8 @@
 import _ from 'lodash'
-import Complex from "./src/Complex"
-import { VectorEntry } from "./src/Entry"
-import Vector from "./src/Vector"
-import Dimension from "./src/Dimension"
+import Complex from "../src/Complex"
+import { VectorEntry } from "../src/Entry"
+import Vector from "../src/Vector"
+import Dimension from "../src/Dimension"
 
 const complex1 = new Complex(3, -1)
 const complex2 = new Complex(2, 0)
