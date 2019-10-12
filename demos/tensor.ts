@@ -3,11 +3,10 @@ import Dimension from "../src/Dimension"
 import Vector from "../src/Vector"
 import Operator from "../src/Operator"
 
-const complex1 = Cx(1)
-const complex2 = Cx(0)
-const complex3 = Cx(2, 1)
-const complex4 = Cx(1)
-
+// const complex1 = Cx(1)
+// const complex2 = Cx(0)
+// const complex3 = Cx(2, 1)
+// const complex4 = Cx(1)
 
 // const vectorComplex = [new Complex(1, 0), new Complex(0, 0), new Complex(2, 1), new Complex(0, -1)]
 const dim1 = Dimension.direction()
@@ -18,11 +17,10 @@ console.log(vector1.toString())
 console.log(vector2.toString())
 
 console.log("Vector from sparse names")
-const vecFromSparse = Vector.fromSparseCoordNames([
-    ['uH', Cx(0, 2)],
-    ['dH', Cx(-1, -1)],
-    ['dV', Cx(0.5, 2.5)]
-], [Dimension.spin(), Dimension.polarization()])
+const vecFromSparse = Vector.fromSparseCoordNames(
+  [["uH", Cx(0, 2)], ["dH", Cx(-1, -1)], ["dV", Cx(0.5, 2.5)]],
+  [Dimension.spin(), Dimension.polarization()],
+)
 console.log(vecFromSparse.toString())
 
 // Outer product
@@ -30,7 +28,6 @@ const outerVec = vector1.outer(vector2)
 console.log(outerVec.toString("cartesian", 2, "\n"))
 console.log(outerVec.toString("polar", 2, "\n"))
 console.log(outerVec.toString("polarTau", 2, "\n"))
-
 
 // Add
 console.log("Add")
@@ -50,13 +47,13 @@ console.log(vector1.conj().toString())
 console.log("Operators")
 
 console.log("Identity")
-const idPolDir = Operator.identity([Dimension.polarization(), Dimension.direction()]) 
+const idPolDir = Operator.identity([Dimension.polarization(), Dimension.direction()])
 console.log(idPolDir.toString())
 
 console.log("Pieces and a tensor product")
-const idPol = Operator.identity([Dimension.polarization()]) 
+const idPol = Operator.identity([Dimension.polarization()])
 console.log(idPol.toString())
-const idDir = Operator.identity([Dimension.spin()]) 
+const idDir = Operator.identity([Dimension.spin()])
 console.log(idDir.toString())
 
 console.log(idPol.outer(idDir).toString())
@@ -69,17 +66,14 @@ const spinX = Operator.fromArray([[Cx(0), Cx(1)], [Cx(1), Cx(0)]], [Dimension.sp
 console.log(spinX.toString())
 
 console.log("From sparse names")
-const opFromSparse = Operator.fromSparseCoordNames([
-    ['uH', 'uH', Cx(0, 2)],
-    ['dH', 'uV', Cx(-1, -1)],
-    ['dV', 'dH', Cx(0.5, 2.5)]
-], [Dimension.spin(), Dimension.polarization()])
+const opFromSparse = Operator.fromSparseCoordNames(
+  [["uH", "uH", Cx(0, 2)], ["dH", "uV", Cx(-1, -1)], ["dV", "dH", Cx(0.5, 2.5)]],
+  [Dimension.spin(), Dimension.polarization()],
+)
 console.log(opFromSparse.toString())
 
 console.log("Tensor spinY and spinX")
 console.log(spinY.outer(spinX).toString())
-
-
 
 console.log("Op vec mul")
 console.log(vector2.toString())
@@ -93,5 +87,14 @@ console.log(spinH.toString())
 console.log(spinH.mulVec(vector2).toString())
 
 console.log("And now a place for an error")
-const vector4 = Vector.fromArray([Cx(0, 1), Cx(0), Cx(-1, 2), Cx(0)], [Dimension.spin(), Dimension.polarization()], false)
-console.log(spinY.outer(spinX).mulVec(vector4).toString())
+const vector4 = Vector.fromArray(
+  [Cx(0, 1), Cx(0), Cx(-1, 2), Cx(0)],
+  [Dimension.spin(), Dimension.polarization()],
+  false,
+)
+console.log(
+  spinY
+    .outer(spinX)
+    .mulVec(vector4)
+    .toString(),
+)
