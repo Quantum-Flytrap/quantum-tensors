@@ -1,5 +1,5 @@
-import Complex from "./Complex"
-import { VectorEntry } from "./Entry"
+import Complex from "../src/Complex"
+import { VectorEntry } from "../src/Entry"
 
 // Coordinates testing
 describe('Complex', () => {
