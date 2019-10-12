@@ -100,10 +100,15 @@ export default class Photons {
   }
 
   actOnSinglePhotons(opsWithPos: [number, number, Operator][]): void {
+    if (this.nPhotons !== 1) {
+      /// SEE COMMENT ABOVE
+      throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
+    }
     const singlePhotonInteraction = this.createSinglePhotonInteraction(opsWithPos)
-    _.range(this.nPhotons).forEach(i => {
-      this.vector = singlePhotonInteraction.mulVecPartial([4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3], this.vector)
-    })
+    this.vector = singlePhotonInteraction.mulVec(this.vector)
+    // _.range(this.nPhotons).forEach(i => {
+    //   this.vector = singlePhotonInteraction.mulVecPartial([4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3], this.vector)
+    // })
   }
 
   /**
