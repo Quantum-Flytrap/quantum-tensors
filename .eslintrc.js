@@ -11,7 +11,17 @@ module.exports = {
   rules: {
     "prettier/prettier": "error",
     // "no-this-alias": false,
-    "@typescript-eslint/no-this-alias": "off"
+    "@typescript-eslint/no-this-alias": "off",
+    '@typescript-eslint/member-delimiter-style': ['off', { // Prevents us from using any delimiter for interface properties.
+      'multiline': {
+        'delimiter': 'comma',
+        'requireLast': false
+      },
+      'singleline': {
+        'delimiter': 'comma',
+        'requireLast': false
+      }
+    }],
   },
   root: true
 };

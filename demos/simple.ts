@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _ from "lodash"
 import Complex from "../src/Complex"
 import { VectorEntry } from "../src/Entry"
 import Vector from "../src/Vector"
@@ -28,11 +28,10 @@ console.log(complex3.toStringPolarTau())
 console.log(complex4.toStringPolarTau())
 
 console.log("\nTesting converting idx to coord; we accidentally got little endian")
-_.range(2 * 4 * 3)
-    .forEach((i) => {
-        const coord = VectorEntry.fromIndexValue(i, [2, 4, 3], complex1).coord
-        console.log(`${i} => ${coord}`)
-    })
+_.range(2 * 4 * 3).forEach(i => {
+  const coord = VectorEntry.fromIndexValue(i, [2, 4, 3], complex1).coord
+  console.log(`${i} => ${coord}`)
+})
 
 console.log("\nTesting sparse cell:")
 const cell1 = new VectorEntry([2, 1, 2], complex1)
@@ -64,6 +63,7 @@ console.log(vector2.toString())
 
 console.log("\nLoading vector from dense matrix sequential list.")
 const vector3 = Vector.fromArray([complex1, complex2, complex3, complex4], [dim1, dim2])
+console.log(vector3.toString())
 
 console.log("\nTesting vector outer product:")
 const outerVector1 = vector1.outer(vector2)

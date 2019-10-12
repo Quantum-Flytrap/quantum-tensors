@@ -54,10 +54,7 @@ export default class Complex {
   //  Multiply
   mul(z2: Complex): Complex {
     const z1 = this
-    return new Complex(
-      z1.re * z2.re - z1.im * z2.im,
-      z1.re * z2.im + z1.im * z2.re
-    )
+    return new Complex(z1.re * z2.re - z1.im * z2.im, z1.re * z2.im + z1.im * z2.re)
   }
 
   // Complex conjugate
@@ -91,9 +88,7 @@ export default class Complex {
       case "polarTau":
         return this.toStringPolarTau(precision)
       default:
-        throw new Error(
-          `complexFormat '${complexFormat}' is not in ['cartesian', 'polar', 'polarTau'].`
-        )
+        throw new Error(`complexFormat '${complexFormat}' is not in ['cartesian', 'polar', 'polarTau'].`)
     }
 
     // NOTE: one below is not favoured by TypeScript
@@ -106,9 +101,7 @@ export default class Complex {
   }
 
   toStringCartesian(precision = 2): string {
-    return `(${this.re.toFixed(precision)} ${
-      this.im >= 0 ? "+" : ""
-    }${this.im.toFixed(precision)}i)`
+    return `(${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i)`
   }
 
   toStringPolar(precision = 2): string {
