@@ -1,13 +1,13 @@
 import _ from "lodash"
-import Complex from "../src/Complex"
+import { Cx } from "../src/Complex"
 import { VectorEntry } from "../src/Entry"
 import Vector from "../src/Vector"
 import Dimension from "../src/Dimension"
 
-const complex1 = new Complex(3, -1)
-const complex2 = new Complex(2, 0)
-const complex3 = new Complex(0, -1)
-const complex4 = new Complex(1, -1)
+const complex1 = Cx(3, -1)
+const complex2 = Cx(2, 0)
+const complex3 = Cx(0, -1)
+const complex4 = Cx(1, -1)
 
 console.log("Testing complex implementation:")
 console.log(complex1.toString())
@@ -16,16 +16,16 @@ console.log(complex3.toString())
 console.log(complex4.toString())
 
 console.log("Testing complex radial:")
-console.log(complex1.toStringPolar())
-console.log(complex2.toStringPolar())
-console.log(complex3.toStringPolar())
-console.log(complex4.toStringPolar())
+console.log(complex1.toString("polar"))
+console.log(complex2.toString("polar"))
+console.log(complex3.toString("polar"))
+console.log(complex4.toString("polar"))
 
 console.log("Testing complex radial with TAU:")
-console.log(complex1.toStringPolarTau())
-console.log(complex2.toStringPolarTau())
-console.log(complex3.toStringPolarTau())
-console.log(complex4.toStringPolarTau())
+console.log(complex1.toString("polarTau"))
+console.log(complex2.toString("polarTau"))
+console.log(complex3.toString("polarTau"))
+console.log(complex4.toString("polarTau"))
 
 console.log("\nTesting converting idx to coord; we accidentally got little endian")
 _.range(2 * 4 * 3).forEach(i => {

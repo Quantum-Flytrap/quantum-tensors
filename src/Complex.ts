@@ -1,9 +1,9 @@
 // COMPLEX NUMBER CLASS
-
-const TAU = 2 * Math.PI
+import { TAU } from "./Constants"
 
 /**
- * A complex number class
+ * Complex number class
+ * https://en.wikipedia.org/wiki/Complex_number
  */
 export default class Complex {
   re: number
@@ -22,100 +22,149 @@ export default class Complex {
   }
 
   /**
-   *
+   * Radius in polar coordinate
+   * @returns number
    */
   get r(): number {
     return this.abs()
   }
 
+  /**
+   * Phi angle in polar coordinate
+   * @returns angle
+   */
   get phi(): number {
     return this.arg()
   }
 
+  /**
+   * Phi angle in polar coordinate with TAU
+   * @returns angle divided by TAU
+   */
+  get phiTau(): number {
+    return this.arg() / TAU
+  }
+
+  /**
+   * Length squared: intensity probability
+   * @returns number
+   */
   abs2(): number {
     return Math.pow(this.re, 2) + Math.pow(this.im, 2)
   }
 
+  /**
+   * Absolute value (length)
+   * @returns absolute value
+   */
   abs(): number {
     return Math.sqrt(Math.pow(this.re, 2) + Math.pow(this.im, 2))
   }
 
+  /**
+   * Complex number argument in range [0,Tau]
+   * @returns number
+   */
   arg(): number {
     let arg = Math.atan2(this.im, this.re)
     if (arg < 0) {
-      arg += 2 * Math.PI
+      arg += TAU
     }
     return arg
   }
 
-  // Addition
+  /**
+   * Addition
+   * @param z2 complex number to be added
+   * @returns z = z1 + z2
+   */
   add(z2: Complex): Complex {
     const z1 = this
     return new Complex(z1.re + z2.re, z1.im + z2.im)
   }
 
-  //  Multiply
+  /**
+   * Substraction
+   * @param z2 complex number to be added
+   * @returns z = z1 - z2
+   */
+  sub(z2: Complex): Complex {
+    const z1 = this
+    return new Complex(z1.re - z2.re, z1.im - z2.im)
+  }
+
+  /**
+   * Multiplication
+   * @param z2 complex number to be multiplied
+   * @returns z = z1 * z2
+   */
   mul(z2: Complex): Complex {
     const z1 = this
     return new Complex(z1.re * z2.re - z1.im * z2.im, z1.re * z2.im + z1.im * z2.re)
   }
 
-  // Complex conjugate
+  /**
+   * Complex conjugation
+   * @returns z = z{re, -im}
+   */
   conj(): Complex {
     return new Complex(this.re, -this.im)
   }
 
-  // Normalize
+  /**
+   * Normalize
+   * https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-vectors/a/vector-magnitude-normalization
+   * @returns z
+   */
   normalize(): Complex {
-    const r = this.abs()
-    return new Complex(this.re / r, this.im / r)
+    if (this.r !== 0) {
+      return new Complex(this.re / this.r, this.im / this.r)
+    } else {
+      throw new Error("Cannot normalize a 0 length vector...")
+    }
   }
 
-  // Equality checker
+  /**
+   * Tests if a complex is equal to another
+   * @param z2 complex to test equality
+   * @returns z1 === z2
+   */
   equal(z2: Complex): boolean {
     return this.re === z2.re && this.im === z2.im
   }
 
-  // Check for zero
+  /**
+   * Check if a complex number is zero
+   * @return z1 === 0
+   */
   isZero(): boolean {
     return this.re === 0 && this.im === 0
   }
 
-  // Override toString() method
+  /**
+   * Override toString() method
+   * @param complexFormat choice between ["cartesian", "polar", "polarTau"]
+   * @param precision float display precision
+   * @returns string with appropriate format
+   */
   toString(complexFormat = "cartesian", precision = 2): string {
     switch (complexFormat) {
       case "cartesian":
-        return this.toStringCartesian(precision)
+        return `(${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i)`
       case "polar":
-        return this.toStringPolar(precision)
+        return `${this.r.toFixed(precision)} exp(${this.phi.toFixed(precision)}i)`
       case "polarTau":
-        return this.toStringPolarTau(precision)
+        return `${this.r.toFixed(precision)} exp(${this.phiTau.toFixed(precision)}τi)`
       default:
         throw new Error(`complexFormat '${complexFormat}' is not in ['cartesian', 'polar', 'polarTau'].`)
     }
-
-    // NOTE: one below is not favoured by TypeScript
-    // const mapping = {
-    //     "cartesian": this.toStringCartesian,
-    //     "radial": this.toStringPolar,
-    //     "radialTau": this.toStringPolarTau,
-    // }
-    // return mapping[complexFormat](precision)
   }
 
-  toStringCartesian(precision = 2): string {
-    return `(${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i)`
-  }
-
-  toStringPolar(precision = 2): string {
-    return `${this.r.toFixed(precision)} exp(${this.phi.toFixed(precision)}i)`
-  }
-
-  toStringPolarTau(precision = 2): string {
-    const rot = this.phi / TAU
-    return `${this.r.toFixed(precision)} exp(${rot.toFixed(precision)}τi)`
-  }
-
+  /**
+   * Create a complex number from polar coordinates
+   * @param r Radius in polar coordinates
+   * @param phi Angle in polar coordinates
+   */
   static fromPolar(r: number, phi: number): Complex {
     return new Complex(r * Math.cos(phi), r * Math.sin(phi))
   }
