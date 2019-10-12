@@ -21,6 +21,9 @@ export default class Complex {
     this.im = im
   }
 
+  /**
+   *
+   */
   get r(): number {
     return this.abs()
   }
