@@ -47,16 +47,16 @@ export default class Complex {
 
   // Addition
   add(z2: Complex): Complex {
-    // const z1 = this
-    return new Complex(this.re + z2.re, this.im + z2.im)
+    const z1 = this
+    return new Complex(z1.re + z2.re, z1.im + z2.im)
   }
 
   //  Multiply
   mul(z2: Complex): Complex {
-    // const z1 = this
+    const z1 = this
     return new Complex(
-      this.re * z2.re - this.im * z2.im,
-      this.re * z2.im + this.im * z2.re
+      z1.re * z2.re - z1.im * z2.im,
+      z1.re * z2.im + z1.im * z2.re
     )
   }
 

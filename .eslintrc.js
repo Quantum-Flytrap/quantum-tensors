@@ -9,7 +9,9 @@ module.exports = {
     "plugin:import/typescript"
   ],
   rules: {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    // "no-this-alias": false,
+    "@typescript-eslint/no-this-alias": "off"
   },
   root: true
 };
