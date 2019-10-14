@@ -50,6 +50,10 @@ At some point we may want to use one of these libraries for backend, it we disco
 
 Also, [https://github.com/stared/thinking-in-tensors-writing-in-pytorch](https://github.com/stared/thinking-in-tensors-writing-in-pytorch) by Piotr Migdał.
 
+## Contributing
+
+* Set-up ESLint with Prettier
+* Try to adhere to [Angular commit style](https://github.com/angular/angular/blob/master/CONTRIBUTING.md)
 
 ## Interesting ideas
 
