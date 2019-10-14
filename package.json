@@ -25,6 +25,8 @@
     "try-simple": "tsc --outDir ./build && node ./build/demos/simple.js",
     "try-tensor": "tsc --outDir ./build && node ./build/demos/tensor.js",
     "try-step": "tsc --outDir ./build && node ./build/demos/step.js",
+    "try-board": "tsc --outDir ./build && node ./build/demos/board.js",
+    "try-debugging": "tsc --outDir ./build && node ./build/demos/debugging.js",
     "build": "tsc --pretty --outDir ./build",
     "test": "tsc --noEmit -p . && jest --no-cache",
     "build-and-deploy-docs": "typedoc --out docs src main.ts && touch docs/.nojekyll && push-dir --dir=docs --branch=gh-pages --cleanup",
