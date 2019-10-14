@@ -31,14 +31,14 @@ export function attenuator(r = Math.SQRT1_2): Operator {
  * A vacuum jar - advances phase by lambda/4.
  */
 export function vacuumJar(): Operator {
-  return ops.amplitudeIntensity(0, -0.25)
+  return ops.amplitudeIntensity(1, -0.25)
 }
 
 /**
  * A glass slab - delays phase by lambda/4.
  */
 export function glassSlab(): Operator {
-  return ops.amplitudeIntensity(0, +0.25)
+  return ops.amplitudeIntensity(1, +0.25)
 }
 
 /**

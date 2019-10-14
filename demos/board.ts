@@ -46,8 +46,8 @@ const state = new Photons(sizeX, sizeY)
 
 // Sugar solutions and mirrors
 // Let's start horizontal
-// >.\.\..
-// ..\.\..
+// >.\..\.
+// ..\V.\.
 // .......
 
 state.addPhotonIndicator(0, 0, ">", "H")
@@ -55,9 +55,10 @@ state.addPhotonIndicator(0, 0, ">", "H")
 // x, y, operator
 const operations: [number, number, Operator][] = [
   [2, 0, el.beamSplitter(135)],
-  [4, 0, el.mirror(135)],
+  [5, 0, el.mirror(135)],
   [2, 1, el.mirror(135)],
-  [4, 1, el.beamSplitter(135)],
+  [3, 1, el.vacuumJar()],
+  [5, 1, el.beamSplitter(135)],
 ]
 
 console.log("Creating Photon")
