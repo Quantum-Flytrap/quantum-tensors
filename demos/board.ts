@@ -21,9 +21,9 @@ import * as el from "../src/Elements"
 // // x, y, operator
 // const operations: [number, number, Operator][] = [
 //   [3, 1, el.sugarSolution(0.125)],
-//   [5, 1, el.mirror(3)],
-//   [5, 2, el.mirror(1)],
-//   [3, 2, el.mirror(3)],
+//   [5, 1, el.mirror(135)],
+//   [5, 2, el.mirror(45)],
+//   [3, 2, el.mirror(135)],
 // ]
 
 // console.log("Creating Photon")
@@ -54,10 +54,10 @@ state.addPhotonIndicator(0, 0, ">", "H")
 
 // x, y, operator
 const operations: [number, number, Operator][] = [
-  [2, 0, el.beamSplitter(3)],
-  [4, 0, el.mirror(3)],
-  [2, 1, el.mirror(3)],
-  [4, 1, el.beamSplitter(3)],
+  [2, 0, el.beamSplitter(135)],
+  [4, 0, el.mirror(135)],
+  [2, 1, el.mirror(135)],
+  [4, 1, el.beamSplitter(135)],
 ]
 
 console.log("Creating Photon")
