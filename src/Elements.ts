@@ -1,3 +1,4 @@
+import _ from "lodash"
 import { Cx } from "./Complex"
 import Dimension from "./Dimension"
 import Operator from "./Operator"
@@ -8,6 +9,10 @@ const dimPol = Dimension.polarization()
 const dimDir = Dimension.direction()
 const idPol = Operator.identity([dimPol])
 const idDir = Operator.identity([dimDir])
+const projH = Operator.indicator([dimPol], "H")
+const projV = Operator.indicator([dimPol], "V")
+
+const mod = (x: number, n: number): number => ((x % n) + n) % n
 
 /**
  * Sugar solution (for polarization rotation)
@@ -82,3 +87,26 @@ export function cornerCube(): Operator {
     idPol,
   ])
 }
+
+/**
+ * A polarizing beam splitter.
+ * Think: a very thin slab of glass.
+ * 45: [/], 135: [\]
+ * @angle Angle in degrees, from -> CCW. Needs to be 45 or 135deg, up to 180deg.
+ * @returns Operator with dimensions [dimDir, dimPol].
+ */
+export function polarizingBeamsplitter(angle: number): Operator {
+  if (!_.includes([45, 135], mod(angle, 180))) {
+    throw new Error(`polarizingBeamsplitter: angle ${angle} mod 180 not in [45, 135].`)
+  }
+
+  return Operator.add([
+    idDir.outer(projH),
+    ops.reflectFromPlaneDirection(angle).outer(projV),
+  ])
+}
+
+// TODO:
+// - Faraday rotator
+// - polarizer
+// - phase plate
