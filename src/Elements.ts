@@ -106,7 +106,27 @@ export function polarizingBeamsplitter(angle: number): Operator {
   ])
 }
 
+/**
+ * Faraday rotator (for polarization rotation)
+ * https://en.wikipedia.org/wiki/Faraday_rotator
+ * @angle Angle in degrees, from -> CCW. Needs to be multiple of 90.
+ * 0: ->, 45: ^, 90: <-, 135: v
+ * @param rot Rotation angle (in TAU) for polarization. By default 1/8 (45deg).
+ * For more current, 2/8 and 3/8 make sense.
+ */
+export function faradayRotator(angle: number, polarizationRotation = 0.125): Operator {
+  return Operator.add([
+    Operator.outer([
+      ops.diodeForDirections(angle),
+      ops.rotationMatrix(polarizationRotation * TAU, dimPol),
+    ]),
+    Operator.outer([
+      ops.diodeForDirections(angle + 180),
+      ops.rotationMatrix(-polarizationRotation * TAU, dimPol),
+    ]),
+  ])
+}
+
 // TODO:
-// - Faraday rotator
 // - polarizer
 // - phase plate

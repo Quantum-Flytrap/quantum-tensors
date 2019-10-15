@@ -118,7 +118,27 @@ export function beamsplitterTransmittionDirections(angle: number): Operator {
   case 90:  // |
     return Operator.fromSparseCoordNames([[">", ">", Cx(1)], ["<", "<", Cx(1)]], [dimDir])
   default:
-    throw new Error(`Angle ${angle} % 180 isn't in the set [0, 45, 90, 135]/`)
+    throw new Error(`Angle ${angle} % 180 isn't in the set [0, 45, 90, 135].`)
+  }
+}
+
+/**
+ * An auxiliary operation for constructing other directional operators.
+ * @param angle Angle in degrees [0, 90, 180, 270] up to 360. --> and CCW.
+ * @returns Operator with dimensions [Dimension.direction()].
+ */
+export function diodeForDirections(angle: number): Operator {
+  switch(mod(angle, 360)) {
+  case 0:   // ->
+    return Operator.fromSparseCoordNames([[">", ">", Cx(1)]], [dimDir])
+  case 90:   // ^
+    return Operator.fromSparseCoordNames([["^", "^", Cx(1)]], [dimDir])
+  case 180:  // <-
+    return Operator.fromSparseCoordNames([["<", "<", Cx(1)]], [dimDir])
+  case 270:  // v
+    return Operator.fromSparseCoordNames([["v", "v", Cx(1)]], [dimDir])
+  default:
+    throw new Error(`Angle ${angle} % 360 isn't in the set [0, 90, 180, 270].`)
   }
 }
 
