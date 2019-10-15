@@ -127,6 +127,41 @@ export function faradayRotator(angle: number, polarizationRotation = 0.125): Ope
   ])
 }
 
-// TODO:
-// - polarizer
-// - phase plate
+/**
+ * A linear polarizer.
+ * @param angle In plane rotation, in degrees [0, 90, 180, 270], i.e  | - | -.
+ * @param polarizationOrientation A number, in tau, i.e. [0, 1]. 0 transmits hotizontal polarization, 0.25 - vertical.
+ * @todo Check angle conventions.
+ */
+export function polarizer(angle: number, polarizationOrientation: number): Operator {
+  return Operator.add([
+    Operator.outer([
+      ops.diodeForDirections(angle),
+      ops.projectionMatrix(polarizationOrientation * TAU, dimPol),
+    ]),
+    Operator.outer([
+      ops.diodeForDirections(angle + 180),
+      ops.projectionMatrix(-polarizationOrientation * TAU, dimPol),
+    ]),
+  ])
+}
+
+/**
+ * A phase plate for linear polarization.
+ * @param angle In plane rotation, in degrees [0, 90, 180, 270], i.e  | - | -.
+ * @param polarizationOrientation A number, in tau, i.e. [0, 1]. 0 transmits hotizontal polarization, 0.25 - vertical.
+ * @param phase Phase shift. 1/4 (default) for quater-wave-plate, 1/2 for half-wave-plate.
+ * @todo Convention: modify this polarization, ortonogal, or some other way?
+ */
+export function phasePlate(angle: number, polarizationOrientation: number, phase = 1/4): Operator {
+  return Operator.add([
+    Operator.outer([
+      ops.diodeForDirections(angle),
+      ops.phaseShiftForRealEigenvectors(polarizationOrientation * TAU, 0, phase, dimPol),
+    ]),
+    Operator.outer([
+      ops.diodeForDirections(angle + 180),
+      ops.phaseShiftForRealEigenvectors(-polarizationOrientation * TAU, 0, phase, dimPol),
+    ]),
+  ])
+}

@@ -39,6 +39,25 @@ export function projectionMatrix(alpha: number, dimension: Dimension): Operator 
 }
 
 /**
+ *  A 2d matrix, phase shift between projections. For phase plate.
+ * @param alpha An angle, in radians, i.e. from the range [0, Tau].
+ * @param phase Phase shift for angle as for the main state, [0, 1].
+ * @param phaseOrthogonal Phase shift for for the orthogonal state, [0, 1].
+ * @param dimension A dimension of size 2, e.g. spin or polarization.
+ */
+export function phaseShiftForRealEigenvectors(
+  alpha: number,
+  phase: number,
+  phaseOrthogonal: number,
+  dimension: Dimension): Operator {
+
+  return Operator.add([
+    projectionMatrix(alpha, dimension).mulConstant(Complex.fromPolar(1, phase * TAU)),
+    projectionMatrix(alpha + 0.25 * TAU, dimension).mulConstant(Complex.fromPolar(1, phaseOrthogonal * TAU)),
+  ])
+}
+
+/**
  * Reflection from an optically lighter material.
  * Note that change horrizontal frame of reference.
  */
