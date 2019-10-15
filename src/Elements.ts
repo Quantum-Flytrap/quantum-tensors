@@ -147,6 +147,26 @@ export function polarizer(angle: number, polarizationOrientation: number): Opera
 }
 
 /**
+ * As from Quantum Game 1, for compatibility.
+ * Don't use in other.
+ * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
+ * @todo Check convention, etc
+ */
+export function polarizerWE(angle: number): Operator {
+  return polarizer(0, angle / 360)
+}
+
+/**
+ * As from Quantum Game 1, for compatibility.
+ * Don't use in other.
+ * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
+ * @todo Check convention, etc
+ */
+export function PolarizerNS(angle: number): Operator {
+  return polarizer(90, angle / 360)
+}
+
+/**
  * A phase plate for linear polarization.
  * @param angle In plane rotation, in degrees [0, 90, 180, 270], i.e  | - | -.
  * @param polarizationOrientation A number, in tau, i.e. [0, 1]. 0 transmits hotizontal polarization, 0.25 - vertical.
@@ -164,4 +184,23 @@ export function phasePlate(angle: number, polarizationOrientation: number, phase
       ops.phaseShiftForRealEigenvectors(-polarizationOrientation * TAU, 0, phase, dimPol),
     ]),
   ])
+}
+
+/**
+ * As from Quantum Game 1, for compatibility.
+ * Don't use in other.
+ * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
+ * @todo Check convention, etc
+ */
+export function quarterWavePlateWE(angle: number): Operator {
+  return phasePlate(0, angle / 360)
+}
+
+/**
+ * As from Quantum Game 1, for compatibility.
+ * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
+ * @todo Check convention, etc
+ */
+export function quarterWavePlateNS(angle: number): Operator {
+  return phasePlate(90, angle / 360)
 }
