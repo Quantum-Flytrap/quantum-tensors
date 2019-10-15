@@ -115,7 +115,7 @@ export function beamsplitterTransmittionDirections(angle: number): Operator {
   case 45:   // /
   case 135:  // \
     return idDir
-  case 135:  // |
+  case 90:  // |
     return Operator.fromSparseCoordNames([[">", ">", Cx(1)], ["<", "<", Cx(1)]], [dimDir])
   default:
     throw new Error(`Angle ${angle} % 180 isn't in the set [0, 45, 90, 135]/`)
