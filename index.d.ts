@@ -121,7 +121,7 @@ export class OperatorEntry {
 }
 
 export class Photons {
-  constructor(sizeX: any, sizeY: any);
+  constructor(sizeX: number, sizeY: number);
 
   vector(): Vector;
 
