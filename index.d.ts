@@ -3,6 +3,9 @@
 export class Complex {
   constructor(re: number, im?: number);
 
+  re(): number;
+  im(): number;
+
   abs(): any;
 
   abs2(): any;
@@ -119,6 +122,8 @@ export class OperatorEntry {
 
 export class Photons {
   constructor(sizeX: any, sizeY: any);
+
+  vector(): Vector;
 
   actOnSinglePhotons(opsWithPos: any): void;
 
