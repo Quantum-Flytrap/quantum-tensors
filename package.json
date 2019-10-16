@@ -7,8 +7,6 @@
   "author": "Piotr Migdal",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^24.0.18",
-    "@types/mocha": "^5.2.7",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "eslint": "^6.5.1",
@@ -38,6 +36,7 @@
     "build/**/*"
   ],
   "dependencies": {
+    "@types/jest": "^24.0.19",
     "@types/lodash": "^4.14.138",
     "lodash": "^4.17.15"
   },
