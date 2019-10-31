@@ -68,7 +68,8 @@ export class OperatorEntry {
 
   // Override toString() methodi
   toString(): string {
-    return `Sparse operator entry [${this.coordOut.toString()}, ${this.coordIn.toString()}] has value ${this.value.toString()}`
+    return `Sparse operator entry [${this.coordOut.toString()}, ${this.coordIn.toString()}]` +
+           `has value ${this.value.toString()}`
   }
 
   // Generate coordinates from dense matrix indices and size of those matrices

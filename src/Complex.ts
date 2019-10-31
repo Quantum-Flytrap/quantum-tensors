@@ -111,6 +111,7 @@ export default class Complex {
     return new Complex(this.re, -this.im)
   }
 
+  /* eslint-disable max-len */
   /**
    * Normalize
    * https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-vectors/a/vector-magnitude-normalization
@@ -149,14 +150,14 @@ export default class Complex {
    */
   toString(complexFormat = "cartesian", precision = 2): string {
     switch (complexFormat) {
-      case "cartesian":
-        return `(${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i)`
-      case "polar":
-        return `${this.r.toFixed(precision)} exp(${this.phi.toFixed(precision)}i)`
-      case "polarTau":
-        return `${this.r.toFixed(precision)} exp(${this.phiTau.toFixed(precision)}τi)`
-      default:
-        throw new Error(`complexFormat '${complexFormat}' is not in ['cartesian', 'polar', 'polarTau'].`)
+    case "cartesian":
+      return `(${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i)`
+    case "polar":
+      return `${this.r.toFixed(precision)} exp(${this.phi.toFixed(precision)}i)`
+    case "polarTau":
+      return `${this.r.toFixed(precision)} exp(${this.phiTau.toFixed(precision)}τi)`
+    default:
+      throw new Error(`complexFormat '${complexFormat}' is not in ['cartesian', 'polar', 'polarTau'].`)
     }
   }
 

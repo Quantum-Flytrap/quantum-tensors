@@ -46,7 +46,8 @@ export default class Photons {
       this.vector = newPhoton
     } else if (this.nPhotons === 2) {
       if (!newPhoton.dot(this.vector).isZero) {
-        throw `Adding photons not yet implemented for non-ortogonal states. Old photon:\n${this.vector}\nand new photon:\n${newPhoton}`
+        throw `Adding photons not yet implemented for non-ortogonal states.` +
+              `Old photon:\n${this.vector}\nand new photon:\n${newPhoton}`
       }
       this.vector = Vector.add([oldPhotons.outer(newPhoton), newPhoton.outer(oldPhotons)]).mulConstant(Cx(Math.SQRT1_2))
     } else {
@@ -133,6 +134,7 @@ export default class Photons {
       .values()
       .map(entries => {
         const first = entries[0]
+        /* eslint-disable @typescript-eslint/no-unused-vars */
         const [x, y, dir, _pol] = first.coord
         const amplitudes: [Complex, Complex] = [Cx(0), Cx(0)]
         entries.forEach(entry => {
@@ -163,6 +165,7 @@ export default class Photons {
       .values()
       .map(entries => {
         const first = entries[0]
+        /* eslint-disable @typescript-eslint/no-unused-vars */
         const [x, y, _dir, _pol] = first.coord
         const probability = entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b)
 
