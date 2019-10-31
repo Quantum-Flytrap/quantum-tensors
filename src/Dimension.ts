@@ -11,6 +11,12 @@ export default class Dimension {
   size: number
   coordNames: string[]
 
+  /**
+   * Creates a dimentions - to be used in a Vector or Operator object
+   * @param name Name of a dimension (e.g. "quibt", "spin", "x", etc)
+   * @param size Size of a dimension
+   * @param coordNames Name of each coordinate
+   */
   constructor(name: string, size: number, coordNames: string[]) {
     if (size !== coordNames.length) {
       throw new Error(`Coordinates [${coordNames}] array is of length ${coordNames.length}, not ${size}.`)
@@ -45,9 +51,9 @@ export default class Dimension {
   }
 
   /**
-   *
-   * @param size
-   * @param name
+   * Creates a dimension with positions from 0 to size-1
+   * @param size A positive integer - size of steps.
+   * @param name Dimension name, e.g. 'x', 'y' or 'z'.
    */
   static position(size: number, name = "x"): Dimension {
     const coordNames = _.range(size).map((i: number) => i.toString())
@@ -134,7 +140,13 @@ export default class Dimension {
     })
   }
 
-  // Also string[]?
+  /**
+   * 
+   * @param s string, such as "udH" or ['u', 'd', 'H'] 
+   * @param dimensions  Dimensions to be used
+   * 
+   * @returns 
+   */
   static stringToCoordIndices(s: string | string[], dimensions: Dimension[]): number[] {
     if (dimensions.length !== s.length) {
       throw `dimensions.length (${dimensions.length}) !== string.length (${s.length})`

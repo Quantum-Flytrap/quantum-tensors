@@ -6,10 +6,10 @@ import Complex from "./Complex"
  * @param sizes Sizes of each dimension
  * 
  * @returns Index in each dimension
+ * 
+ * @todo Check that values are good (also: small endian vs big endian )
  */
 export function CoordsFromIndex(index: number, sizes: number[]): number[] {
-  // Convert index to coordinate system in the size dimensions
-  // TODO: Check that values are good
   let i = index
   const coords = sizes.map(dimSize => {
     const coord = i % dimSize
@@ -20,32 +20,47 @@ export function CoordsFromIndex(index: number, sizes: number[]): number[] {
 }
 
 /**
- * Class for vector entires.
+ * Class for vector entires (also know as: vector values, cells).
  * To be used only within a Vector object, or to create such.
  */
 export class VectorEntry {
   coord: number[]
   value: Complex
 
+  /**
+   * Creates a VectorEntry from coord and value.
+   * @param coord 
+   * @param value 
+   */
   constructor(coord: number[], value: Complex) {
     this.coord = coord
     this.value = value
   }
 
-  // Compute outer product with another sparse cell
+  /**
+   * Tensor product of two entires (multiplies values, concatenates coordinates).
+   * @param e2 The other entry
+   */
   outer(e2: VectorEntry): VectorEntry {
     const e1 = this
     return new VectorEntry(e1.coord.concat(e2.coord), e1.value.mul(e2.value))
   }
 
-  // Override toString() methodi
+  /**
+   * Overrides toString() method. 
+   * @returms E.g. "Sparse vector entry [3,0,1] has value (1.00 - 0.50 i)"
+   */
   toString(): string {
     return `Sparse vector entry [${this.coord.toString()}] has value ${this.value.toString()}`
   }
 
-  // Generate coordinates from dense matrix indices and size of those matrices
+  /**
+   * Creates a VectorEntry from an integer index, coordinate sizes and value.
+   * @param index an integer
+   * @param sizes sizes od dimensions
+   * @param value entry value
+   */
   static fromIndexValue(index: number, sizes: number[], value: Complex): VectorEntry {
-    // Convert index to coordinate system in the size dimensions
     const coords = CoordsFromIndex(index, sizes)
     return new VectorEntry(coords, value)
   }
@@ -60,25 +75,44 @@ export class OperatorEntry {
   coordIn: number[]
   value: Complex
 
+  /**
+   * Creates a VectorEntry from output and input coordinates, and value.
+   * @param coordOut 
+   * @param coordIn 
+   * @param value 
+   */
   constructor(coordOut: number[], coordIn: number[], value: Complex) {
     this.coordOut = coordOut
     this.coordIn = coordIn
     this.value = value
   }
 
-  // Compute outer product with another sparse cell
+  /**
+   * Tensor product of two entires (multiplies values, concatenates coordinates).
+   * @param e2  The other entry
+   */
   outer(e2: OperatorEntry): OperatorEntry {
     const e1 = this
     return new OperatorEntry(e1.coordOut.concat(e2.coordOut), e1.coordIn.concat(e2.coordIn), e1.value.mul(e2.value))
   }
 
-  // Override toString() methodi
+  /**
+   * Overrides toString() method. 
+   * @returms E.g. "Sparse operator entry [[3,0,1], [2,1,1]] has value (1.00 - 0.5 i)"
+   */
   toString(): string {
     return `Sparse operator entry [${this.coordOut.toString()}, ${this.coordIn.toString()}]` +
            `has value ${this.value.toString()}`
   }
 
-  // Generate coordinates from dense matrix indices and size of those matrices
+  /**
+   * Creates OperatorEntry from two integer indices, coordinate sizes and a value.
+   * @param indexOut an integer for output index
+   * @param indexIn  an integer for output index
+   * @param sizesOut sizes od output dimensions
+   * @param sizesIn  sizes od output dimensions
+   * @param value  entry value
+   */
   static fromIndexIndexValue(
     indexOut: number,
     indexIn: number,
@@ -86,7 +120,7 @@ export class OperatorEntry {
     sizesIn: number[],
     value: Complex,
   ): OperatorEntry {
-    // Convert index to coordinate system in the size dimensions
+
     const coordOut = CoordsFromIndex(indexOut, sizesOut)
     const coordIn = CoordsFromIndex(indexIn, sizesIn)
     return new OperatorEntry(coordOut, coordIn, value)
