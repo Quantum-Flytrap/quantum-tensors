@@ -81,8 +81,7 @@ console.log(state.ketString())
 console.log("Steps:")
 
 _.range(10).forEach(i => {
-  console.log(`Step ${i}:`)
   state.propagatePhotons()
   state.actOnSinglePhotons(operations)
-  console.log(state.ketString())
+  console.log(`Step ${i}: ${state.ketString()}`)
 })
