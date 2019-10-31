@@ -77,12 +77,12 @@ const operations: [number, number, Operator][] = [
 // works the same for everything
 
 console.log("Creating Photon")
-console.log(state.vector.toString())
+console.log(state.ketString())
 console.log("Steps:")
 
 _.range(10).forEach(i => {
   console.log(`Step ${i}:`)
   state.propagatePhotons()
   state.actOnSinglePhotons(operations)
-  console.log(state.vector.toString())
+  console.log(state.ketString())
 })

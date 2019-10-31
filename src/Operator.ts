@@ -258,8 +258,7 @@ export default class Operator {
   // }
 
   // TODO: Dense matrix visualisation
-  toString(complexFormat = "cartesian", precision = 2, separator = " + "): string {
-    const introStr = `Operator with ${this.entries.length} entires of max size [[${this.sizeOut}], [${this.sizeIn}]] with dimensions [[${this.namesOut}], [${this.namesIn}]]`
+  toString(complexFormat = "cartesian", precision = 2, separator = " + ", intro = true): string {
     const valueStr = this.entries
       .map(entry => {
         const coordStrOut = entry.coordOut.map((i: number, dim: number) => this.coordNamesOut[dim][i])
@@ -268,7 +267,14 @@ export default class Operator {
       })
       .join(separator)
 
-    return `${introStr}\n${valueStr}\n`
+    if (intro) {
+      const introStr = `Operator with ${this.entries.length} entires` + 
+                       `of max size [[${this.sizeOut}], [${this.sizeIn}]]` + 
+                       `with dimensions [[${this.namesOut}], [${this.namesIn}]]`
+      return `${introStr}\n${valueStr}\n`
+    } else {
+      return valueStr
+    }
   }
 
   static identity(dimensions: Dimension[]): Operator {

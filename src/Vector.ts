@@ -101,16 +101,21 @@ export default class Vector {
   }
 
   // TODO: Dense matrix visualisation
-  toString(complexFormat = "cartesian", precision = 2, separator = " + "): string {
-    const introStr = `Vector with ${this.cells.length} entries of max size [${this.size}] with dimensions [${this.names}]`
+  toString(complexFormat = "cartesian", precision = 2, separator = " + ", intro = true): string {
     const valueStr = this.cells
       .map(cell => {
         const coordStr = cell.coord.map((i: number, dim: number) => this.coordNames[dim][i])
         return `${cell.value.toString(complexFormat, precision)} |${coordStr}⟩`
       })
       .join(separator)
-
-    return `${introStr}\n${valueStr}\n`
+    
+    if (intro) {
+      const introStr = `Vector with ${this.cells.length} entries` +
+                       ` of max size [${this.size}] with dimensions [${this.names}]`
+      return `${introStr}\n${valueStr}\n`
+    } else {
+      return valueStr
+    }
   }
 
   // Loading from dense array list of cells

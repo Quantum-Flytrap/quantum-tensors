@@ -176,4 +176,8 @@ export default class Photons {
 
     return aggregated
   }
+
+  ketString(complexFormat = "cartesian", precision = 2): string {
+    return this.vector.toString(complexFormat, precision, " + ", false)
+  }
 }
