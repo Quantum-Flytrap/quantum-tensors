@@ -186,7 +186,9 @@ export default class Operator {
 
     Dimension.checkDimensions(m.dimensionsIn, _.at(v.dimensions, coordIndices))
 
-    const complementIndices = _.range(v.dimensions.length).filter(i => _.includes(coordIndices, i))
+    const complementIndices = _
+      .range(v.dimensions.length)
+      .filter(i => !_.includes(coordIndices, i))
 
     // if m.dimensionsOut !== m.dimensionsIn
     const newDimensions = _.cloneDeep(v.dimensions)
