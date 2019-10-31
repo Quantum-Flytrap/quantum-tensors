@@ -28,7 +28,12 @@ module.exports = {
       "imports": "never",
       "exports": "never",
       "functions": "only-multiline"
-  }]
+    }],
+    // "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_",
+      "ignoreRestSiblings": true,
+    }],
   },
   root: true
 };
