@@ -34,6 +34,15 @@ module.exports = {
       "argsIgnorePattern": "^_",
       "ignoreRestSiblings": true,
     }],
+    "require-jsdoc": [1, {
+      "require": {
+          "FunctionDeclaration": true,
+          "MethodDefinition": false,
+          "ClassDeclaration": true,
+          "ArrowFunctionExpression": false,
+          "FunctionExpression": false
+      }
+    }]
   },
   root: true
 };

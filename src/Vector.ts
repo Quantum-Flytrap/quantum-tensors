@@ -1,16 +1,12 @@
-// VECTOR CLASS
-// Tensor-aware named sparse complex vector
-
-// VECTOR CLASS
-// add
-// dot product
-// permute
-
 import Complex, { Cx } from "./Complex"
 import { VectorEntry } from "./Entry"
 import Dimension from "./Dimension"
 import _ from "lodash"
 
+/**
+ * Vector class. 
+ * A complex number sparse vector aware of dimensions and tensor structure.
+ */
 export default class Vector {
   cells: VectorEntry[]
   dimensions: Dimension[]

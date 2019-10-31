@@ -1,17 +1,13 @@
-// VECTOR CLASS
-// Tensor-aware named sparse complex vector
-
-// VECTOR CLASS
-// add
-// dot product
-// permute
-
 import Complex, { Cx } from "./Complex"
 import { VectorEntry, OperatorEntry } from "./Entry"
 import Vector from "./Vector"
 import Dimension from "./Dimension"
 import _ from "lodash"
 
+/**
+ * Operator class. 
+ * A complex number sparse matrix aware of dimensions and tensor structure.
+ */
 export default class Operator {
   entries: OperatorEntry[]
   dimensionsOut: Dimension[]

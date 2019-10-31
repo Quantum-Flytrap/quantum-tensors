@@ -1,4 +1,3 @@
-// COMPLEX NUMBER CLASS
 import { TAU } from "./Constants"
 
 /**

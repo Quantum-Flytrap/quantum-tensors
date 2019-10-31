@@ -1,14 +1,12 @@
-// SPARSE MATRIX CELL
-// Contains the path to a cell and its value.
-
-// coordinate as an abstracted entry?
-// MultiIndex
-
-// VectoryEntry
-// MatrixEntry
-
 import Complex from "./Complex"
 
+/**
+ * Turns an index into a multiindex, according to dimension sizes
+ * @param index An integer
+ * @param sizes Sizes of each dimension
+ * 
+ * @returns Index in each dimension
+ */
 export function CoordsFromIndex(index: number, sizes: number[]): number[] {
   // Convert index to coordinate system in the size dimensions
   // TODO: Check that values are good
@@ -21,6 +19,10 @@ export function CoordsFromIndex(index: number, sizes: number[]): number[] {
   return coords
 }
 
+/**
+ * Class for vector entires.
+ * To be used only within a Vector object, or to create such.
+ */
 export class VectorEntry {
   coord: number[]
   value: Complex
@@ -49,6 +51,10 @@ export class VectorEntry {
   }
 }
 
+/**
+ * Class for operarator entires.
+ * To be used only within a Operator object, or to create such.
+ */
 export class OperatorEntry {
   coordOut: number[]
   coordIn: number[]

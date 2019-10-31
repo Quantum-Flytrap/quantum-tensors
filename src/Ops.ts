@@ -127,6 +127,11 @@ export function reflectFromPlaneDirection(angle: number): Operator {
   return Operator.fromSparseCoordNames(sparseCoords, [dimDir])
 }
 
+/**
+ * An auxiliary operation for beam splitter transmittion directions.
+ * @param angle Angle in degrees [0, 45, 90, 135] up to 180. --> and CCW.
+ * @returns Operator with dimensions [Dimension.direction()].
+ */
 export function beamsplitterTransmittionDirections(angle: number): Operator {
   switch(mod(angle, 180)) {
   case 0:  // -

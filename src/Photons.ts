@@ -1,9 +1,3 @@
-// create state
-// loop of
-// - make it pass through U
-// - propagate
-// - note detection probabilities
-
 import _ from "lodash"
 import Vector from "./Vector"
 import Operator from "./Operator"
@@ -11,6 +5,12 @@ import Dimension from "./Dimension"
 import { Cx } from "./Complex"
 import { Complex } from "../main"
 
+/**
+ * Photons class. 
+ * A state of many photons, each with with dimensions:
+ * x, y, direction, polarization
+ * Designed so that it will work with https://github.com/stared/quantum-game-2 board.
+ */
 export default class Photons {
   readonly sizeX: number
   readonly sizeY: number

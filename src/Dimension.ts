@@ -1,7 +1,11 @@
-// DIMENSION CLASS
-// See for autofocusing to reduce dimension max size limit[min ... max]
 import * as _ from "lodash"
 
+/**
+ * Dimension class, e.g.
+ * - "polarisation" with coordinates ["H", "V"]
+ * - "direction" with coordinates [">", "^", "<", "v"]
+ * Vide: http://nlp.seas.harvard.edu/NamedTensor and http://nlp.seas.harvard.edu/NamedTensor2
+ */
 export default class Dimension {
   name: string
   size: number
