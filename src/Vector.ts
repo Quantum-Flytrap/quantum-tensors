@@ -8,13 +8,22 @@ import _ from "lodash"
  * A complex number sparse vector aware of dimensions and tensor structure.
  */
 export default class Vector {
-  cells: VectorEntry[]
+  entries: VectorEntry[]
   dimensions: Dimension[]
 
   // TODO: assume the cells are ordered
-  constructor(cells: VectorEntry[], dimensions: Dimension[]) {
-    this.cells = cells
+  constructor(entries: VectorEntry[], dimensions: Dimension[]) {
+    this.entries = entries
     this.dimensions = dimensions
+  }
+
+  /**
+   * @deprecated
+   * A getter to for .entries.
+   * Use .entires instead; here only to make sure it is not a breaking change.
+   */
+  get cells(): VectorEntry[] {
+    return this.entries
   }
 
   // Getters for dimensions
