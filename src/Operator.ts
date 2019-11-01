@@ -15,7 +15,7 @@ export default class Operator {
 
   /**
    * Creates an operator from sparse entires.
-   * This is a low-level method (due to the explicit use of OperatorEntry).
+   * This is a low-level method (due to the explicit use of {@link OperatorEntry}).
    * You may need 'fromArray' or 'fromSparseCoordNames' instead.
    * @param entries  Operator entries.
    * @param dimensionsOut Output dimensions.
