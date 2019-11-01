@@ -36,6 +36,7 @@ export default class Operator {
 
   /**
    * @returns The sizes of output dimensions.
+   * @see {@link Dimension}
    */
   get sizeOut(): number[] {
     return this.dimensionsOut.map(dimension => dimension.size)
@@ -43,6 +44,7 @@ export default class Operator {
 
   /**
    * @returns The sizes of input dimensions.
+   * @see {@link Dimension}
    */
   get sizeIn(): number[] {
     return this.dimensionsIn.map(dimension => dimension.size)
@@ -66,6 +68,7 @@ export default class Operator {
 
   /**
    * @returns Output dimension names.
+   * @see {@link Dimension}
    */
   get namesOut(): string[] {
     return this.dimensionsOut.map(dimension => dimension.name)
@@ -73,6 +76,7 @@ export default class Operator {
 
   /**
    * @returns Input dimension names.
+   * @see {@link Dimension}
    */
   get namesIn(): string[] {
     return this.dimensionsIn.map(dimension => dimension.name)
@@ -80,6 +84,7 @@ export default class Operator {
 
   /**
    * @returns Names of the coordinates for each output dimension.
+   * @see {@link Dimension}
    */
   get coordNamesOut(): string[][] {
     return this.dimensionsOut.map(dimension => dimension.coordNames)
@@ -87,6 +92,7 @@ export default class Operator {
 
   /**
    * @returns Names of the coordinates for each input dimension.
+   * @see {@link Dimension}
    */
   get coordNamesIn(): string[][] {
     return this.dimensionsIn.map(dimension => dimension.coordNames)
