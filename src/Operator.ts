@@ -16,7 +16,7 @@ export default class Operator {
   /**
    * Creates an operator from sparse entires.
    * This is a low-level method (due to the explicit use of {@link OperatorEntry}).
-   * You may need 'fromArray' or 'fromSparseCoordNames' instead.
+   * You may need {@link Operator.fromArray} or {@link Operator.fromSparseCoordNames} instead.
    * @param entries  Operator entries.
    * @param dimensionsOut Output dimensions.
    * @param dimensionsIn Input dimensions. If not specified, assumed to be the same as input dimensions.
@@ -115,7 +115,7 @@ export default class Operator {
   }
 
   /**
-   * Conjdugate transpose (Hermitian transpose, dagger operator)
+   * Conjdugate transpose (Hermitian transpose, dagger operator).
    * https://en.wikipedia.org/wiki/Conjugate_transpose
    * @returns a^† Hermitian conjugate of an operator.
    */
@@ -157,10 +157,11 @@ export default class Operator {
 
   /**
    * Add two operators.
-   * @param m2 Other operator with same dimensions.
-   * @returns m1 + m2
    * 
    * Note: May be overengineered for adding 2 vectors with this map-reduce approach.
+   * 
+   * @param m2 Other operator with same dimensions.
+   * @returns m1 + m2
    */
   add(m2: Operator): Operator {
     const m1 = this
@@ -241,7 +242,7 @@ export default class Operator {
   }
 
   /**
-   * Multiply a 
+   * Perform an multiplication on a vector, (M v), on some dimensions. 
    * E.g. if there are 3 particles, and you want to apply an operation only on the first: M_0 v.
    * Or if you want to apply an operation on the first and the third M_02 v.  
    * In principle, you can do the same by mutlipying matrices with identities, but wouldnot scale.
@@ -339,6 +340,8 @@ export default class Operator {
 
   /**
    * String description of an operator.
+   * @see {@link Complex.toString} for formating options.
+   * 
    * @param complexFormat complex number format; a choice between ["cartesian", "polar", "polarTau"]
    * @param precision float display precision
    * @param separator entry separator
@@ -415,17 +418,17 @@ export default class Operator {
   /**
    * Creates an operator from a dense array of complex numbers.
    * It needs dimensions to create the complex structure.
+   * 
+   * @example
+   * const spinY = Operator.fromArray([
+    *  [Cx(0, 0), Cx(0, -1)],
+    *  [Cx(0, 1), Cx(0,  0)]
+    * ], [Dimension.spin()])
+   * 
    * @param denseArray A 2-d array of complex numbers.
    * @param dimensionsOut Dimensions out.
    * @param dimensionsIn Dimensions in (if not provided, then the same as out).
    * @param removeZeros If to remove zero value.
-   * 
-   * E.g.:
-   * 
-   * const spinY = Operator.fromArray([
-   *  [Cx(0, 0), Cx(0, -1)],
-   *  [Cx(0, 1), Cx(0,  0)]
-   * ], [Dimension.spin()])
    * 
    * @todo Consider using flatMap for readibility.
    */
@@ -478,12 +481,14 @@ export default class Operator {
 
   /**
    * Creates an operator projecting on a single element, given by its symbol, e.g. |H,u⟩⟨H,u|.
+   * 
+   * @example
+   * Operator.indicator([Dimensions.polarisation(), Dimensions.spin()], 'Hu')
+   * 
    * @param dimensions
    * @param coordNames Symbols for each ordinate.
    * For symbols with more than one letter you need to use an array of strings.
    * 
-   * E.g. 
-   * Operator.indicator([Dimensions.polarisation(), Dimensions.spin()], 'Hu').
    */
   static indicator(dimensions: Dimension[], coordNames: string | string[]): Operator {
     const coords = Dimension.stringToCoordIndices(coordNames, dimensions)
@@ -495,14 +500,14 @@ export default class Operator {
    * The most typically way of creating custom operators,
    * directly from its entries (delivered in a visual form).
    * 
-   * E.g.
+   * @example
    * export const opY =  Operator.fromSparseCoordNames([
    * ['V', 'H', Cx(0, 1)],
    * ['H', 'V', Cx(0, -1)],
    * ], [Dimension.polariztion()])
    * 
    * @param stringedEntries A list of entries, using symbols. 
-   * ['Hu', 'Vu', C(0.5, -1)] ->   (0.50 - 1.00i) |H,u⟩⟨V,u|
+   * ['Hu', 'Vu', C(0.5, -1)] ->  (0.50 - 1.00i) |H,u⟩⟨V,u|
    * @param dimensionsOut Output dimensions.
    * @param dimensionsIn Input dimensions. If not specified, the same as in dimensionsOut.
    * 
@@ -527,7 +532,9 @@ export default class Operator {
 
   /**
    * Outer product (tensor product) between two or more operators.
-   * See: outer as a method.
+   * 
+   * @see {@link Operator.outer} for the actual implementation.
+   * 
    * @param ops [m1, m2, ...]
    * 
    * @returns ⨂[m1, m2, ...]
@@ -540,7 +547,8 @@ export default class Operator {
 
   /**
    * As sum of many operators with compatible dimensions.
-   * See: add as a method.
+   * @see {@link Operator.add} for the actual implementation.
+   * 
    * @param ops [m1, m2, ...]
    * 
    * @returns m1 + m2 + ...
