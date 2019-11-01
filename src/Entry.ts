@@ -101,7 +101,7 @@ export class OperatorEntry {
    * @returms E.g. "Sparse operator entry [[3,0,1], [2,1,1]] has value (1.00 - 0.5 i)"
    */
   toString(): string {
-    return `Sparse operator entry [${this.coordOut.toString()}, ${this.coordIn.toString()}]` +
+    return `Sparse operator entry [${this.coordOut.toString()}, ${this.coordIn.toString()}] ` +
            `has value ${this.value.toString()}`
   }
 

@@ -189,8 +189,8 @@ export default class Vector {
       .join(separator)
     
     if (intro) {
-      const introStr = `Vector with ${this.entries.length} entries` +
-                       ` of max size [${this.size}] with dimensions [${this.names}]`
+      const introStr = `Vector with ${this.entries.length} entries ` +
+                       `of max size [${this.size}] with dimensions [${this.names}]`
       return `${introStr}\n${valueStr}\n`
     } else {
       return valueStr

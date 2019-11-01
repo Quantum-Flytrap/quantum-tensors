@@ -367,8 +367,8 @@ export default class Operator {
       .join(separator)
 
     if (intro) {
-      const introStr = `Operator with ${this.entries.length} entires` + 
-                       `of max size [[${this.sizeOut}], [${this.sizeIn}]]` + 
+      const introStr = `Operator with ${this.entries.length} entires ` + 
+                       `of max size [[${this.sizeOut}], [${this.sizeIn}]] ` + 
                        `with dimensions [[${this.namesOut}], [${this.namesIn}]]`
       return `${introStr}\n${valueStr}\n`
     } else {
@@ -458,7 +458,7 @@ export default class Operator {
 
     if (denseArray.length !== totalSizeOut || denseArray[0].length !== totalSizeIn) {
       throw new Error(
-        `Dimension inconsistency: array is [${denseArray.length}, ${denseArray[0].length}]` +
+        `Dimension inconsistency: array is [${denseArray.length}, ${denseArray[0].length}] ` +
         `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`
       )
     }
