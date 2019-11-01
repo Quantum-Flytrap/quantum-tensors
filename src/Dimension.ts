@@ -2,7 +2,7 @@ import * as _ from "lodash"
 
 /**
  * Dimension class, e.g.
- * - "polarisation" with coordinates ["H", "V"]
+ * - "polarization" with coordinates ["H", "V"]
  * - "direction" with coordinates [">", "^", "<", "v"]
  * Vide: http://nlp.seas.harvard.edu/NamedTensor and http://nlp.seas.harvard.edu/NamedTensor2
  */
@@ -28,10 +28,10 @@ export default class Dimension {
 
   /**
    * Create dimension for polarization
-   * @returns polarisation dimension
+   * @returns polarization dimension
    */
   static polarization(): Dimension {
-    return new Dimension("polarisation", 2, ["H", "V"])
+    return new Dimension("polarization", 2, ["H", "V"])
   }
 
   /**

@@ -177,7 +177,7 @@ export default class Vector {
    * 
    * @returns A string, e.g.:
    * 
-   * Vector with 3 entries of max size [2,2] with dimensions [spin,polarisation]
+   * Vector with 3 entries of max size [2,2] with dimensions [spin,polarization]
    * (0.00 +2.00i) |u,H⟩ + (-1.00 -1.00i) |d,H⟩ + (0.50 +2.50i) |d,V⟩
    */
   toString(complexFormat = "cartesian", precision = 2, separator = " + ", intro = true): string {
@@ -229,7 +229,7 @@ export default class Vector {
    * Creates a vector with a single 1 value and all zeros, e.g. |H,u⟩.
    * 
    * @example
-   * Vector.indicator([Dimensions.polarisation(), Dimensions.spin()], 'Hu')
+   * Vector.indicator([Dimensions.polarization(), Dimensions.spin()], 'Hu')
    * 
    * @param dimensions 
    * @param coordNames Symbols for each ordinate.

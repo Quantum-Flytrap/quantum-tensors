@@ -354,7 +354,7 @@ export default class Operator {
    * @param intro if to show dimensions and sized
    * 
    * @returns A string like:
-   * Operator with 4 entiresof max size [[2,2], [2,2]] with dimensions [[polarisation,spin], [polarisation,spin]]
+   * Operator with 4 entiresof max size [[2,2], [2,2]] with dimensions [[polarization,spin], [polarization,spin]]
    * (1.00 +0.00i) |H,u⟩⟨H,u| + (1.00 +0.00i) |H,d⟩⟨H,d| + (1.00 +0.00i) |V,u⟩⟨V,u| + (1.00 +0.00i) |V,d⟩⟨V,d|
    */
   toString(complexFormat = "cartesian", precision = 2, separator = " + ", intro = true): string {
@@ -489,7 +489,7 @@ export default class Operator {
    * Creates an operator projecting on a single element, given by its symbol, e.g. |H,u⟩⟨H,u|.
    * 
    * @example
-   * Operator.indicator([Dimensions.polarisation(), Dimensions.spin()], 'Hu')
+   * Operator.indicator([Dimensions.polarization(), Dimensions.spin()], 'Hu')
    * 
    * @param dimensions
    * @param coordNames Symbols for each ordinate.
