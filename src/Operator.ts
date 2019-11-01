@@ -13,53 +13,90 @@ export default class Operator {
   dimensionsOut: Dimension[]
   dimensionsIn: Dimension[]
 
-  // TODO: assume the entries are ordered
+  /**
+   * Creates an operator from sparse entires.
+   * This is a low-level method (due to the explicit use of OperatorEntry).
+   * You may need 'fromArray' or 'fromSparseCoordNames' instead.
+   * @param entries  Operator entries.
+   * @param dimensionsOut Output dimensions.
+   * @param dimensionsIn Input dimensions. If not specified, assumed to be the same as input dimensions.
+   */
   constructor(entries: OperatorEntry[], dimensionsOut: Dimension[], dimensionsIn: Dimension[] = dimensionsOut) {
     this.entries = entries
     this.dimensionsOut = dimensionsOut
     this.dimensionsIn = dimensionsIn
-    // NOTE: usually out==in, how to account for that?
   }
 
+  /**
+   * @returns A pair of output and input dimensions.
+   */
   get dimensions(): [Dimension[], Dimension[]] {
     return [this.dimensionsOut, this.dimensionsIn]
   }
 
-  // Out/In nasty, but I don;t have a clear idea how to to it
-
+  /**
+   * @returns The sizes of output dimensions.
+   */
   get sizeOut(): number[] {
     return this.dimensionsOut.map(dimension => dimension.size)
   }
 
+  /**
+   * @returns The sizes of input dimensions.
+   */
   get sizeIn(): number[] {
     return this.dimensionsIn.map(dimension => dimension.size)
   }
 
+  /**
+   * @returns The total size of output (a product of all output sizes).
+   * It is the matrix row number.
+   */
   get totalSizeOut(): number {
     return this.sizeOut.reduce((a, b) => a * b)
   }
 
+  /**
+   * @returns The total size of input (a product of all input sizes).
+   * It is the matrix column number.
+   */
   get totalSizeIn(): number {
     return this.sizeIn.reduce((a, b) => a * b)
   }
 
+  /**
+   * @returns Output dimension names.
+   */
   get namesOut(): string[] {
     return this.dimensionsOut.map(dimension => dimension.name)
   }
 
+  /**
+   * @returns Input dimension names.
+   */
   get namesIn(): string[] {
     return this.dimensionsIn.map(dimension => dimension.name)
   }
 
+  /**
+   * @returns Names of the coordinates for each output dimension.
+   */
   get coordNamesOut(): string[][] {
     return this.dimensionsOut.map(dimension => dimension.coordNames)
   }
 
+  /**
+   * @returns Names of the coordinates for each input dimension.
+   */
   get coordNamesIn(): string[][] {
     return this.dimensionsIn.map(dimension => dimension.coordNames)
   }
 
-  // Conjugate
+  /**
+   * Elementwise complex conjugation (no transpose!).
+   * https://en.wikipedia.org/wiki/Complex_conjugate 
+   * @returns A^* - simple conjugate of an operator.
+   */
   conj(): Operator {
     const entries = this.entries.map(
       entry => new OperatorEntry([...entry.coordOut], [...entry.coordIn], entry.value.conj()),
@@ -67,14 +104,20 @@ export default class Operator {
     return new Operator(entries, this.dimensionsOut, this.dimensionsIn)
   }
 
-  // Transpose
+  /**
+   * Matrix transpose (no cojugation).
+   * https://en.wikipedia.org/wiki/Transpose
+   * @returns a^T Transpose of an operator.
+   */
   transpose(): Operator {
     const entries = this.entries.map(entry => new OperatorEntry([...entry.coordIn], [...entry.coordOut], entry.value))
     return new Operator(entries, this.dimensionsIn, this.dimensionsOut)
   }
 
   /**
-   * Dagger operator: Hermitian conjugate
+   * Conjdugate transpose (Hermitian transpose, dagger operator)
+   * https://en.wikipedia.org/wiki/Conjugate_transpose
+   * @returns a^† Hermitian conjugate of an operator.
    */
   dag(): Operator {
     const entries = this.entries.map(
@@ -83,7 +126,15 @@ export default class Operator {
     return new Operator(entries, this.dimensionsIn, this.dimensionsOut)
   }
 
-  // Outer product of vectors
+  /**
+   * Outer product between two operators.
+   * In this context, same as: Kronecker product and tensor product.
+   * https://en.wikipedia.org/wiki/Kronecker_product 
+   * @param m2 Another operator.
+   * @returns m1 ⊗ m2
+   * 
+   * @todo Consider using flatMap for clarity.
+   */
   outer(m2: Operator): Operator {
     const m1 = this
     const dimensionsOut: Dimension[] = m1.dimensionsOut.concat(m2.dimensionsOut)
@@ -104,9 +155,14 @@ export default class Operator {
     return new Operator(entries, dimensionsOut, dimensionsIn)
   }
 
+  /**
+   * Add two operators.
+   * @param m2 Other operator with same dimensions.
+   * @returns m1 + m2
+   * 
+   * Note: May be overengineered for adding 2 vectors with this map-reduce approach.
+   */
   add(m2: Operator): Operator {
-    // NOTE: may be overengineered for adding 2 vectors with this map-reduce approach
-
     const m1 = this
 
     Dimension.checkDimensions(m1.dimensionsIn, m2.dimensionsIn)
@@ -126,15 +182,32 @@ export default class Operator {
     return new Operator(entries, m1.dimensionsOut, m1.dimensionsIn)
   }
 
+  /**
+   * Returns the operator multipied by a complex constant.
+   * @param c 
+   * @returns c M
+   */
   mulConstant(c: Complex): Operator {
     const entries = this.entries.map(entry => new OperatorEntry(entry.coordOut, entry.coordIn, entry.value.mul(c)))
     return new Operator(entries, this.dimensionsOut, this.dimensionsIn)
   }
 
+  /**
+   * Subtract operators from each other.
+   * @param m2 Another operator with compatible dimensions.
+   * 
+   * @returns m1 - m2
+   */
   sub(m2: Operator): Operator {
     return this.add(m2.mulConstant(Cx(-1)))
   }
 
+  /**
+   * Multiply a operator times a vector.
+   * @param v Vector with dimensions compatible with operators input dimensions
+   * 
+   * @returns u = M v (a vector with dimensions as operator output dimensions)
+   */
   mulVec(v: Vector): Vector {
     const m: Operator = this
 
@@ -167,14 +240,23 @@ export default class Operator {
     return new Vector(entries, m.dimensionsOut)
   }
 
+  /**
+   * Multiply a 
+   * E.g. if there are 3 particles, and you want to apply an operation only on the first: M_0 v.
+   * Or if you want to apply an operation on the first and the third M_02 v.  
+   * In principle, you can do the same by mutlipying matrices with identities, but wouldnot scale.
+   * @param coordIndices Dimension indices at which be perform the opration.
+   * They need to be unique. Right now we accept only when they are sorted.
+   * @param v Vector on which we apply the operation.
+   * 
+   * @returns M_(coord_indices) ⊗ I_(everywhere_else) v
+   * 
+   * @todo If needed, I can write also a version in which we don't assume they are sorted.
+   */
   mulVecPartial(coordIndices: number[], v: Vector): Vector {
-    // for now, the inside part is much from mulVec
 
     const m = this
 
-    // we can relax the sorted considtion later
-    // it will involve some transposes
-    // or maybe we can relax the sorted condition?
     if (
       !_.chain(coordIndices)
         .sortBy()
@@ -255,7 +337,17 @@ export default class Operator {
 
   // }
 
-  // TODO: Dense matrix visualisation
+  /**
+   * String description of an operator.
+   * @param complexFormat complex number format; a choice between ["cartesian", "polar", "polarTau"]
+   * @param precision float display precision
+   * @param separator entry separator
+   * @param intro if to show dimensions and sized
+   * 
+   * @returns A string like:
+   * Operator with 4 entiresof max size [[2,2], [2,2]] with dimensions [[polarisation,spin], [polarisation,spin]]
+   * (1.00 +0.00i) |H,u⟩⟨H,u| + (1.00 +0.00i) |H,d⟩⟨H,d| + (1.00 +0.00i) |V,u⟩⟨V,u| + (1.00 +0.00i) |V,d⟩⟨V,d|
+   */
   toString(complexFormat = "cartesian", precision = 2, separator = " + ", intro = true): string {
     const valueStr = this.entries
       .map(entry => {
@@ -275,6 +367,12 @@ export default class Operator {
     }
   }
 
+  /**
+   * Creates identity matrix, given dimensions.
+   * https://en.wikipedia.org/wiki/Identity_matrix 
+   * @param dimensions A list of dimensions.
+   * @returns I
+   */
   static identity(dimensions: Dimension[]): Operator {
     const sizes = dimensions.map(dimension => dimension.size)
     const totalSize = sizes.reduce((a, b) => a * b)
@@ -285,7 +383,13 @@ export default class Operator {
     return new Operator(entries, dimensions, dimensions)
   }
 
-  // https://en.wikipedia.org/wiki/Shift_matrix
+  /**
+   * A shift operator in one dimension. Things outside go to zero.
+   * https://en.wikipedia.org/wiki/Shift_matrix
+   * Useful e.g. for moving particles in position by one.
+   * @param dimension dimension
+   * @param shift an integer (e.g. +1 or -1)
+   */
   static shift(dimension: Dimension, shift: number): Operator {
     const start = Math.max(0, -shift)
     const end = Math.min(dimension.size, dimension.size - shift)
@@ -296,11 +400,35 @@ export default class Operator {
     return new Operator(entries, [dimension], [dimension])
   }
 
+  /**
+   * A zero operator for given dimensions.
+   * https://en.wikipedia.org/wiki/Zero_matrix
+   * @param dimensionsOut 
+   * @param dimensionsIn 
+   * 
+   * @returns 0 (as a matrix)
+   */
   static zeros(dimensionsOut: Dimension[], dimensionsIn: Dimension[] = dimensionsOut): Operator {
     return new Operator([], dimensionsOut, dimensionsIn)
   }
 
-  // Loading from dense array list of cells
+  /**
+   * Creates an operator from a dense array of complex numbers.
+   * It needs dimensions to create the complex structure.
+   * @param denseArray A 2-d array of complex numbers.
+   * @param dimensionsOut Dimensions out.
+   * @param dimensionsIn Dimensions in (if not provided, then the same as out).
+   * @param removeZeros If to remove zero value.
+   * 
+   * E.g.:
+   * 
+   * const spinY = Operator.fromArray([
+   *  [Cx(0, 0), Cx(0, -1)],
+   *  [Cx(0, 1), Cx(0,  0)]
+   * ], [Dimension.spin()])
+   * 
+   * @todo Consider using flatMap for readibility.
+   */
   static fromArray(
     denseArray: Complex[][],
     dimensionsOut: Dimension[],
@@ -348,13 +476,39 @@ export default class Operator {
     return new Operator(entries, dimensionsOut, dimensionsIn)
   }
 
-  // a operator with only one 1 on one diagonal element, rest zeros
+  /**
+   * Creates an operator projecting on a single element, given by its symbol, e.g. |H,u⟩⟨H,u|.
+   * @param dimensions
+   * @param coordNames Symbols for each ordinate.
+   * For symbols with more than one letter you need to use an array of strings.
+   * 
+   * E.g. 
+   * Operator.indicator([Dimensions.polarisation(), Dimensions.spin()], 'Hu').
+   */
   static indicator(dimensions: Dimension[], coordNames: string | string[]): Operator {
     const coords = Dimension.stringToCoordIndices(coordNames, dimensions)
     const entries = [new OperatorEntry(coords, coords, Cx(1))]
     return new Operator(entries, dimensions, dimensions)
   }
 
+  /**
+   * The most typically way of creating custom operators,
+   * directly from its entries (delivered in a visual form).
+   * 
+   * E.g.
+   * export const opY =  Operator.fromSparseCoordNames([
+   * ['V', 'H', Cx(0, 1)],
+   * ['H', 'V', Cx(0, -1)],
+   * ], [Dimension.polariztion()])
+   * 
+   * @param stringedEntries A list of entries, using symbols. 
+   * ['Hu', 'Vu', C(0.5, -1)] ->   (0.50 - 1.00i) |H,u⟩⟨V,u|
+   * @param dimensionsOut Output dimensions.
+   * @param dimensionsIn Input dimensions. If not specified, the same as in dimensionsOut.
+   * 
+   * @returns An operator, as desired.
+   * 
+   */
   static fromSparseCoordNames(
     stringedEntries: [string, string, Complex][],
     dimensionsOut: Dimension[],
@@ -371,12 +525,28 @@ export default class Operator {
     return new Operator(entries, dimensionsOut, dimensionsIn)
   }
 
-  // outer product for more
+  /**
+   * Outer product (tensor product) between two or more operators.
+   * See: outer as a method.
+   * @param ops [m1, m2, ...]
+   * 
+   * @returns ⨂[m1, m2, ...]
+   * 
+   * @todo Can be optimized if needed.
+   */
   static outer(ops: Operator[]): Operator {
     return ops.reduce((acc, x) => acc.outer(x))
   }
 
-  // (can be optimized if needed)
+  /**
+   * As sum of many operators with compatible dimensions.
+   * See: add as a method.
+   * @param ops [m1, m2, ...]
+   * 
+   * @returns m1 + m2 + ...
+   * 
+   * @todo Can be optimized if needed.
+   */
   static add(ops: Operator[]): Operator {
     return ops.reduce((acc, x) => acc.add(x))
   }
