@@ -147,6 +147,41 @@ export default class Vector {
   }
 
   /**
+   * Inner product, the classic ⟨bra|ket⟩ for complex vectors.
+   * https://en.wikipedia.org/wiki/Bra%E2%80%93ket_notation
+   * It is anti-linear in the first argument, and linear in the seconf.
+   * @param v2 The other vector (ket).
+   * @returns v1^† . v2 or ⟨v1|v2⟩
+   */
+  inner(v2: Vector): Complex {
+    return this.conj().dot(v2)
+  }
+
+  /**
+   * Vector norm (vector length) squared.
+   * In quantum physics, it is probability of a quantum state.
+   * 
+   * @note Would be equivalent to inner product with itself,
+   * but we use a more straightforward implementation (plus, to make sure we get a real number).
+   * 
+   * @returns ⟨v|v⟩
+   */
+  normSquared(): number {
+    return this.entries
+      .map((entry) => entry.value.abs2())
+      .reduce((a, b) => a + b)
+  }
+
+  /**
+   * Creates a normalized vector (i.e. with norm 1).
+   * @returns A normalized vector: |v⟩ / √⟨v|v⟩
+   */
+  normalize(): Vector {
+    const norm = this.normSquared()
+    return this.mulConstant(Cx(norm))
+  }
+
+  /**
    * Outer product between two vectors.
    * In this context, same as: Kronecker product and tensor product.
    * https://en.wikipedia.org/wiki/Kronecker_product 
