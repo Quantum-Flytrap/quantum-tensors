@@ -141,7 +141,7 @@ export default class Operator {
     Dimension.checkDimensions(m.dimensionsIn, v.dimensions)
 
     const vValueMap = new Map<string, Complex>()
-    v.cells.forEach(entry => {
+    v.entries.forEach(entry => {
       vValueMap.set(entry.coord.toString(), entry.value)
     })
 
@@ -194,7 +194,7 @@ export default class Operator {
     const newDimensions = _.cloneDeep(v.dimensions)
     _.range(coordIndices.length).forEach(i => (newDimensions[coordIndices[i]] = m.dimensionsOut[i]))
 
-    const newEntries = _.chain(v.cells)
+    const newEntries = _.chain(v.entries)
       .groupBy(entry => _.at(entry.coord, complementIndices))
       .values()
       .map(vecEntries => {

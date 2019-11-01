@@ -119,7 +119,7 @@ export default class Photons {
     if (this.nPhotons !== 1) {
       throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
     }
-    const aggregated = _.chain(this.vector.cells)
+    const aggregated = _.chain(this.vector.entries)
       .groupBy(entry => _.at(entry.coord, [0, 1, 2]))
       .values()
       .map(entries => {
@@ -150,7 +150,7 @@ export default class Photons {
       throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
     }
 
-    const aggregated = _.chain(this.vector.cells)
+    const aggregated = _.chain(this.vector.entries)
       .groupBy(entry => _.at(entry.coord, [0, 1]))
       .values()
       .map(entries => {

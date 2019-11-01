@@ -42,7 +42,7 @@ export default class Vector {
 
   // Conjugate
   conj(): Vector {
-    const entries = this.cells.map(cell => new VectorEntry([...cell.coord], cell.value.conj()))
+    const entries = this.entries.map(entry => new VectorEntry([...entry.coord], entry.value.conj()))
     return new Vector(entries, this.dimensions)
   }
 
@@ -53,7 +53,7 @@ export default class Vector {
 
     Dimension.checkDimensions(v1.dimensions, v2.dimensions)
 
-    const entries = _.chain(v1.cells.concat(v2.cells))
+    const entries = _.chain(v1.entries.concat(v2.entries))
       .groupBy((entry: VectorEntry) => entry.coord.toString())
       .values()
       .map((grouped: VectorEntry[]) => {
@@ -67,7 +67,7 @@ export default class Vector {
   }
 
   mulConstant(c: Complex): Vector {
-    const entries = this.cells.map(entry => new VectorEntry(entry.coord, entry.value.mul(c)))
+    const entries = this.entries.map(entry => new VectorEntry(entry.coord, entry.value.mul(c)))
     return new Vector(entries, this.dimensions)
   }
 
@@ -80,7 +80,7 @@ export default class Vector {
 
     Dimension.checkDimensions(v1.dimensions, v2.dimensions)
 
-    const result = _.chain(v1.cells.concat(v2.cells))
+    const result = _.chain(v1.entries.concat(v2.entries))
       .groupBy((entry: VectorEntry) => entry.coord.toString())
       .values()
       .map((grouped: VectorEntry[]) => {
@@ -100,22 +100,26 @@ export default class Vector {
   outer(v2: Vector): Vector {
     const v1 = this
     const dimensions: Dimension[] = v1.dimensions.concat(v2.dimensions)
-    const cells: VectorEntry[] = []
-    v1.cells.forEach((cell1: VectorEntry) => v2.cells.forEach((cell2: VectorEntry) => cells.push(cell1.outer(cell2))))
-    return new Vector(cells, dimensions)
+    const entries: VectorEntry[] = []
+    v1.entries.forEach((entry1: VectorEntry) =>
+      v2.entries.forEach((entry2: VectorEntry) =>
+        entries.push(entry1.outer(entry2))
+      )
+    )
+    return new Vector(entries, dimensions)
   }
 
   // TODO: Dense matrix visualisation
   toString(complexFormat = "cartesian", precision = 2, separator = " + ", intro = true): string {
-    const valueStr = this.cells
-      .map(cell => {
-        const coordStr = cell.coord.map((i: number, dim: number) => this.coordNames[dim][i])
-        return `${cell.value.toString(complexFormat, precision)} |${coordStr}⟩`
+    const valueStr = this.entries
+      .map(entry => {
+        const coordStr = entry.coord.map((i: number, dim: number) => this.coordNames[dim][i])
+        return `${entry.value.toString(complexFormat, precision)} |${coordStr}⟩`
       })
       .join(separator)
     
     if (intro) {
-      const introStr = `Vector with ${this.cells.length} entries` +
+      const introStr = `Vector with ${this.entries.length} entries` +
                        ` of max size [${this.size}] with dimensions [${this.names}]`
       return `${introStr}\n${valueStr}\n`
     } else {
@@ -129,23 +133,23 @@ export default class Vector {
     const sizes = dimensions.map(dimension => dimension.size)
     const totalSize = sizes.reduce((a, b) => a * b)
     if (denseArray.length !== totalSize) {
-      throw new Error(`Dimension inconsistency: cell count ${denseArray.length} != total: ${totalSize}`)
+      throw new Error(`Dimension inconsistency: entry count ${denseArray.length} != total: ${totalSize}`)
     }
 
     // Map values to cells indices in a dense representation
-    const cells: VectorEntry[] = denseArray
+    const entries: VectorEntry[] = denseArray
       .map((value: Complex, index: number): [number, Complex] => [index, value])
       .filter(([_index, value]: [number, Complex]): boolean => !removeZeros || !value.isZero())
       .map(([index, value]: [number, Complex]): VectorEntry => VectorEntry.fromIndexValue(index, sizes, value))
 
-    return new Vector(cells, dimensions)
+    return new Vector(entries, dimensions)
   }
 
   // a vector with only one 1, rest zeros
   static indicator(dimensions: Dimension[], coordNames: string[]): Vector {
     const coords = Dimension.stringToCoordIndices(coordNames, dimensions)
-    const cells = [new VectorEntry(coords, Cx(1))]
-    return new Vector(cells, dimensions)
+    const entries = [new VectorEntry(coords, Cx(1))]
+    return new Vector(entries, dimensions)
   }
 
   static fromSparseCoordNames(stringedEntries: [string, Complex][], dimensions: Dimension[]): Vector {
