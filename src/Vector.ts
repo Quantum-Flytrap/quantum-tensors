@@ -169,7 +169,7 @@ export default class Vector {
   normSquared(): number {
     return this.entries
       .map((entry) => entry.value.abs2())
-      .reduce((a, b) => a + b)
+      .reduce((a, b) => a + b, 0)
   }
 
   /**
@@ -178,6 +178,9 @@ export default class Vector {
    */
   normalize(): Vector {
     const norm = this.normSquared()
+    if (norm === 0) {
+      throw `Cannot normalize a zero-length vector!`
+    }
     return this.mulConstant(Cx(norm))
   }
 
