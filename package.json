@@ -1,6 +1,6 @@
 {
   "name": "quantum-tensors",
-  "version": "0.0.2",
+  "version": "0.2.0",
   "description": "Tensors for quantum information and quantum optics.",
   "main": "build/main.js",
   "repository": "https://github.com/stared/quantum-tensors",
