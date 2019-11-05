@@ -138,6 +138,27 @@ export default class Photons {
   }
 
   /**
+   * Measure the absolute absorbtion on a given tile.
+   * So for for a single photon (as we project everything a single tile)
+   * @param posX Position x.
+   * @param posY Position y.
+   * @param op Operator, assumed to be with dimensions [pol, dir].
+   * 
+   * @returns Probability lost at tile (x, y) after applying the operator.
+   * Does not change the photon object.
+   */
+  measureAbsorptionAtOperator(posX: number, posY: number, op: Operator): number {
+    if (this.nPhotons !== 1) {
+      throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
+    }
+    const localizedOperator = this.createLocalizedOperator(op, posX, posY)
+    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`])
+    const newVector = localizedOperator.mulVec(this.vector)
+    const oldVector = localizedId.mulVecPartial([0, 1], this.vector)
+    return oldVector.normSquared() - newVector.normSquared()
+  }
+
+  /**
    * Turn an list of operators in a complete one-photon iteraction operator for the board.
    * @remark Some space for improvement with avoiding identity (direct sum structure),
    * vide {@link Operator.mulVecPartial}.
@@ -179,7 +200,7 @@ export default class Photons {
    * Angles 0-360, starting from --> and moving counterclockwise
    * |psi> = (are + i aim) |H> + (bre + i bim) |V>
    * 
-   * @todo Intefcace is clunky and restrictred to 1 particle.
+   * @todo Interface is clunky and restrictred to 1 particle.
    */
   aggregatePolarization(): {
     x: number
