@@ -9,7 +9,10 @@ import { Complex } from "../main"
  * Photons class. 
  * A state of many photons, each with with dimensions:
  * x, y, direction, polarization
+ * @see {@link @Dimension.position}, {@link @Dimension.direction}, {@link @Dimension.polarization}
  * Designed so that it will work with https://github.com/stared/quantum-game-2 board.
+ * @todo Think deeply about which things should change in-plance, and which: modify this object.
+ * @todo A lot of things with interfaces to make them consistent.
  */
 export default class Photons {
   readonly sizeX: number
@@ -19,6 +22,11 @@ export default class Photons {
   readonly dimX: Dimension
   readonly dimY: Dimension
 
+  /**
+   * Create a board for photons. 
+   * @param sizeX An integer, size x (width) of the board.
+   * @param sizeY An integer, size y (height) of the board.
+   */
   constructor(sizeX: number, sizeY: number) {
     this.sizeX = sizeX
     this.sizeY = sizeY
@@ -28,6 +36,15 @@ export default class Photons {
     this.dimY = Dimension.position(sizeY, "y")
   }
 
+  /**
+   * Create a single photon vector.
+   * @param posX Position of the photon, x.
+   * @param posY Position of the photon, y.
+   * @param dirDirection Direction from ['>', '^', '<', 'v].
+   * @param pol Polarization from ['H', 'V'].
+   * 
+   * @returns A vector [dimX, DimY, dir, pol], does not modify the object.
+   */
   createPhoton(posX: number, posY: number, dir: string, pol: string): Vector {
     const dimensions = [this.dimX, this.dimY, Dimension.direction(), Dimension.polarization()]
     const state = [posX.toString(), posY.toString(), dir, pol]
@@ -35,10 +52,20 @@ export default class Photons {
     return Vector.indicator(dimensions, state)
   }
 
+  /**
+   * Add one more photon to the state, using {@link createPhoton}.
+   * 
+   * @remark
+   * 
+   * @param posX Position of the photon, x.
+   * @param posY Position of the photon, y.
+   * @param dir Direction from ['>', '^', '<', 'v].
+   * @param pol Polarization from ['H', 'V'].
+   * 
+   * @returns Nothings, acts in-place.
+   */
   addPhotonIndicator(posX: number, posY: number, dir: string, pol: string): void {
-    // for now, let's assume these are:
-    // - perpendicular (otherwise would need creation-operator-like weightging)
-    // - just two (otherwise would need dimension permutation OR outer with positios inside)
+
     const newPhoton = this.createPhoton(posX, posY, dir, pol)
     const oldPhotons = this.vector
     this.nPhotons += 1
@@ -55,6 +82,12 @@ export default class Photons {
     }
   }
 
+  /**
+   * Create a propagator, given this object dimX and dimY.
+   * @param yDirMeansDown For true, direction 'v' increments dimY.
+   * 
+   * @return An operator, with dimensions [dimX, dimY, {@link Dimension.direction()}].
+   */
   createPhotonPropagator(yDirMeansDown = true): Operator {
     const dir = Dimension.direction()
     const dimX = this.dimX
@@ -69,7 +102,12 @@ export default class Photons {
     ])
   }
 
-  // UGLY AS FCK BUT, HAD SOME ERRORS
+  /**
+   * Propagate all particles, using {@link createPhotonPropagator}.
+   * @param yDirMeansDown or true, direction 'v' increments dimY.
+   * 
+   * @returns Nothing, acts in-place.
+   */
   propagatePhotons(yDirMeansDown = true): void {
     const photonPropagator = this.createPhotonPropagator(yDirMeansDown)
     _.range(this.nPhotons).forEach((i) => {
@@ -77,12 +115,26 @@ export default class Photons {
     })
   }
 
+  /**
+   * Create an operator for a particular place, projecting only on the particular position.
+   * @param op Operator, assumed to be with dimensions [pol, dir].
+   * @param posX Position x.
+   * @param posY Posiiton y.
+   * 
+   * @returns An operator [dimX, dimY, pol, dir].
+   */
   createLocalizedOperator(op: Operator, posX: number, posY: number): Operator {
     return Operator.outer([Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`]), op])
   }
 
+  /**
+   * Turn an list of operators in a complete one-photon iteraction operator for the board.
+   * @remark Some space for improvement with avoiding identity (direct sum structure),
+   * vide {@link Operator.mulVecPartial}.
+   * @param opsWithPos A list of [x, y, operator with [dir, pol]].
+   */
   createSinglePhotonInteraction(opsWithPos: [number, number, Operator][]): Operator {
-    // some space for improvement with avoiding identity (direct sum structure)
+    // 
     const localizedOpsShifted = opsWithPos.map((x: [number, number, Operator]) => {
       const [posX, posY, op] = x
       const shiftedOp = op.sub(Operator.identity([Dimension.direction(), Dimension.polarization()]))
@@ -95,6 +147,14 @@ export default class Photons {
     ])
   }
 
+  /**
+   * Act on single photons with a given set of operations.
+   * @remark Absorption for states with n>1 photons is broken.
+   * - it tracks only a fixed-number of photons subspace.
+   * @param opsWithPos A list of [x, y, operator with [dir, pol]].
+   * 
+   * @returns Nothing, as acts in-place.
+   */
   actOnSinglePhotons(opsWithPos: [number, number, Operator][]): void {
     const singlePhotonInteraction = this.createSinglePhotonInteraction(opsWithPos)
     _.range(this.nPhotons).forEach(i => {
@@ -103,9 +163,13 @@ export default class Photons {
   }
 
   /**
+   * Combine H and V polarization, to 
    * Right now kind od dirty, but should work
+   * @returns
    * Angles 0-360, starting from --> and moving counterclockwise
    * |psi> = (are + i aim) |H> + (bre + i bim) |V>
+   * 
+   * @todo Intefcace is clunky and restrictred to 1 particle.
    */
   aggregatePolarization(): {
     x: number
@@ -145,6 +209,10 @@ export default class Photons {
     return aggregated
   }
 
+  /**
+   * Shows probability of photons.
+   * @todo Create probability for any number of photons.
+   */
   totalIntensityPerTile(): { x: number; y: number; probability: number }[] {
     if (this.nPhotons !== 1) {
       throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
@@ -159,17 +227,21 @@ export default class Photons {
         const [x, y, _dir, _pol] = first.coord
         const probability = entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b)
 
-        return {
-          x: x,
-          y: y,
-          probability: probability,
-        }
+        return {x, y, probability}
       })
       .value()
 
     return aggregated
   }
 
+  /**
+   * Generates a string for kets.
+   * See {@link Vector.toString} for formatting options.
+   * @param complexFormat ['cartesian', 'polar', 'polarTau'].
+   * @param precision Float precision.
+   * 
+   * @returns A ket string, e.g. (0.71 +0.00i) |3,1,>,V⟩ + (0.00 +0.71i) |2,2,v,V⟩.
+   */
   ketString(complexFormat = "cartesian", precision = 2): string {
     return this.vector.toString(complexFormat, precision, " + ", false)
   }
