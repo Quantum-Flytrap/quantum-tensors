@@ -236,6 +236,14 @@ export default class Vector {
   }
 
   /**
+   * Create a copy of the vector.
+   * @todo Make it more lightweight than using lodash.
+   */
+  copy(): Vector {
+    return _.cloneDeep(this)
+  }
+
+  /**
    * Creates a a vector from a dense array of complex numbers.
    * It needs dimensions to create the complex structure.
    * 

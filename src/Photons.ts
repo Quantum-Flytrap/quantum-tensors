@@ -37,6 +37,16 @@ export default class Photons {
   }
 
   /**
+   * @returns A deep copy of the same object.
+   */
+  copy(): Photons {
+    const newPhotons = new Photons(this.sizeX, this.sizeY)
+    newPhotons.vector = this.vector.copy()
+    newPhotons.nPhotons = this.nPhotons
+    return newPhotons
+  }
+
+  /**
    * Create a single photon vector.
    * @param posX Position of the photon, x.
    * @param posY Position of the photon, y.
