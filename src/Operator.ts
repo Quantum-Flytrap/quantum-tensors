@@ -55,7 +55,7 @@ export default class Operator {
    * It is the matrix row number.
    */
   get totalSizeOut(): number {
-    return this.sizeOut.reduce((a, b) => a * b)
+    return this.sizeOut.reduce((a, b) => a * b, 0)
   }
 
   /**
@@ -63,7 +63,7 @@ export default class Operator {
    * It is the matrix column number.
    */
   get totalSizeIn(): number {
-    return this.sizeIn.reduce((a, b) => a * b)
+    return this.sizeIn.reduce((a, b) => a * b, 0)
   }
 
   /**
@@ -384,7 +384,7 @@ export default class Operator {
    */
   static identity(dimensions: Dimension[]): Operator {
     const sizes = dimensions.map(dimension => dimension.size)
-    const totalSize = sizes.reduce((a, b) => a * b)
+    const totalSize = sizes.reduce((a, b) => a * b, 0)
 
     const entries = _.range(totalSize).map(index =>
       OperatorEntry.fromIndexIndexValue(index, index, sizes, sizes, Cx(1, 0)),
@@ -446,10 +446,10 @@ export default class Operator {
   ): Operator {
     // Get size vector from dimensions
     const sizesOut = dimensionsOut.map(dimension => dimension.size)
-    const totalSizeOut = sizesOut.reduce((a, b) => a * b)
+    const totalSizeOut = sizesOut.reduce((a, b) => a * b, 0)
 
     const sizesIn = dimensionsIn.map(dimension => dimension.size)
-    const totalSizeIn = sizesIn.reduce((a, b) => a * b)
+    const totalSizeIn = sizesIn.reduce((a, b) => a * b, 0)
 
     const rowLengths = denseArray.map(row => row.length)
     if (_.min(rowLengths) !== _.max(rowLengths)) {

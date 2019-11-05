@@ -46,7 +46,7 @@ export default class Vector {
    * @returns The total size (the total array length).
    */
   get totalSize(): number {
-    return this.size.reduce((a, b) => a * b)
+    return this.size.reduce((a, b) => a * b, 0)
   }
 
   /**
@@ -140,7 +140,7 @@ export default class Vector {
           return Cx(0, 0)
         }
       })
-      .reduce((a, b) => a.add(b))
+      .reduce((a, b) => a.add(b), Cx(0))
       .value()
 
     return result
@@ -249,7 +249,7 @@ export default class Vector {
   static fromArray(denseArray: Complex[], dimensions: Dimension[], removeZeros = true): Vector {
     // Get size vector from dimensions
     const sizes = dimensions.map(dimension => dimension.size)
-    const totalSize = sizes.reduce((a, b) => a * b)
+    const totalSize = sizes.reduce((a, b) => a * b, 0)
     if (denseArray.length !== totalSize) {
       throw new Error(`Dimension inconsistency: entry count ${denseArray.length} != total: ${totalSize}`)
     }
