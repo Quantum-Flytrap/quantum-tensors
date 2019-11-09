@@ -63,6 +63,33 @@ export default class Photons {
   } 
 
   /**
+   * Dimension indices for particle i, for [posX, posY, dir, pol].
+   * @param i Photon id, from [0, ..., nPhotons - 1]
+   * @returns E.g. for 1: [4, 5, 6, 7]
+   */
+  vectorIndicesForParticle(i: number): number[] {
+    return [4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3]
+  }
+
+  /**
+   * Dimension indices for particle i, for [posX, posY, dir].
+   * @param i Photon id, from [0, ..., nPhotons - 1]
+   * @returns E.g. for 1: [4, 5, 6]
+   */
+  vectorPosDirIndicesForParticle(i: number): number[] {
+    return [4 * i, 4 * i + 1, 4 * i + 2]
+  }
+
+  /**
+   * Dimension indices for particle i, for [posX, posY]. 
+   * @param i Photon id, from [0, ..., nPhotons - 1]
+   * @returns E.g. for 1: [4, 5]
+   */
+  vectorPosIndicesForParticle(i: number): number[] {
+    return [4 * i, 4 * i + 1]
+  }
+
+  /**
    * Create a single photon vector.
    * @param posX Position of the photon, x.
    * @param posY Position of the photon, y.
@@ -137,7 +164,7 @@ export default class Photons {
   propagatePhotons(yDirMeansDown = true): void {
     const photonPropagator = this.createPhotonPropagator(yDirMeansDown)
     _.range(this.nPhotons).forEach((i) => {
-      this.vector = photonPropagator.mulVecPartial([4 * i, 4 * i + 1, 4 * i + 2], this.vector)
+      this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
     })
   }
 
@@ -155,7 +182,6 @@ export default class Photons {
 
   /**
    * Measure the absolute absorbtion on a given tile.
-   * So for for a single photon (as we project everything a single tile)
    * @param posX Position x.
    * @param posY Position y.
    * @param op Operator, assumed to be with dimensions [pol, dir].
@@ -163,14 +189,11 @@ export default class Photons {
    * @returns Probability lost at tile (x, y) after applying the operator.
    * Does not change the photon object.
    */
-  measureAbsorptionAtOperator(posX: number, posY: number, op: Operator): number {
-    if (this.nPhotons !== 1) {
-      throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
-    }
+  measureAbsorptionAtOperator(posX: number, posY: number, op: Operator, photonId = 0): number {
     const localizedOperator = this.createLocalizedOperator(op, posX, posY)
     const localizedId = Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`])
-    const newVector = localizedOperator.mulVec(this.vector)
-    const oldVector = localizedId.mulVecPartial([0, 1], this.vector)
+    const newVector = localizedOperator.mulVecPartial(this.vectorIndicesForParticle(photonId), this.vector)
+    const oldVector = localizedId.mulVecPartial(this.vectorPosIndicesForParticle(photonId), this.vector)
     return oldVector.normSquared() - newVector.normSquared()
   }
 
@@ -205,7 +228,7 @@ export default class Photons {
   actOnSinglePhotons(opsWithPos: [number, number, Operator][]): void {
     const singlePhotonInteraction = this.createSinglePhotonInteraction(opsWithPos)
     _.range(this.nPhotons).forEach(i => {
-      this.vector = singlePhotonInteraction.mulVecPartial([4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3], this.vector)
+      this.vector = singlePhotonInteraction.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
     })
   }
 
