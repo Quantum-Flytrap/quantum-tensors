@@ -47,6 +47,22 @@ export default class Photons {
   }
 
   /**
+   * Normalize in-place 
+   */
+  normalizeInplace(): void {
+    this.vector = this.vector.normalize()
+  } 
+
+  /**
+   * Normalize a copy
+   */
+  normalize(): Photons {
+    const newPhotons = this.copy()
+    this.normalizeInplace()
+    return newPhotons
+  } 
+
+  /**
    * Create a single photon vector.
    * @param posX Position of the photon, x.
    * @param posY Position of the photon, y.

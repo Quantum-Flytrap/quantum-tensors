@@ -179,7 +179,7 @@ export default class Vector {
   normalize(): Vector {
     const norm = this.normSquared()
     if (norm === 0) {
-      throw `Cannot normalize a zero-length vector!`
+      throw new Error('Cannot normalize a zero-length vector!')
     }
     return this.mulConstant(Cx(norm))
   }
