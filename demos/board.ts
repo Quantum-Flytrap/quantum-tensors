@@ -51,12 +51,12 @@ import * as el from "../src/Elements"
 //   [5, 1, el.beamSplitter(135)],
 // ]
 
-console.log("===========================")
-console.log("BOARD 3")
+// console.log("===========================")
+// console.log("BOARD 3")
 
-const sizeX = 8
-const sizeY = 3
-const state = new Photons(sizeX, sizeY)
+// const sizeX = 8
+// const sizeY = 3
+// const state = new Photons(sizeX, sizeY)
 
 // Sugar solutions and PBS
 // Let's start horizontal
@@ -64,17 +64,32 @@ const state = new Photons(sizeX, sizeY)
 // ..../..
 // .......
 
-state.addPhotonIndicator(0, 0, ">", "H")
+// state.addPhotonIndicator(0, 0, ">", "H")
 
-// x, y, operator
+// // x, y, operator
+// const operations: [number, number, Operator][] = [
+//   [2, 0, el.sugarSolution()],
+//   [4, 0, el.polarizingBeamsplitter(135)],
+//   [4, 1, el.polarizingBeamsplitter(45)],
+// ]
+
+console.log("===========================")
+console.log("BOARD 4")
+
+const sizeX = 8
+const sizeY = 8
+const state = new Photons(sizeX, sizeY)
+
+state.addPhotonIndicator(0, 2, ">", "H")
+state.addPhotonIndicator(2, 0, "v", "H")
+
+// // x, y, operator
 const operations: [number, number, Operator][] = [
-  [2, 0, el.sugarSolution()],
-  [4, 0, el.polarizingBeamsplitter(135)],
-  [4, 1, el.polarizingBeamsplitter(45)],
+  [2, 2, el.beamSplitter(135)],
 ]
 
-// print part
-// works the same for everything
+// // print part
+// // works the same for everything
 
 console.log("Creating Photon")
 console.log(state.ketString())
