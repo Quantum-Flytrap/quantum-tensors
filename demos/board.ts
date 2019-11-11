@@ -97,6 +97,11 @@ console.log("Steps:")
 
 _.range(10).forEach(i => {
   state.propagatePhotons()
+  //// this seem to work
+  // const abs = state.measureAbsorptionAtOperator(3, 2, el.attenuator(0), 0)
+  // console.log("Abs at 3,2: ", abs)
+  console.log(state.vectorValuedMeasurement(3, 2, el.attenuator(0), 0))
+  console.log(state.vectorValuedMeasurement(3, 2, el.attenuator(0), 1)) // paticle 2
   state.actOnSinglePhotons(operations)
   console.log(`Step ${i}: ${state.ketString()}`)
 })

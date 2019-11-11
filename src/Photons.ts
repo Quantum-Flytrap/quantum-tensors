@@ -197,6 +197,71 @@ export default class Photons {
     return oldVector.normSquared() - newVector.normSquared()
   }
 
+
+  /**
+   * Demo of measurement of one particle
+   * So far the basis is FIXED, so it won't give corrent results with operators absorbing in a basis
+   * that does not commute with this basis.
+   * Vide {@link measureAbsorptionAtOperator} as the structure is 
+   * @param posX 
+   * @param posY 
+   * @param op 
+   * @param photonId 
+   * 
+   * @return Only measurement (zeros excluded). Conditional state is NOT normalized (to avoid issues with division by )
+   */
+  vectorValuedMeasurement(posX: number, posY: number, op: Operator, photonId = 0): any {
+    // as I see later, localizedOperator can be discarded as
+    // we use localizedId anyway
+    const localizedOperator = this.createLocalizedOperator(op, posX, posY)
+    // for decomposition of identity
+    // this step is dirty, as it won't work, say, for polarizer at non H/V angle
+    const basis = ['>H', '>V', '^H', '^V', '<H', '<V', 'vH', 'vV']
+    const dimDir = Dimension.direction()
+    const dimPol = Dimension.polarization()
+    
+    // for sho
+    // just in case [...posInd] if I modify it elsewere (better safe than sorry)
+    const posInd = this.vectorPosIndicesForParticle(photonId)
+    const dirPolInd = [4 * photonId + 2, 4 * photonId + 3]
+
+    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`])
+    // we already project on pos, so it is consistent!
+    // it may be goo to gather it, though
+
+    const oldVectorHere = localizedId.mulVecPartial([...posInd], this.vector)
+
+    return basis.map((coordStr) => {
+      const projection = Operator.indicator([dimDir, dimPol], coordStr)
+      const vectorProjected = projection.mulVecPartial(dirPolInd, oldVectorHere)
+      const inputProjectedProbabability = vectorProjected.normSquared()
+      const allId = this.vectorIndicesForParticle(photonId)
+      const outputProjectedProbability = localizedOperator.mulVecPartial([...allId], vectorProjected).normSquared()
+      const p = inputProjectedProbabability - outputProjectedProbability
+
+      const proj = Operator.indicator(
+        [this.dimX, this.dimY, dimDir, dimPol],
+        [`${posX}`, `${posY}`, coordStr[0], coordStr[1]]
+      )
+      
+      const newPhotons = this.copy()
+      newPhotons.nPhotons -= 1
+      
+      newPhotons.vector =  proj.mulVecPartial([...allId], this.vector)._removeDimension([...allId])
+      return {
+        photonId: photonId, 
+        x: posX,
+        y: posY,
+        dirStr: coordStr[0],
+        polStr: coordStr[1],
+        inputProb: inputProjectedProbabability,
+        probability: p,
+        projectedState: newPhotons.ketString(), // for now just print  // not normalized
+      }
+
+    }).filter((d) => d.inputProb > 0)
+  }
+
   /**
    * Turn an list of operators in a complete one-photon iteraction operator for the board.
    * @remark Some space for improvement with avoiding identity (direct sum structure),

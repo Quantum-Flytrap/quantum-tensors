@@ -147,6 +147,32 @@ export default class Vector {
   }
 
   /**
+   * It is NOT a safe operation.
+   * Unless before we applied an in-bassis projection to this coordinate
+   * it will produce something which will cause errors, due to possibility of entries with same coords
+   * E.g. for (0.00 -0.71i) |2,3,^,V,1,8,>,H⟩ -> (0.00 -0.71i) |1,8,>,H⟩ 
+   * @todo Create dotPartial and innerPartial instead
+   * @param coordIndices Indices to be removed
+   */
+  _removeDimension(coordIndices: number[]): Vector {
+    const complementIndices = _
+      .range(this.dimensions.length)
+      .filter(i => !_.includes(coordIndices, i))
+
+    const newDims = _.at(this.dimensions, complementIndices)
+    const newEntries = this.entries.map((entry) => 
+      new VectorEntry(_.at(entry.coord, complementIndices), entry.value)
+    )
+
+    return new Vector(newEntries, newDims)
+  }
+
+  // dotPartial(coordIndices: number[], v: Vector): Vector {
+  // TO DO
+  // }
+
+
+  /**
    * Inner product, the classic ⟨bra|ket⟩ for complex vectors.
    * https://en.wikipedia.org/wiki/Bra%E2%80%93ket_notation
    * It is anti-linear in the first argument, and linear in the seconf.
