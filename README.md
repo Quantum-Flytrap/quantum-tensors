@@ -5,7 +5,7 @@ For example for quantum computing, quantum information, and well - the Quantum G
 
 `(1.00 +0.00i) |1,2,>,V⟩` -> `(-0.71 +0.00i) |1,2,>,H⟩ + (0.71 +0.00i) |1,2,>,V⟩`
 
-Developed at the [Centre of Quantum Technologies](https://www.quantumlah.org/), National Univeristy of Singapore, by [Piotr Migdał](https://p.migdal.pl/), [Philippe Cochin](https://github.com/sneakyweasel) et al.
+Developed at the [Centre of Quantum Technologies](https://www.quantumlah.org/), National University of Singapore, by [Piotr Migdał](https://p.migdal.pl/), [Philippe Cochin](https://github.com/sneakyweasel) et al.
 It is a part of the [Quantum Game 2](https://github.com/stared/quantum-game-2) project.
 
 We base the philosophy of this package on:
