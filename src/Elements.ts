@@ -1,16 +1,16 @@
-import _ from "lodash"
-import { Cx } from "./Complex"
-import Dimension from "./Dimension"
-import Operator from "./Operator"
-import { TAU } from "./Constants"
-import * as ops from "./Ops"
+import _ from 'lodash'
+import { Cx } from './Complex'
+import Dimension from './Dimension'
+import Operator from './Operator'
+import { TAU } from './Constants'
+import * as ops from './Ops'
 
 const dimPol = Dimension.polarization()
 const dimDir = Dimension.direction()
 const idPol = Operator.identity([dimPol])
 const idDir = Operator.identity([dimDir])
-const projH = Operator.indicator([dimPol], "H")
-const projV = Operator.indicator([dimPol], "V")
+const projH = Operator.indicator([dimPol], 'H')
+const projV = Operator.indicator([dimPol], 'V')
 
 const mod = (x: number, n: number): number => ((x % n) + n) % n
 
@@ -53,10 +53,7 @@ export function glassSlab(): Operator {
  * @returns Operator with dimensions [dimDir, dimPol].
  */
 export function mirror(angle: number): Operator {
-  return Operator.outer([
-    ops.reflectFromPlaneDirection(angle),
-    ops.reflectPhaseFromDenser(),
-  ])
+  return Operator.outer([ops.reflectFromPlaneDirection(angle), ops.reflectPhaseFromDenser()])
 }
 
 /**
@@ -81,8 +78,13 @@ export function beamSplitter(angle: number): Operator {
 export function cornerCube(): Operator {
   return Operator.outer([
     Operator.fromSparseCoordNames(
-      [["<", ">", Cx(1)], ["v", "^", Cx(1)], [">", "<", Cx(1)], ["^", "v", Cx(1)]],
-      [dimDir]
+      [
+        ['<', '>', Cx(1)],
+        ['v', '^', Cx(1)],
+        ['>', '<', Cx(1)],
+        ['^', 'v', Cx(1)],
+      ],
+      [dimDir],
     ),
     idPol,
   ])
@@ -100,10 +102,7 @@ export function polarizingBeamsplitter(angle: number): Operator {
     throw new Error(`polarizingBeamsplitter: angle ${angle} mod 180 not in [45, 135].`)
   }
 
-  return Operator.add([
-    idDir.outer(projH),
-    ops.reflectFromPlaneDirection(angle).outer(projV),
-  ])
+  return Operator.add([idDir.outer(projH), ops.reflectFromPlaneDirection(angle).outer(projV)])
 }
 
 /**
@@ -116,14 +115,8 @@ export function polarizingBeamsplitter(angle: number): Operator {
  */
 export function faradayRotator(angle: number, polarizationRotation = 0.125): Operator {
   return Operator.add([
-    Operator.outer([
-      ops.diodeForDirections(angle),
-      ops.rotationMatrix(polarizationRotation * TAU, dimPol),
-    ]),
-    Operator.outer([
-      ops.diodeForDirections(angle + 180),
-      ops.rotationMatrix(-polarizationRotation * TAU, dimPol),
-    ]),
+    Operator.outer([ops.diodeForDirections(angle), ops.rotationMatrix(polarizationRotation * TAU, dimPol)]),
+    Operator.outer([ops.diodeForDirections(angle + 180), ops.rotationMatrix(-polarizationRotation * TAU, dimPol)]),
   ])
 }
 
@@ -135,14 +128,8 @@ export function faradayRotator(angle: number, polarizationRotation = 0.125): Ope
  */
 export function polarizer(angle: number, polarizationOrientation: number): Operator {
   return Operator.add([
-    Operator.outer([
-      ops.diodeForDirections(angle),
-      ops.projectionMatrix(polarizationOrientation * TAU, dimPol),
-    ]),
-    Operator.outer([
-      ops.diodeForDirections(angle + 180),
-      ops.projectionMatrix(-polarizationOrientation * TAU, dimPol),
-    ]),
+    Operator.outer([ops.diodeForDirections(angle), ops.projectionMatrix(polarizationOrientation * TAU, dimPol)]),
+    Operator.outer([ops.diodeForDirections(angle + 180), ops.projectionMatrix(-polarizationOrientation * TAU, dimPol)]),
   ])
 }
 
@@ -173,7 +160,7 @@ export function PolarizerNS(angle: number): Operator {
  * @param phase Phase shift. 1/4 (default) for quater-wave-plate, 1/2 for half-wave-plate.
  * @todo Convention: modify this polarization, ortonogal, or some other way?
  */
-export function phasePlate(angle: number, polarizationOrientation: number, phase = 1/4): Operator {
+export function phasePlate(angle: number, polarizationOrientation: number, phase = 1 / 4): Operator {
   return Operator.add([
     Operator.outer([
       ops.diodeForDirections(angle),

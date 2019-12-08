@@ -1,13 +1,13 @@
-import Complex from "./Complex";
-import { CoordsFromIndex } from "./helpers";
+import Complex from './Complex'
+import { CoordsFromIndex } from './helpers'
 
 /**
  * Class for vector entires (also know as: vector values, cells).
  * To be used only within a Vector object, or to create such.
  */
 export default class VectorEntry {
-  coord: number[];
-  value: Complex;
+  coord: number[]
+  value: Complex
 
   /**
    * Creates a VectorEntry from coord and value.
@@ -15,8 +15,8 @@ export default class VectorEntry {
    * @param value
    */
   constructor(coord: number[], value: Complex) {
-    this.coord = coord;
-    this.value = value;
+    this.coord = coord
+    this.value = value
   }
 
   /**
@@ -24,8 +24,8 @@ export default class VectorEntry {
    * @param e2 The other entry
    */
   outer(e2: VectorEntry): VectorEntry {
-    const e1 = this;
-    return new VectorEntry(e1.coord.concat(e2.coord), e1.value.mul(e2.value));
+    const e1 = this
+    return new VectorEntry(e1.coord.concat(e2.coord), e1.value.mul(e2.value))
   }
 
   /**
@@ -33,7 +33,7 @@ export default class VectorEntry {
    * @returms E.g. "Sparse vector entry [3,0,1] has value (1.00 - 0.50 i)"
    */
   toString(): string {
-    return `Sparse vector entry [${this.coord.toString()}] has value ${this.value.toString()}`;
+    return `Sparse vector entry [${this.coord.toString()}] has value ${this.value.toString()}`
   }
 
   /**
@@ -42,12 +42,8 @@ export default class VectorEntry {
    * @param sizes sizes od dimensions
    * @param value entry value
    */
-  static fromIndexValue(
-    index: number,
-    sizes: number[],
-    value: Complex
-  ): VectorEntry {
-    const coords = CoordsFromIndex(index, sizes);
-    return new VectorEntry(coords, value);
+  static fromIndexValue(index: number, sizes: number[], value: Complex): VectorEntry {
+    const coords = CoordsFromIndex(index, sizes)
+    return new VectorEntry(coords, value)
   }
 }

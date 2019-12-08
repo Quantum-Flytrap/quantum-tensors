@@ -1,4 +1,4 @@
-import * as _ from "lodash"
+import _ from 'lodash'
 
 /**
  * Dimension class, e.g.
@@ -31,7 +31,7 @@ export default class Dimension {
    * @returns polarization dimension
    */
   static polarization(): Dimension {
-    return new Dimension("polarization", 2, ["H", "V"])
+    return new Dimension('polarization', 2, ['H', 'V'])
   }
 
   /**
@@ -39,7 +39,7 @@ export default class Dimension {
    * @returns direction dimensions
    */
   static direction(): Dimension {
-    return new Dimension("direction", 4, [">", "^", "<", "v"])
+    return new Dimension('direction', 4, ['>', '^', '<', 'v'])
   }
 
   /**
@@ -47,7 +47,7 @@ export default class Dimension {
    * @returns spin dimensions
    */
   static spin(): Dimension {
-    return new Dimension("spin", 2, ["u", "d"])
+    return new Dimension('spin', 2, ['u', 'd'])
   }
 
   /**
@@ -55,7 +55,7 @@ export default class Dimension {
    * @param size A positive integer - size of steps.
    * @param name Dimension name, e.g. 'x', 'y' or 'z'.
    */
-  static position(size: number, name = "x"): Dimension {
+  static position(size: number, name = 'x'): Dimension {
     const coordNames = _.range(size).map((i: number) => i.toString())
     return new Dimension(name, size, coordNames)
   }
@@ -72,7 +72,7 @@ export default class Dimension {
    * @returns string with concat names
    */
   get coordString(): string {
-    return this.coordNames.join("")
+    return this.coordNames.join('')
   }
 
   /**
@@ -104,7 +104,7 @@ export default class Dimension {
    * @param dims Array of dimensions
    */
   static concatDimNames(dims: Dimension[]): string {
-    let names = ""
+    let names = ''
     dims.forEach(dim => {
       names += dim.coordString
     })
@@ -122,30 +122,30 @@ export default class Dimension {
     if (dims1.length !== dims2.length) {
       console.error(
         `Dimensions with unequal number of components ${dims1.length} !== ${dims2.length}.\n
-        Dimensions 1:\n${dims1.join("\n")}\n
-        Dimensions 2:\n${dims2.join("\n")}`,
+        Dimensions 1:\n${dims1.join('\n')}\n
+        Dimensions 2:\n${dims2.join('\n')}`,
       )
-      throw new Error("Dimensions array size mismatch...")
+      throw new Error('Dimensions array size mismatch...')
     }
     // Check for order
     _.range(dims1.length).forEach(i => {
       if (!dims1[i].isEqual(dims2[i])) {
         console.error(
           `Dimensions have the same number of components, but the component ${i} is\n${dims1[i]}\nvs\n${dims2[i]}.\n
-          Dimensions 1:\n${dims1.join("\n")}\n
-          Dimensions 2:\n${dims2.join("\n")}`,
+          Dimensions 1:\n${dims1.join('\n')}\n
+          Dimensions 2:\n${dims2.join('\n')}`,
         )
-        throw new Error("Dimensions array order mismatch...")
+        throw new Error('Dimensions array order mismatch...')
       }
     })
   }
 
   /**
-   * 
-   * @param s string, such as "udH" or ['u', 'd', 'H'] 
+   *
+   * @param s string, such as "udH" or ['u', 'd', 'H']
    * @param dimensions  Dimensions to be used
-   * 
-   * @returns 
+   *
+   * @returns
    */
   static stringToCoordIndices(s: string | string[], dimensions: Dimension[]): number[] {
     if (dimensions.length !== s.length) {

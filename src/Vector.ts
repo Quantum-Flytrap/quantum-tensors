@@ -1,7 +1,7 @@
-import Complex, { Cx } from "./Complex";
-import VectorEntry from "./VectorEntry";
-import Dimension from "./Dimension";
-import _ from "lodash";
+import Complex, { Cx } from './Complex'
+import VectorEntry from './VectorEntry'
+import Dimension from './Dimension'
+import _ from 'lodash'
 
 /**
  * Vector class.
@@ -10,8 +10,8 @@ import _ from "lodash";
  * @see {@link Complex} and {@link Dimension}
  */
 export default class Vector {
-  entries: VectorEntry[];
-  dimensions: Dimension[];
+  entries: VectorEntry[]
+  dimensions: Dimension[]
 
   /**
    * Creates a vector entry.
@@ -21,8 +21,8 @@ export default class Vector {
    * @param dimensions Dimensions.
    */
   constructor(entries: VectorEntry[], dimensions: Dimension[]) {
-    this.entries = entries;
-    this.dimensions = dimensions;
+    this.entries = entries
+    this.dimensions = dimensions
   }
 
   /**
@@ -31,7 +31,7 @@ export default class Vector {
    * Use this.entires instead; here only to make sure it is not a breaking change.
    */
   get cells(): VectorEntry[] {
-    return this.entries;
+    return this.entries
   }
 
   /**
@@ -39,14 +39,14 @@ export default class Vector {
    * @see {@link Dimension}
    */
   get size(): number[] {
-    return this.dimensions.map(dimension => dimension.size);
+    return this.dimensions.map(dimension => dimension.size)
   }
 
   /**
    * @returns The total size (the total array length).
    */
   get totalSize(): number {
-    return this.size.reduce((a, b) => a * b);
+    return this.size.reduce((a, b) => a * b)
   }
 
   /**
@@ -54,14 +54,14 @@ export default class Vector {
    * @see {@link Dimension}
    */
   get names(): string[] {
-    return this.dimensions.map(dimension => dimension.name);
+    return this.dimensions.map(dimension => dimension.name)
   }
 
   /**
    * @returns Coordinate names for each {@link Dimension}.
    */
   get coordNames(): string[][] {
-    return this.dimensions.map(dimension => dimension.coordNames);
+    return this.dimensions.map(dimension => dimension.coordNames)
   }
 
   /**
@@ -70,10 +70,8 @@ export default class Vector {
    * @returns Complex conjugation for a vector.
    */
   conj(): Vector {
-    const entries = this.entries.map(
-      entry => new VectorEntry([...entry.coord], entry.value.conj())
-    );
-    return new Vector(entries, this.dimensions);
+    const entries = this.entries.map(entry => new VectorEntry([...entry.coord], entry.value.conj()))
+    return new Vector(entries, this.dimensions)
   }
 
   /**
@@ -84,23 +82,21 @@ export default class Vector {
    *
    */
   add(v2: Vector): Vector {
-    const v1 = this;
+    const v1 = this
 
-    Dimension.checkDimensions(v1.dimensions, v2.dimensions);
+    Dimension.checkDimensions(v1.dimensions, v2.dimensions)
 
     const entries = _.chain(v1.entries.concat(v2.entries))
       .groupBy((entry: VectorEntry) => entry.coord.toString())
       .values()
       .map((grouped: VectorEntry[]) => {
-        const coord = [...grouped[0].coord];
-        const value = grouped
-          .map(entry => entry.value)
-          .reduce((a, b) => a.add(b));
-        return new VectorEntry(coord, value);
+        const coord = [...grouped[0].coord]
+        const value = grouped.map(entry => entry.value).reduce((a, b) => a.add(b))
+        return new VectorEntry(coord, value)
       })
-      .value();
+      .value()
 
-    return new Vector(entries, v1.dimensions);
+    return new Vector(entries, v1.dimensions)
   }
 
   /**
@@ -109,10 +105,8 @@ export default class Vector {
    * @returns c v
    */
   mulConstant(c: Complex): Vector {
-    const entries = this.entries.map(
-      entry => new VectorEntry(entry.coord, entry.value.mul(c))
-    );
-    return new Vector(entries, this.dimensions);
+    const entries = this.entries.map(entry => new VectorEntry(entry.coord, entry.value.mul(c)))
+    return new Vector(entries, this.dimensions)
   }
 
   /**
@@ -121,7 +115,7 @@ export default class Vector {
    * @returns v1 - v2
    */
   sub(v2: Vector): Vector {
-    return this.add(v2.mulConstant(Cx(-1)));
+    return this.add(v2.mulConstant(Cx(-1)))
   }
 
   /**
@@ -132,24 +126,24 @@ export default class Vector {
    * @returns v1 . v2
    */
   dot(v2: Vector): Complex {
-    const v1 = this;
+    const v1 = this
 
-    Dimension.checkDimensions(v1.dimensions, v2.dimensions);
+    Dimension.checkDimensions(v1.dimensions, v2.dimensions)
 
     const result = _.chain(v1.entries.concat(v2.entries))
       .groupBy((entry: VectorEntry) => entry.coord.toString())
       .values()
       .map((grouped: VectorEntry[]) => {
         if (grouped.length === 2) {
-          return grouped[0].value.mul(grouped[1].value);
+          return grouped[0].value.mul(grouped[1].value)
         } else {
-          return Cx(0, 0);
+          return Cx(0, 0)
         }
       })
       .reduce((a, b) => a.add(b), Cx(0))
-      .value();
+      .value()
 
-    return result;
+    return result
   }
 
   /**
@@ -161,17 +155,12 @@ export default class Vector {
    * @param coordIndices Indices to be removed
    */
   _removeDimension(coordIndices: number[]): Vector {
-    const complementIndices = _.range(this.dimensions.length).filter(
-      i => !_.includes(coordIndices, i)
-    );
+    const complementIndices = _.range(this.dimensions.length).filter(i => !_.includes(coordIndices, i))
 
-    const newDims = _.at(this.dimensions, complementIndices);
-    const newEntries = this.entries.map(
-      entry =>
-        new VectorEntry(_.at(entry.coord, complementIndices), entry.value)
-    );
+    const newDims = _.at(this.dimensions, complementIndices)
+    const newEntries = this.entries.map(entry => new VectorEntry(_.at(entry.coord, complementIndices), entry.value))
 
-    return new Vector(newEntries, newDims);
+    return new Vector(newEntries, newDims)
   }
 
   // dotPartial(coordIndices: number[], v: Vector): Vector {
@@ -186,7 +175,7 @@ export default class Vector {
    * @returns v1^† . v2 or ⟨v1|v2⟩
    */
   inner(v2: Vector): Complex {
-    return this.conj().dot(v2);
+    return this.conj().dot(v2)
   }
 
   /**
@@ -199,9 +188,7 @@ export default class Vector {
    * @returns ⟨v|v⟩
    */
   normSquared(): number {
-    return this.entries
-      .map(entry => entry.value.abs2())
-      .reduce((a, b) => a + b, 0);
+    return this.entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b, 0)
   }
 
   /**
@@ -209,11 +196,11 @@ export default class Vector {
    * @returns A normalized vector: |v⟩ / √⟨v|v⟩
    */
   normalize(): Vector {
-    const norm = this.normSquared();
+    const norm = this.normSquared()
     if (norm === 0) {
-      throw new Error("Cannot normalize a zero-length vector!");
+      throw new Error('Cannot normalize a zero-length vector!')
     }
-    return this.mulConstant(Cx(norm));
+    return this.mulConstant(Cx(norm))
   }
 
   /**
@@ -226,15 +213,13 @@ export default class Vector {
    * @todo Consider using flatMap for clarity.
    */
   outer(v2: Vector): Vector {
-    const v1 = this;
-    const dimensions: Dimension[] = v1.dimensions.concat(v2.dimensions);
-    const entries: VectorEntry[] = [];
+    const v1 = this
+    const dimensions: Dimension[] = v1.dimensions.concat(v2.dimensions)
+    const entries: VectorEntry[] = []
     v1.entries.forEach((entry1: VectorEntry) =>
-      v2.entries.forEach((entry2: VectorEntry) =>
-        entries.push(entry1.outer(entry2))
-      )
-    );
-    return new Vector(entries, dimensions);
+      v2.entries.forEach((entry2: VectorEntry) => entries.push(entry1.outer(entry2))),
+    )
+    return new Vector(entries, dimensions)
   }
 
   /**
@@ -250,31 +235,20 @@ export default class Vector {
    * Vector with 3 entries of max size [2,2] with dimensions [spin,polarization]
    * (0.00 +2.00i) |u,H⟩ + (-1.00 -1.00i) |d,H⟩ + (0.50 +2.50i) |d,V⟩
    */
-  toString(
-    complexFormat = "cartesian",
-    precision = 2,
-    separator = " + ",
-    intro = true
-  ): string {
+  toString(complexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
     const valueStr = this.entries
       .map(entry => {
-        const coordStr = entry.coord.map(
-          (i: number, dim: number) => this.coordNames[dim][i]
-        );
-        return `${entry.value.toString(
-          complexFormat,
-          precision
-        )} |${coordStr}⟩`;
+        const coordStr = entry.coord.map((i: number, dim: number) => this.coordNames[dim][i])
+        return `${entry.value.toString(complexFormat, precision)} |${coordStr}⟩`
       })
-      .join(separator);
+      .join(separator)
 
     if (intro) {
       const introStr =
-        `Vector with ${this.entries.length} entries ` +
-        `of max size [${this.size}] with dimensions [${this.names}]`;
-      return `${introStr}\n${valueStr}\n`;
+        `Vector with ${this.entries.length} entries ` + `of max size [${this.size}] with dimensions [${this.names}]`
+      return `${introStr}\n${valueStr}\n`
     } else {
-      return valueStr;
+      return valueStr
     }
   }
 
@@ -283,7 +257,7 @@ export default class Vector {
    * @todo Make it more lightweight than using lodash.
    */
   copy(): Vector {
-    return _.cloneDeep(this);
+    return _.cloneDeep(this)
   }
 
   /**
@@ -297,33 +271,21 @@ export default class Vector {
    * @param dimensions Dimensions.
    * @param removeZeros If to remove zero value.
    */
-  static fromArray(
-    denseArray: Complex[],
-    dimensions: Dimension[],
-    removeZeros = true
-  ): Vector {
+  static fromArray(denseArray: Complex[], dimensions: Dimension[], removeZeros = true): Vector {
     // Get size vector from dimensions
-    const sizes = dimensions.map(dimension => dimension.size);
-    const totalSize = sizes.reduce((a, b) => a * b);
+    const sizes = dimensions.map(dimension => dimension.size)
+    const totalSize = sizes.reduce((a, b) => a * b)
     if (denseArray.length !== totalSize) {
-      throw new Error(
-        `Dimension inconsistency: entry count ${denseArray.length} != total: ${totalSize}`
-      );
+      throw new Error(`Dimension inconsistency: entry count ${denseArray.length} != total: ${totalSize}`)
     }
 
     // Map values to cells indices in a dense representation
     const entries: VectorEntry[] = denseArray
       .map((value: Complex, index: number): [number, Complex] => [index, value])
-      .filter(
-        ([_index, value]: [number, Complex]): boolean =>
-          !removeZeros || !value.isZero()
-      )
-      .map(
-        ([index, value]: [number, Complex]): VectorEntry =>
-          VectorEntry.fromIndexValue(index, sizes, value)
-      );
+      .filter(([_index, value]: [number, Complex]): boolean => !removeZeros || !value.isZero())
+      .map(([index, value]: [number, Complex]): VectorEntry => VectorEntry.fromIndexValue(index, sizes, value))
 
-    return new Vector(entries, dimensions);
+    return new Vector(entries, dimensions)
   }
 
   /**
@@ -337,9 +299,9 @@ export default class Vector {
    * For symbols with more than one letter you need to use an array of strings.
    */
   static indicator(dimensions: Dimension[], coordNames: string[]): Vector {
-    const coords = Dimension.stringToCoordIndices(coordNames, dimensions);
-    const entries = [new VectorEntry(coords, Cx(1))];
-    return new Vector(entries, dimensions);
+    const coords = Dimension.stringToCoordIndices(coordNames, dimensions)
+    const entries = [new VectorEntry(coords, Cx(1))]
+    return new Vector(entries, dimensions)
   }
 
   /**
@@ -357,18 +319,11 @@ export default class Vector {
    *
    * @returns A vector, as desired.
    */
-  static fromSparseCoordNames(
-    stringedEntries: [string, Complex][],
-    dimensions: Dimension[]
-  ): Vector {
+  static fromSparseCoordNames(stringedEntries: [string, Complex][], dimensions: Dimension[]): Vector {
     const entries = stringedEntries.map(
-      ([coordNameStr, value]) =>
-        new VectorEntry(
-          Dimension.stringToCoordIndices(coordNameStr, dimensions),
-          value
-        )
-    );
-    return new Vector(entries, dimensions);
+      ([coordNameStr, value]) => new VectorEntry(Dimension.stringToCoordIndices(coordNameStr, dimensions), value),
+    )
+    return new Vector(entries, dimensions)
   }
 
   /**
@@ -383,7 +338,7 @@ export default class Vector {
    * @todo Can be optimized if needed.
    */
   static outer(vectors: Vector[]): Vector {
-    return vectors.reduce((acc, x) => acc.outer(x));
+    return vectors.reduce((acc, x) => acc.outer(x))
   }
 
   /**
@@ -397,6 +352,6 @@ export default class Vector {
    * @todo Can be optimized if needed.
    */
   static add(vectors: Vector[]): Vector {
-    return vectors.reduce((acc, x) => acc.add(x));
+    return vectors.reduce((acc, x) => acc.add(x))
   }
 }

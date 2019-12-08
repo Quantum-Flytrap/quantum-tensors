@@ -1,7 +1,7 @@
-import Complex, { Cx } from "./Complex"
-import Operator from "./Operator"
-import Dimension from "./Dimension"
-import { TAU } from "./Constants"
+import Complex, { Cx } from './Complex'
+import Operator from './Operator'
+import Dimension from './Dimension'
+import { TAU } from './Constants'
 
 const dimPol = Dimension.polarization()
 const dimDir = Dimension.direction()
@@ -21,7 +21,10 @@ export const isqrt2 = Cx(Math.SQRT1_2)
  * @param dimension A dimension of size 2, e.g. spin or polarization.
  */
 export function rotationMatrix(alpha: number, dimension: Dimension): Operator {
-  const array = [[cos(alpha), sin(-alpha)], [sin(alpha), cos(alpha)]]
+  const array = [
+    [cos(alpha), sin(-alpha)],
+    [sin(alpha), cos(alpha)],
+  ]
   return Operator.fromArray(array, [dimension])
 }
 
@@ -49,8 +52,8 @@ export function phaseShiftForRealEigenvectors(
   alpha: number,
   phase: number,
   phaseOrthogonal: number,
-  dimension: Dimension): Operator {
-
+  dimension: Dimension,
+): Operator {
   return Operator.add([
     projectionMatrix(alpha, dimension).mulConstant(Complex.fromPolar(1, phase * TAU)),
     projectionMatrix(alpha + 0.25 * TAU, dimension).mulConstant(Complex.fromPolar(1, phaseOrthogonal * TAU)),
@@ -62,7 +65,10 @@ export function phaseShiftForRealEigenvectors(
  * Note that change horrizontal frame of reference.
  */
 export function reflectPhaseFromLighter(): Operator {
-  const array = [[Cx(-1), Cx(0)], [Cx(0), Cx(1)]]
+  const array = [
+    [Cx(-1), Cx(0)],
+    [Cx(0), Cx(1)],
+  ]
   return Operator.fromArray(array, [dimPol], [dimPol])
 }
 
@@ -71,13 +77,16 @@ export function reflectPhaseFromLighter(): Operator {
  * Note that change horrizontal frame of reference.
  */
 export function reflectPhaseFromDenser(): Operator {
-  const array = [[Cx(-1), Cx(0)], [Cx(0), Cx(1)]]
+  const array = [
+    [Cx(-1), Cx(0)],
+    [Cx(0), Cx(1)],
+  ]
   return Operator.fromArray(array, [dimPol], [dimPol])
 }
 
 /**
  * An omnidirectional operator multiplying by a complex number.
- * @param r Absolute value of amplitide multipier. E.g. Math.SQRT1_2 for 
+ * @param r Absolute value of amplitide multipier. E.g. Math.SQRT1_2 for
  * @param rot Phase multiplier, in TAU (from range: [0,1]).
  */
 export function amplitudeIntensity(r: number, rot: number): Operator {
@@ -85,44 +94,44 @@ export function amplitudeIntensity(r: number, rot: number): Operator {
 }
 
 /**
- * A reflection from a plane that has two refletive sides.  
+ * A reflection from a plane that has two refletive sides.
  * Rotations: - / | \
  * @param angle In degrees, only values [0, 45, 90, 135]. From ->, counterclockwise.
  * @returns Operator with dimensions [Dimension.polarization()]
  */
 export function reflectFromPlaneDirection(angle: number): Operator {
   let sparseCoords: [string, string, Complex][]
-  switch(mod(angle, 180)) {
-  case 0:  // -
-    sparseCoords = [
-      ["v", "^", Cx(1)],
-      ["^", "v", Cx(1)],
-    ]
-    break
-  case 45:  // /
-    sparseCoords = [
-      ["^", ">", Cx(1)],
-      [">", "^", Cx(1)],
-      ["v", "<", Cx(1)],
-      ["<", "v", Cx(1)],
-    ]
-    break
-  case 90:  // |
-    sparseCoords = [
-      ["<", ">", Cx(1)],
-      [">", "<", Cx(1)],
-    ]
-    break
-  case 135:  // \
-    sparseCoords = [
-      ["v", ">", Cx(1)],
-      [">", "v", Cx(1)],
-      ["^", "<", Cx(1)],
-      ["<", "^", Cx(1)],
-    ]
-    break
-  default:
-    throw new Error(`Angle ${angle} % 180 isn't in the set [0, 45, 90, 135]`)
+  switch (mod(angle, 180)) {
+    case 0: // -
+      sparseCoords = [
+        ['v', '^', Cx(1)],
+        ['^', 'v', Cx(1)],
+      ]
+      break
+    case 45: // /
+      sparseCoords = [
+        ['^', '>', Cx(1)],
+        ['>', '^', Cx(1)],
+        ['v', '<', Cx(1)],
+        ['<', 'v', Cx(1)],
+      ]
+      break
+    case 90: // |
+      sparseCoords = [
+        ['<', '>', Cx(1)],
+        ['>', '<', Cx(1)],
+      ]
+      break
+    case 135: // \
+      sparseCoords = [
+        ['v', '>', Cx(1)],
+        ['>', 'v', Cx(1)],
+        ['^', '<', Cx(1)],
+        ['<', '^', Cx(1)],
+      ]
+      break
+    default:
+      throw new Error(`Angle ${angle} % 180 isn't in the set [0, 45, 90, 135]`)
   }
   return Operator.fromSparseCoordNames(sparseCoords, [dimDir])
 }
@@ -133,16 +142,28 @@ export function reflectFromPlaneDirection(angle: number): Operator {
  * @returns Operator with dimensions [Dimension.direction()].
  */
 export function beamsplitterTransmittionDirections(angle: number): Operator {
-  switch(mod(angle, 180)) {
-  case 0:  // -
-    return Operator.fromSparseCoordNames([["^", "^", Cx(1)], ["v", "v", Cx(1)]], [dimDir])
-  case 45:   // /
-  case 135:  // \
-    return idDir
-  case 90:  // |
-    return Operator.fromSparseCoordNames([[">", ">", Cx(1)], ["<", "<", Cx(1)]], [dimDir])
-  default:
-    throw new Error(`Angle ${angle} % 180 isn't in the set [0, 45, 90, 135].`)
+  switch (mod(angle, 180)) {
+    case 0: // -
+      return Operator.fromSparseCoordNames(
+        [
+          ['^', '^', Cx(1)],
+          ['v', 'v', Cx(1)],
+        ],
+        [dimDir],
+      )
+    case 45: // /
+    case 135: // \
+      return idDir
+    case 90: // |
+      return Operator.fromSparseCoordNames(
+        [
+          ['>', '>', Cx(1)],
+          ['<', '<', Cx(1)],
+        ],
+        [dimDir],
+      )
+    default:
+      throw new Error(`Angle ${angle} % 180 isn't in the set [0, 45, 90, 135].`)
   }
 }
 
@@ -152,17 +173,17 @@ export function beamsplitterTransmittionDirections(angle: number): Operator {
  * @returns Operator with dimensions [Dimension.direction()].
  */
 export function diodeForDirections(angle: number): Operator {
-  switch(mod(angle, 360)) {
-  case 0:   // ->
-    return Operator.fromSparseCoordNames([[">", ">", Cx(1)]], [dimDir])
-  case 90:   // ^
-    return Operator.fromSparseCoordNames([["^", "^", Cx(1)]], [dimDir])
-  case 180:  // <-
-    return Operator.fromSparseCoordNames([["<", "<", Cx(1)]], [dimDir])
-  case 270:  // v
-    return Operator.fromSparseCoordNames([["v", "v", Cx(1)]], [dimDir])
-  default:
-    throw new Error(`Angle ${angle} % 360 isn't in the set [0, 90, 180, 270].`)
+  switch (mod(angle, 360)) {
+    case 0: // ->
+      return Operator.fromSparseCoordNames([['>', '>', Cx(1)]], [dimDir])
+    case 90: // ^
+      return Operator.fromSparseCoordNames([['^', '^', Cx(1)]], [dimDir])
+    case 180: // <-
+      return Operator.fromSparseCoordNames([['<', '<', Cx(1)]], [dimDir])
+    case 270: // v
+      return Operator.fromSparseCoordNames([['v', 'v', Cx(1)]], [dimDir])
+    default:
+      throw new Error(`Angle ${angle} % 360 isn't in the set [0, 90, 180, 270].`)
   }
 }
 

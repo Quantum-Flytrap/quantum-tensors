@@ -1,4 +1,5 @@
-import { TAU } from "./Constants"
+import { TAU } from './Constants'
+import { hslToHex } from './helpers'
 
 /**
  * Complex number class
@@ -103,6 +104,22 @@ export default class Complex {
   }
 
   /**
+   * Division
+   * @param z2 complex number denominator
+   * @returns z = z1 / z2
+   */
+  div(z2: Complex): Complex {
+    const z1 = this
+    const denom = z2.im * z2.im + z2.re * z2.re
+    if (denom === 0) {
+      throw new Error(`Cannot divide by 0. z1: ${this.toString()} / z2: ${z2.toString()}`)
+    }
+    const re = (z1.re * z2.re + z1.im * z2.im) / denom
+    const im = (z2.re * z1.im - z1.re * z2.im) / denom
+    return new Complex(re, im)
+  }
+
+  /**
    * Complex conjugation
    * @returns z = z{re, -im}
    */
@@ -120,7 +137,7 @@ export default class Complex {
     if (this.r !== 0) {
       return new Complex(this.re / this.r, this.im / this.r)
     } else {
-      throw new Error("Cannot normalize a 0 length vector...")
+      throw new Error('Cannot normalize a 0 length vector...')
     }
   }
 
@@ -147,17 +164,27 @@ export default class Complex {
    * @param precision float display precision
    * @returns string with appropriate format
    */
-  toString(complexFormat = "cartesian", precision = 2): string {
+  toString(complexFormat = 'cartesian', precision = 2): string {
     switch (complexFormat) {
-    case "cartesian":
-      return `(${this.re.toFixed(precision)} ${this.im >= 0 ? "+" : ""}${this.im.toFixed(precision)}i)`
-    case "polar":
-      return `${this.r.toFixed(precision)} exp(${this.phi.toFixed(precision)}i)`
-    case "polarTau":
-      return `${this.r.toFixed(precision)} exp(${this.phiTau.toFixed(precision)}τi)`
-    default:
-      throw new Error(`complexFormat '${complexFormat}' is not in ['cartesian', 'polar', 'polarTau'].`)
+      case 'cartesian':
+        return `(${this.re.toFixed(precision)} ${this.im >= 0 ? '+' : ''}${this.im.toFixed(precision)}i)`
+      case 'polar':
+        return `${this.r.toFixed(precision)} exp(${this.phi.toFixed(precision)}i)`
+      case 'polarTau':
+        return `${this.r.toFixed(precision)} exp(${this.phiTau.toFixed(precision)}τi)`
+      default:
+        throw new Error(`complexFormat '${complexFormat}' is not in ['cartesian', 'polar', 'polarTau'].`)
     }
+  }
+
+  /**
+   * Generate HSL color from complex number
+   * See complex domain coloring
+   * @returns RGB string
+   */
+  toColor(): string {
+    const angle = ((this.phi * 360) / TAU + 360) % 360
+    return hslToHex(angle, 100, 100 - 50 * this.r)
   }
 
   /**

@@ -1,14 +1,14 @@
-import Complex from "./Complex";
-import { CoordsFromIndex } from "./helpers";
+import Complex from './Complex'
+import { CoordsFromIndex } from './helpers'
 
 /**
  * Class for operarator entires.
  * To be used only within a Operator object, or to create such.
  */
 export default class OperatorEntry {
-  coordOut: number[];
-  coordIn: number[];
-  value: Complex;
+  coordOut: number[]
+  coordIn: number[]
+  value: Complex
 
   /**
    * Creates a VectorEntry from output and input coordinates, and value.
@@ -17,9 +17,9 @@ export default class OperatorEntry {
    * @param value
    */
   constructor(coordOut: number[], coordIn: number[], value: Complex) {
-    this.coordOut = coordOut;
-    this.coordIn = coordIn;
-    this.value = value;
+    this.coordOut = coordOut
+    this.coordIn = coordIn
+    this.value = value
   }
 
   /**
@@ -27,12 +27,8 @@ export default class OperatorEntry {
    * @param e2  The other entry
    */
   outer(e2: OperatorEntry): OperatorEntry {
-    const e1 = this;
-    return new OperatorEntry(
-      e1.coordOut.concat(e2.coordOut),
-      e1.coordIn.concat(e2.coordIn),
-      e1.value.mul(e2.value)
-    );
+    const e1 = this
+    return new OperatorEntry(e1.coordOut.concat(e2.coordOut), e1.coordIn.concat(e2.coordIn), e1.value.mul(e2.value))
   }
 
   /**
@@ -43,7 +39,7 @@ export default class OperatorEntry {
     return (
       `Sparse operator entry [${this.coordOut.toString()}, ${this.coordIn.toString()}] ` +
       `has value ${this.value.toString()}`
-    );
+    )
   }
 
   /**
@@ -59,10 +55,10 @@ export default class OperatorEntry {
     indexIn: number,
     sizesOut: number[],
     sizesIn: number[],
-    value: Complex
+    value: Complex,
   ): OperatorEntry {
-    const coordOut = CoordsFromIndex(indexOut, sizesOut);
-    const coordIn = CoordsFromIndex(indexIn, sizesIn);
-    return new OperatorEntry(coordOut, coordIn, value);
+    const coordOut = CoordsFromIndex(indexOut, sizesOut)
+    const coordIn = CoordsFromIndex(indexIn, sizesIn)
+    return new OperatorEntry(coordOut, coordIn, value)
   }
 }
