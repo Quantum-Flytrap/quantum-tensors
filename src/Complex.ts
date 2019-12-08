@@ -74,6 +74,14 @@ export default class Complex {
   }
 
   /**
+   * Complex conjugation
+   * @returns z = z{re, -im}
+   */
+  conj(): Complex {
+    return new Complex(this.re, -this.im)
+  }
+
+  /**
    * Addition
    * @param z2 complex number to be added
    * @returns z = z1 + z2
@@ -119,14 +127,6 @@ export default class Complex {
     return new Complex(re, im)
   }
 
-  /**
-   * Complex conjugation
-   * @returns z = z{re, -im}
-   */
-  conj(): Complex {
-    return new Complex(this.re, -this.im)
-  }
-
   /* eslint-disable max-len */
   /**
    * Normalize
@@ -156,6 +156,14 @@ export default class Complex {
    */
   isZero(): boolean {
     return this.re === 0 && this.im === 0
+  }
+
+  /**
+   * Check if a complex number is normalized
+   * @return z1.r === 1
+   */
+  isNormal(): boolean {
+    return this.r === 1
   }
 
   /**

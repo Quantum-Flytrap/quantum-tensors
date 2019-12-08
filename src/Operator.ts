@@ -1,9 +1,9 @@
+import _ from 'lodash'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import OperatorEntry from './OperatorEntry'
 import Vector from './Vector'
 import Dimension from './Dimension'
-import _ from 'lodash'
 
 /**
  * Operator class.

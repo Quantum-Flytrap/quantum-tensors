@@ -1,7 +1,7 @@
+import _ from 'lodash'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
-import _ from 'lodash'
 
 /**
  * Vector class.

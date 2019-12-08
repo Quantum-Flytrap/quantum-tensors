@@ -1,7 +1,7 @@
-import * as _ from "lodash"
-import Photons from "../src/Photons"
-import Operator from "../src/Operator"
-import * as el from "../src/Elements"
+import _ from 'lodash'
+import Photons from '../src/Photons'
+import Operator from '../src/Operator'
+import * as el from '../src/Elements'
 
 // TODO big
 
@@ -73,27 +73,25 @@ import * as el from "../src/Elements"
 //   [4, 1, el.polarizingBeamsplitter(45)],
 // ]
 
-console.log("===========================")
-console.log("BOARD 4")
+console.log('===========================')
+console.log('BOARD 4')
 
 const sizeX = 8
 const sizeY = 8
 const state = new Photons(sizeX, sizeY)
 
-state.addPhotonIndicator(0, 2, ">", "H")
-state.addPhotonIndicator(2, 0, "v", "H")
+state.addPhotonIndicator(0, 2, '>', 'H')
+state.addPhotonIndicator(2, 0, 'v', 'H')
 
 // // x, y, operator
-const operations: [number, number, Operator][] = [
-  [2, 2, el.beamSplitter(135)],
-]
+const operations: [number, number, Operator][] = [[2, 2, el.beamSplitter(135)]]
 
 // // print part
 // // works the same for everything
 
-console.log("Creating Photon")
+console.log('Creating Photon')
 console.log(state.ketString())
-console.log("Steps:")
+console.log('Steps:')
 
 _.range(10).forEach(i => {
   state.propagatePhotons()
