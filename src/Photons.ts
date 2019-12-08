@@ -1,4 +1,6 @@
+/* eslint-disable-next-line */
 import _ from 'lodash'
+import { IParticle } from './interfaces'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
@@ -116,6 +118,7 @@ export default class Photons {
    * @param pol Polarization from ['H', 'V'].
    *
    * @returns Nothings, acts in-place.
+   * TODO: could use an interface
    */
   addPhotonIndicator(posX: number, posY: number, dir: string, pol: string): void {
     const newPhoton = this.createPhoton(posX, posY, dir, pol)
@@ -305,15 +308,7 @@ export default class Photons {
    *
    * @todo Interface is clunky and restrictred to 1 particle.
    */
-  aggregatePolarization(): {
-    x: number
-    y: number
-    direction: number
-    are: number
-    aim: number
-    bre: number
-    bim: number
-  }[] {
+  aggregatePolarization(): IParticle[] {
     if (this.nPhotons !== 1) {
       throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
     }
@@ -357,7 +352,6 @@ export default class Photons {
       .values()
       .map(entries => {
         const first = entries[0]
-        /* eslint-disable @typescript-eslint/no-unused-vars */
         const [x, y, _dir, _pol] = first.coord
         const probability = entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b)
 

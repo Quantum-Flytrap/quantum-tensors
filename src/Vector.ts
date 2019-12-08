@@ -1,3 +1,4 @@
+/* eslint-disable-next-line */
 import _ from 'lodash'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'

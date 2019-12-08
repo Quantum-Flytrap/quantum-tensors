@@ -1,3 +1,4 @@
+/* eslint-disable-next-line */
 import _ from 'lodash'
 import { Cx } from './Complex'
 import Dimension from './Dimension'
