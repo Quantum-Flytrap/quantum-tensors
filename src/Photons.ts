@@ -210,7 +210,9 @@ export default class Photons {
    * @param photonId
    *
    * @return Only measurement (zeros excluded). Conditional state is NOT normalized (to avoid issues with division by )
+   * FIXME: No return type
    */
+  /* eslint-disable-next-line */
   vectorValuedMeasurement(posX: number, posY: number, op: Operator, photonId = 0): any {
     // as I see later, localizedOperator can be discarded as
     // we use localizedId anyway

@@ -224,6 +224,14 @@ export default class Vector {
   }
 
   /**
+   * Create a copy of the vector.
+   * @todo Make it more lightweight than using lodash.
+   */
+  copy(): Vector {
+    return _.cloneDeep(this)
+  }
+
+  /**
    * String description of a vector.
    * @see {@link Complex.toString} for formating options.
    * @param complexFormat Complex number format - a choice between ["cartesian", "polar", "polarTau"].
@@ -253,12 +261,8 @@ export default class Vector {
     }
   }
 
-  /**
-   * Create a copy of the vector.
-   * @todo Make it more lightweight than using lodash.
-   */
-  copy(): Vector {
-    return _.cloneDeep(this)
+  toDenseMatrix() {
+    this.entries.map((entry: VectorEntry) => {})
   }
 
   /**

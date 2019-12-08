@@ -39,7 +39,7 @@
     "build-defs": "tsc --declaration --outDir . --emitDeclarationOnly",
     "postinstall": "tsc --outDir ./build",
     "eslint-fix": "eslint --fix src/*.ts",
-    "lint": "eslint . --ext .js,.ts"
+    "lint": "eslint . --ext .ts"
   },
   "files": [
     "build/**/*"
