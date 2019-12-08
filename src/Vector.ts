@@ -261,9 +261,14 @@ export default class Vector {
     }
   }
 
-  toDenseMatrix() {
-    this.entries.map((entry: VectorEntry) => {})
-  }
+  // toArray(): Complex[][] {
+  //   const denseVector: Complex[][] = Array(12).fill(Cx(0, 0))
+  //   this.entries.forEach((entry: VectorEntry, index: number) => {
+
+  //     denseVector.push(entry.value)
+  //   })
+  //   return denseVector
+  // }
 
   /**
    * Creates a a vector from a dense array of complex numbers.

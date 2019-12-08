@@ -1,5 +1,5 @@
 import Complex from './Complex'
-import { CoordsFromIndex } from './helpers'
+import { coordsFromIndex } from './helpers'
 
 /**
  * Class for vector entires (also know as: vector values, cells).
@@ -43,7 +43,7 @@ export default class VectorEntry {
    * @param value entry value
    */
   static fromIndexValue(index: number, sizes: number[], value: Complex): VectorEntry {
-    const coords = CoordsFromIndex(index, sizes)
+    const coords = coordsFromIndex(index, sizes)
     return new VectorEntry(coords, value)
   }
 }

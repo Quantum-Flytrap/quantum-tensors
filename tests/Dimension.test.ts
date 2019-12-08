@@ -5,19 +5,19 @@ describe('Dimension', () => {
     const polarization = Dimension.polarization()
     const direction = Dimension.direction()
     const spin = Dimension.spin()
-    expect(polarization).toEqual({ coordNames: ['H', 'V'], name: 'polarisation', size: 2 })
+    expect(polarization).toEqual({ coordNames: ['H', 'V'], name: 'polarization', size: 2 })
     expect(direction).toEqual({ coordNames: ['>', '^', '<', 'v'], name: 'direction', size: 4 })
     expect(spin).toEqual({ coordNames: ['u', 'd'], name: 'spin', size: 2 })
   })
 
   it('should forbid creating dimensions with a mismatched length of element and size', () => {
     const error1 = {
-      name: 'polarisation',
+      name: 'polarization',
       size: 2,
       coordNames: ['H', 'V', 'WeaselDimension'],
     }
     const error2 = {
-      name: 'polarisation',
+      name: 'polarization',
       size: 3,
       coordNames: ['H', 'V'],
     }
@@ -31,7 +31,7 @@ describe('Dimension', () => {
 
   it('should retrieve the index of a coordinate from the array of coordinates names', () => {
     const obj = {
-      name: 'polarisation',
+      name: 'polarization',
       size: 3,
       coordNames: ['H', 'V', 'WeaselDimension'],
     }
@@ -41,7 +41,7 @@ describe('Dimension', () => {
 
   it('should error if provided a wrong coordinate name', () => {
     const obj = {
-      name: 'polarisation',
+      name: 'polarization',
       size: 3,
       coordNames: ['H', 'V', 'WeaselDimension'],
     }
@@ -53,7 +53,7 @@ describe('Dimension', () => {
 
   it('should display errors related to dimension array size', () => {
     const obj1 = {
-      name: 'polarisation',
+      name: 'polarization',
       size: 3,
       coordNames: ['H', 'V', 'WeaselDimension'],
     }
@@ -65,7 +65,7 @@ describe('Dimension', () => {
 
   it('should display errors related to dimension array order', () => {
     const obj1 = {
-      name: 'polarisation',
+      name: 'polarization',
       size: 3,
       coordNames: ['H', 'V', 'WeaselDimension'],
     }
