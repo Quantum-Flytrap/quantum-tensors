@@ -19,23 +19,33 @@ Documentation: [p.migdal.pl/quantum-tensors](https://p.migdal.pl/quantum-tensors
 
 ![Quantum Tensors logo](imgs/quantum-tensors-logo.jpg)
 
-## Usage
+## Installation
 
-Right now, you can install this package from this GitHub repository.
-If you use NPM:
+The easiest way is to install from [the NPM repository](https://www.npmjs.com/package/quantum-tensors):
+
+```
+npm install quantum-tensors
+```
+
+Or, if you use yarn package manager, 
+
+```
+yarn add quantum-tensors
+```
+
+If you want to install a development version, you can get package directly from this GitHub repository. In this case, the commands are:
 
 ```
 npm install stared/quantum-tensors#master
 ```
 
-And if you use yarn:
+Or if you use yarn:
 
 ```
 yarn add stared/quantum-tensors#master
 ```
 
-It will download it and run scripts to process TypeScript files, so it generates JavaScript.
-Right now, we intend to use it with TypeScript only - if you tried to use it with JavaScript, let us know!
+## Usage
 
 And then in your project write:
 
@@ -43,8 +53,7 @@ And then in your project write:
 import * as qt from 'quantum-tensors'
 ```
 
-Once it gets more mature, I will push it to the NPM repository.
-
+There are a few examples in [demos](https://github.com/stared/quantum-tensors/tree/master/demos) folder.
 
 ## Why
 
