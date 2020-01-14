@@ -1,6 +1,6 @@
 {
   "name": "quantum-tensors",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Tensors for quantum information and quantum optics.",
   "main": "build/main.js",
   "types": "build/main.d.js",
