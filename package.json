@@ -1,6 +1,6 @@
 {
   "name": "quantum-tensors",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Tensors for quantum information and quantum optics.",
   "main": "build/main.js",
   "types": "build/main.d.js",
@@ -38,7 +38,6 @@
     "build-docs": "typedoc --out docs src main.ts",
     "build-and-deploy-docs": "typedoc --out docs src main.ts && touch docs/.nojekyll && push-dir --dir=docs --branch=gh-pages --cleanup",
     "build-defs": "tsc --declaration --outDir . --emitDeclarationOnly",
-    "postinstall": "tsc --outDir ./build",
     "eslint-fix": "eslint --fix src/*.ts",
     "lint": "eslint . --ext .js,.ts"
   },
