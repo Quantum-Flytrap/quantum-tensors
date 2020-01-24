@@ -1,3 +1,4 @@
+/* eslint-disable-next-line */
 import _ from 'lodash'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
@@ -44,6 +45,7 @@ export default class Vector {
 
   /**
    * @returns The total size (the total array length).
+   * FIXME: size and totalSize is confusing, rename to length or size, sizes?
    */
   get totalSize(): number {
     return this.size.reduce((a, b) => a * b)
@@ -65,12 +67,56 @@ export default class Vector {
   }
 
   /**
+   * Vector norm (vector length) squared.
+   * In quantum physics, it is probability of a quantum state.
+   *
+   * @note Would be equivalent to inner product with itself,
+   * but we use a more straightforward implementation (plus, to make sure we get a real number).
+   *
+   * @returns ⟨v|v⟩
+   * FIXME: Feels it should be a getter
+   */
+  normSquared(): number {
+    return this.entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b, 0)
+  }
+
+  /**
+   * Create a copy of the vector.
+   * @todo Make it more lightweight than using lodash.
+   */
+  copy(): Vector {
+    return _.cloneDeep(this)
+  }
+
+  /**
    * Complex conjugation. Note that that for quantum states it is essentially
    * ket <-> bra, i.e. |psi⟩^† = ⟨psi|
    * @returns Complex conjugation for a vector.
    */
   conj(): Vector {
     const entries = this.entries.map(entry => new VectorEntry([...entry.coord], entry.value.conj()))
+    return new Vector(entries, this.dimensions)
+  }
+
+  /**
+   * Creates a normalized vector (i.e. with norm 1).
+   * @returns A normalized vector: |v⟩ / √⟨v|v⟩
+   */
+  normalize(): Vector {
+    const norm = this.normSquared()
+    if (norm === 0) {
+      throw new Error('Cannot normalize a zero-length vector!')
+    }
+    return this.mulConstant(Cx(norm))
+  }
+
+  /**
+   * Multiply vector by a constant.
+   * @param c A complex number.
+   * @returns c v
+   */
+  mulConstant(c: Complex): Vector {
+    const entries = this.entries.map(entry => new VectorEntry(entry.coord, entry.value.mul(c)))
     return new Vector(entries, this.dimensions)
   }
 
@@ -97,16 +143,6 @@ export default class Vector {
       .value()
 
     return new Vector(entries, v1.dimensions)
-  }
-
-  /**
-   * Multiply vector by a constant.
-   * @param c A complex number.
-   * @returns c v
-   */
-  mulConstant(c: Complex): Vector {
-    const entries = this.entries.map(entry => new VectorEntry(entry.coord, entry.value.mul(c)))
-    return new Vector(entries, this.dimensions)
   }
 
   /**
@@ -146,6 +182,41 @@ export default class Vector {
     return result
   }
 
+  // dotPartial(coordIndices: number[], v: Vector): Vector {
+  // TODO: Implement dotPartial
+  // }
+
+  /**
+   * Inner product, the classic ⟨bra|ket⟩ for complex vectors.
+   * https://en.wikipedia.org/wiki/Bra%E2%80%93ket_notation
+   * It is anti-linear in the first argument, and linear in the seconf.
+   * @param v2 The other vector (ket).
+   * @returns v1^† . v2 or ⟨v1|v2⟩
+   */
+  inner(v2: Vector): Complex {
+    return this.conj().dot(v2)
+  }
+
+  /**
+   * Outer product between two vectors.
+   * In this context, same as: Kronecker product and tensor product.
+   * https://en.wikipedia.org/wiki/Kronecker_product
+   * @param v2 Another operator.
+   * @returns v = v1 ⊗ v2
+   *
+   * @todo Consider using flatMap for clarity.
+   * FIXME: Result shouldn't be a multi-column vector type
+   */
+  outer(v2: Vector): Vector {
+    const v1 = this
+    const dimensions: Dimension[] = v1.dimensions.concat(v2.dimensions)
+    const entries: VectorEntry[] = []
+    v1.entries.forEach((entry1: VectorEntry) =>
+      v2.entries.forEach((entry2: VectorEntry) => entries.push(entry1.outer(entry2))),
+    )
+    return new Vector(entries, dimensions)
+  }
+
   /**
    * It is NOT a safe operation.
    * Unless before we applied an in-bassis projection to this coordinate
@@ -161,65 +232,6 @@ export default class Vector {
     const newEntries = this.entries.map(entry => new VectorEntry(_.at(entry.coord, complementIndices), entry.value))
 
     return new Vector(newEntries, newDims)
-  }
-
-  // dotPartial(coordIndices: number[], v: Vector): Vector {
-  // TO DO
-  // }
-
-  /**
-   * Inner product, the classic ⟨bra|ket⟩ for complex vectors.
-   * https://en.wikipedia.org/wiki/Bra%E2%80%93ket_notation
-   * It is anti-linear in the first argument, and linear in the seconf.
-   * @param v2 The other vector (ket).
-   * @returns v1^† . v2 or ⟨v1|v2⟩
-   */
-  inner(v2: Vector): Complex {
-    return this.conj().dot(v2)
-  }
-
-  /**
-   * Vector norm (vector length) squared.
-   * In quantum physics, it is probability of a quantum state.
-   *
-   * @note Would be equivalent to inner product with itself,
-   * but we use a more straightforward implementation (plus, to make sure we get a real number).
-   *
-   * @returns ⟨v|v⟩
-   */
-  normSquared(): number {
-    return this.entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b, 0)
-  }
-
-  /**
-   * Creates a normalized vector (i.e. with norm 1).
-   * @returns A normalized vector: |v⟩ / √⟨v|v⟩
-   */
-  normalize(): Vector {
-    const norm = this.normSquared()
-    if (norm === 0) {
-      throw new Error('Cannot normalize a zero-length vector!')
-    }
-    return this.mulConstant(Cx(norm))
-  }
-
-  /**
-   * Outer product between two vectors.
-   * In this context, same as: Kronecker product and tensor product.
-   * https://en.wikipedia.org/wiki/Kronecker_product
-   * @param v2 Another operator.
-   * @returns v = v1 ⊗ v2
-   *
-   * @todo Consider using flatMap for clarity.
-   */
-  outer(v2: Vector): Vector {
-    const v1 = this
-    const dimensions: Dimension[] = v1.dimensions.concat(v2.dimensions)
-    const entries: VectorEntry[] = []
-    v1.entries.forEach((entry1: VectorEntry) =>
-      v2.entries.forEach((entry2: VectorEntry) => entries.push(entry1.outer(entry2))),
-    )
-    return new Vector(entries, dimensions)
   }
 
   /**
@@ -253,11 +265,15 @@ export default class Vector {
   }
 
   /**
-   * Create a copy of the vector.
-   * @todo Make it more lightweight than using lodash.
+   * Export to a dense array format
+   * @returns Complex[][] array vector
    */
-  copy(): Vector {
-    return _.cloneDeep(this)
+  toDense(): Complex[][] {
+    const denseVector: Complex[][] = Array(this.totalSize).fill([Cx(0, 0)])
+    this.entries.forEach((entry: VectorEntry) => {
+      denseVector[entry.coord[0]] = [entry.value]
+    })
+    return denseVector
   }
 
   /**
@@ -307,7 +323,6 @@ export default class Vector {
   /**
    *
    * @example
-   *
    * const singletState = Vector.fromSparseCoordNames([
    *   ['ud', Cx(1)],
    *   ['du', Cx(-1)],

@@ -1,5 +1,5 @@
 import Complex from './Complex'
-import { CoordsFromIndex } from './helpers'
+import { coordsFromIndex } from './helpers'
 
 /**
  * Class for operarator entires.
@@ -57,8 +57,8 @@ export default class OperatorEntry {
     sizesIn: number[],
     value: Complex,
   ): OperatorEntry {
-    const coordOut = CoordsFromIndex(indexOut, sizesOut)
-    const coordIn = CoordsFromIndex(indexIn, sizesIn)
+    const coordOut = coordsFromIndex(indexOut, sizesOut)
+    const coordIn = coordsFromIndex(indexIn, sizesIn)
     return new OperatorEntry(coordOut, coordIn, value)
   }
 }
