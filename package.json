@@ -4,7 +4,7 @@
   "description": "Tensors for quantum information and quantum optics.",
   "main": "build/main.js",
   "types": "build/main.d.js",
-  "repository": "https://github.com/stared/quantum-tensors",
+  "repository": "https://github.com/Quantum-Game/quantum-tensors",
   "author": "Piotr Migdal",
   "license": "MIT",
   "devDependencies": {
