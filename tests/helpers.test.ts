@@ -1,4 +1,4 @@
-import { coordsFromIndex, coordsToIndex } from '../src/helpers'
+import { coordsFromIndex, coordsToIndex, isPermutation } from '../src/helpers'
 
 describe('coordsFromIndex', () => {
   it('should map zero to zeros', () => {
@@ -49,5 +49,29 @@ describe('coordsToIndex', () => {
   it('should be inverse of coordsFromIndex', () => {
     const sizes = [3, 2, 5, 4, 3, 5, 1]
     expect(coordsToIndex(coordsFromIndex(234, sizes), sizes)).toEqual(234)
+  })
+})
+
+describe('isPermutation', () => {
+  it('should work on sorted', () => {
+    expect(isPermutation([0])).toEqual(true)
+    expect(isPermutation([0, 1, 2, 3])).toEqual(true)
+  })
+
+  it('should work on unsorted', () => {
+    expect(isPermutation([2, 0, 1])).toEqual(true)
+    expect(isPermutation([0, 3, 2, 4, 1])).toEqual(true)
+  })
+
+  it('should show more or less elemens', () => {
+    expect(isPermutation([2, 1, 1])).toEqual(false)
+    expect(isPermutation([2, 1, 1, 1])).toEqual(false)
+    expect(isPermutation([5, 3, 2, 4, 0])).toEqual(false)
+  })
+
+  it('should check array size', () => {
+    expect(isPermutation([0, 1, 2, 3], 3)).toEqual(false)
+    expect(isPermutation([0, 1, 2, 3], 4)).toEqual(true)
+    expect(isPermutation([0, 1, 2, 3], 5)).toEqual(false)
   })
 })

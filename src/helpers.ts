@@ -1,3 +1,6 @@
+/* eslint-disable-next-line */
+import _ from 'lodash'
+
 /**
  * Turns an index into a multi-index, according to dimension sizes.
  * @note It uses little-endian,
@@ -37,6 +40,20 @@ export function coordsToIndex(coords: number[], sizes: number[]): number {
     factor *= sizes[dim]
   })
   return res
+}
+
+/**
+ * Checks if a given array is a permuation, i.e. consisto of [0, 1, 2, ..., n - 1] in any order.
+ * @param array Array to be tested
+ * @param n Number of elements
+ */
+export function isPermutation(array: number[], n = array.length): boolean {
+  if (array.length !== n) {
+    return false
+  }
+  const counts = new Array(array.length).fill(0)
+  array.forEach(x => (counts[x] += 1))
+  return _.every(counts)
 }
 
 /**

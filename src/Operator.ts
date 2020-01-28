@@ -1,5 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
+import { isPermutation } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import OperatorEntry from './OperatorEntry'
@@ -342,6 +343,27 @@ export default class Operator {
   //     return result
 
   // }
+
+  /**
+   * Changing order of dimensions for a vector, from [0, 1, 2, ...] to something else.
+   * @param orderOut  E.g. [2, 0, 1]
+   * @param orderIn  E.g. [2, 0, 1]
+   */
+  permute(orderOut: number[], orderIn = orderOut): Operator {
+    if (!isPermutation(orderOut, this.dimensionsOut.length)) {
+      throw new Error(`${orderOut} is not a valid permutation for ${this.dimensionsOut.length} dimensions.`)
+    }
+    if (!isPermutation(orderIn, this.dimensionsOut.length)) {
+      throw new Error(`${orderIn} is not a valid permutation for ${this.dimensionsIn.length} dimensions.`)
+    }
+    const dimensionsOut = _.at(this.dimensionsOut, orderOut)
+    const dimensionsIn = _.at(this.dimensionsIn, orderIn)
+
+    const entries = this.entries.map(
+      entry => new OperatorEntry(_.at(entry.coordOut, orderOut), _.at(entry.coordOut, orderOut), entry.value),
+    )
+    return new Operator(entries, dimensionsOut, dimensionsIn)
+  }
 
   /**
    * String description of an operator.

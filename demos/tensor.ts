@@ -27,6 +27,16 @@ const vecFromSparse = Vector.fromSparseCoordNames(
 )
 console.log(vecFromSparse.toString())
 
+// Permutations
+console.log('No perm')
+console.log(vecFromSparse.permute([0, 1]).toString())
+
+console.log('Perm swap')
+console.log(vecFromSparse.permute([1, 0]).toString())
+
+// console.log('Wrong perm')
+// console.log(vecFromSparse.permute([0]).toString())
+
 // Outer product
 const outerVec = vector1.outer(vector2)
 console.log(outerVec.toString('cartesian', 2, '\n'))

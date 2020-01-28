@@ -15,6 +15,7 @@ describe('Sparse Complex Vector', () => {
   const entry3 = new VectorEntry([2], complex3)
   const entries = [entry1, entry2, entry3]
   const vector = new Vector(entries, dimensions)
+  // it is incorrect, and the file requires complete rewrite
 
   xit('should create a vector from entries and dimensions', () => {
     const dimensions = [Dimension.spin(), Dimension.direction(), Dimension.spin()]
@@ -49,6 +50,8 @@ describe('Sparse Complex Vector', () => {
     const complex3conj = Cx(3, 3)
     expect(vector.conj().toDense()).toEqual([[complex1conj], [complex2conj], [complex3conj], [complex0conj]])
   })
+
+  // TODO: permutations
 
   // Norm squared
   it('should compute the norm squared of a vector', () => {
