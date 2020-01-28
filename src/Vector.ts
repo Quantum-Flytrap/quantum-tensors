@@ -1,9 +1,10 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { isPermutation } from './helpers'
+import { coordsToIndex, isPermutation } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
+import { IEntryIndexValue } from './interfaces'
 
 /**
  * Vector class.
@@ -288,6 +289,17 @@ export default class Vector {
       denseVector[entry.coord[0]] = [entry.value]
     })
     return denseVector
+  }
+
+  /**
+   * Export entires into a flatten, sparse list.
+   * @returns E.g. [{i: 2, v: Cx(2, 4)}, {i: 5, v: Cx(-1, 0)}, ...]
+   */
+  toIndexValues(): IEntryIndexValue[] {
+    return this.entries.map(entry => ({
+      i: coordsToIndex(entry.coord, this.size),
+      v: entry.value,
+    }))
   }
 
   /**

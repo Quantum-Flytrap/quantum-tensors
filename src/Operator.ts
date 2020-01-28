@@ -1,11 +1,12 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { isPermutation } from './helpers'
+import { coordsToIndex, isPermutation } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import OperatorEntry from './OperatorEntry'
 import Vector from './Vector'
 import Dimension from './Dimension'
+import { IEntryIndexIndexValue } from './interfaces'
 
 /**
  * Operator class.
@@ -396,6 +397,18 @@ export default class Operator {
     } else {
       return valueStr
     }
+  }
+
+  /**
+   * Export entires into a flatten, sparse list.
+   * @returns E.g. [{i: 2, j: 0, v: Cx(2, 4)}, {i: 5, j: 3, v: Cx(-1, 0)}, ...]
+   */
+  toIndexIndexValues(): IEntryIndexIndexValue[] {
+    return this.entries.map(entry => ({
+      i: coordsToIndex(entry.coordOut, this.sizeOut),
+      j: coordsToIndex(entry.coordIn, this.sizeIn),
+      v: entry.value,
+    }))
   }
 
   /**
