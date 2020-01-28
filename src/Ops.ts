@@ -62,7 +62,7 @@ export function phaseShiftForRealEigenvectors(
 
 /**
  * Reflection from an optically lighter material.
- * Note that change horrizontal frame of reference.
+ * Note that change horizontal frame of reference.
  */
 export function reflectPhaseFromLighter(): Operator {
   const array = [
@@ -74,12 +74,12 @@ export function reflectPhaseFromLighter(): Operator {
 
 /**
  * Reflection from an optically denser material.
- * Note that change horrizontal frame of reference.
+ * Note that change horizontal frame of reference.
  */
 export function reflectPhaseFromDenser(): Operator {
   const array = [
-    [Cx(-1), Cx(0)],
-    [Cx(0), Cx(1)],
+    [Cx(1), Cx(0)],
+    [Cx(0), Cx(-1)],
   ]
   return Operator.fromArray(array, [dimPol], [dimPol])
 }
