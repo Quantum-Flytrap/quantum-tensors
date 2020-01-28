@@ -32,4 +32,14 @@ describe('Sparse Complex Operator', () => {
       '(0.00 +2.00i) |u,H⟩⟨u,H| + (-1.00 -1.00i) |d,H⟩⟨u,V| + (0.50 +2.50i) |d,V⟩⟨d,H|',
     )
   })
+
+  it('should export to sparse index index value', () => {
+    const idPolDir = Operator.identity([Dimension.polarization(), Dimension.spin()])
+    expect(idPolDir.toIndexIndexValues()).toEqual([
+      { i: 0, j: 0, v: Cx(1) },
+      { i: 1, j: 1, v: Cx(1) },
+      { i: 2, j: 2, v: Cx(1) },
+      { i: 3, j: 3, v: Cx(1) },
+    ])
+  })
 })
