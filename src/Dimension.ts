@@ -14,7 +14,7 @@ export default class Dimension {
 
   /**
    * Creates a dimentions - to be used in a Vector or Operator object
-   * @param name Name of a dimension (e.g. "quibt", "spin", "x", etc)
+   * @param name Name of a dimension (e.g. "qubit", "spin", "x", etc)
    * @param size Size of a dimension
    * @param coordNames Name of each coordinate
    */
