@@ -1,5 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
+import { isPermutation } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
@@ -214,6 +215,19 @@ export default class Vector {
     v1.entries.forEach((entry1: VectorEntry) =>
       v2.entries.forEach((entry2: VectorEntry) => entries.push(entry1.outer(entry2))),
     )
+    return new Vector(entries, dimensions)
+  }
+
+  /**
+   * Changing order of dimensions for a vector, from [0, 1, 2, ...] to something else.
+   * @param order  E.g. [2, 0, 1]
+   */
+  permute(order: number[]): Vector {
+    if (!isPermutation(order, this.dimensions.length)) {
+      throw new Error(`${order} is not a valid permutation for ${this.dimensions.length} dimensions.`)
+    }
+    const dimensions = _.at(this.dimensions, order)
+    const entries = this.entries.map(entry => new VectorEntry(_.at(entry.coord, order), entry.value))
     return new Vector(entries, dimensions)
   }
 
