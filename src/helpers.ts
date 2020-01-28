@@ -1,11 +1,11 @@
 /**
- * Turns an index into a multi-index, according to dimension sizes
+ * Turns an index into a multi-index, according to dimension sizes.
+ * @note It uses little-endian,
+ * https://chortle.ccsu.edu/AssemblyTutorial/Chapter-15/ass15_3.html.
  * @param index An integer
  * @param sizes Sizes of each dimension
  *
  * @returns Index in each dimension
- *
- * @todo Check that values are good (also: small endian vs big endian)
  */
 export function coordsFromIndex(index: number, sizes: number[]): number[] {
   let i = index
@@ -15,6 +15,28 @@ export function coordsFromIndex(index: number, sizes: number[]): number[] {
     return coord
   })
   return coords
+}
+
+/**
+ * Turns a multi-index into an index, inverse of {@link coordsFromIndex}
+ * @note It uses little-endian,
+ * https://chortle.ccsu.edu/AssemblyTutorial/Chapter-15/ass15_3.html.
+ * @param coords Index in each dimension
+ * @param sizes Sizes of each dimension
+ *
+ * @return Index
+ */
+export function coordsToIndex(coords: number[], sizes: number[]): number {
+  if (coords.length !== sizes.length) {
+    throw new Error(`Coordinates ${coords} and sizes ${sizes} are of different lengths}.`)
+  }
+  let factor = 1
+  let res = 0
+  coords.forEach((coord, dim) => {
+    res += factor * coord
+    factor *= sizes[dim]
+  })
+  return res
 }
 
 /**
