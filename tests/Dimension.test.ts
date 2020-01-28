@@ -1,6 +1,16 @@
 import Dimension from '../src/Dimension'
 
 describe('Dimension', () => {
+  const original = console.error
+
+  beforeEach(() => {
+    console.error = jest.fn()
+  })
+
+  afterEach(() => {
+    console.error = original
+  })
+
   it('should create dimensions from static methods', () => {
     const polarization = Dimension.polarization()
     const direction = Dimension.direction()
