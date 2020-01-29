@@ -1,5 +1,11 @@
 # Quantum Tensors
 
+[![npm version](https://badge.fury.io/js/quantum-tensors.svg)](https://badge.fury.io/js/quantum-tensors)
+![License](https://img.shields.io/npm/l/quantum-tensors)
+[![Build Status](https://travis-ci.com/Quantum-Game/quantum-tensors.svg?branch=master)](https://travis-ci.com/Quantum-Game/quantum-tensors)
+[![Coverage Status](https://codecov.io/gh/Quantum-Game/quantum-tensors/branch/master/graph/badge.svg)](https://codecov.io/gh/Quantum-Game/quantum-tensors/)
+[![Twitter @QuantumGameIO](https://img.shields.io/twitter/follow/QuantumGameIO)](https://twitter.com/quantumgameio)
+
 It is a JavaScript / TypeScript package for sparse tensor operations on complex numbers.
 For example for quantum computing, quantum information, and well - the Quantum Game.
 
