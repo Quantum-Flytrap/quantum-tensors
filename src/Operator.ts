@@ -361,7 +361,7 @@ export default class Operator {
     const dimensionsIn = _.at(this.dimensionsIn, orderIn)
 
     const entries = this.entries.map(
-      entry => new OperatorEntry(_.at(entry.coordOut, orderOut), _.at(entry.coordOut, orderOut), entry.value),
+      entry => new OperatorEntry(_.at(entry.coordOut, orderOut), _.at(entry.coordIn, orderIn), entry.value),
     )
     return new Operator(entries, dimensionsOut, dimensionsIn)
   }
