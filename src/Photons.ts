@@ -4,8 +4,7 @@ import { IParticle } from './interfaces'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
-import { Cx } from './Complex'
-import { Complex } from '../main'
+import Complex, { Cx } from './Complex'
 
 /**
  * Photons class.
