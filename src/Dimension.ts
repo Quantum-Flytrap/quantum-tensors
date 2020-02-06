@@ -62,6 +62,15 @@ export default class Dimension {
   }
 
   /**
+   * Create dimension for qubit (an abstract two-level system)
+   * @note Equivalent to {@link Dimension.position}(2, 'qubit')
+   * @returns qubit dimensions
+   */
+  static qubit(): Dimension {
+    return new Dimension('qubit', 2, ['0', '1'])
+  }
+
+  /**
    * Overrides toString() method
    * @returns formatted string
    */
