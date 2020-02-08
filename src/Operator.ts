@@ -1,6 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { coordsToIndex, isPermutation } from './helpers'
+import { coordsToIndex, checkCoordsSizesCompability, isPermutation } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import OperatorEntry from './OperatorEntry'
@@ -29,6 +29,11 @@ export default class Operator {
     this.entries = entries
     this.dimensionsOut = dimensionsOut
     this.dimensionsIn = dimensionsIn
+
+    this.entries.forEach(entry => {
+      checkCoordsSizesCompability(entry.coordOut, this.sizeOut)
+      checkCoordsSizesCompability(entry.coordIn, this.sizeIn)
+    })
   }
 
   /**

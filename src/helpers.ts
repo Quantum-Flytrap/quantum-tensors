@@ -43,7 +43,24 @@ export function coordsToIndex(coords: number[], sizes: number[]): number {
 }
 
 /**
- * Checks if a given array is a permuation, i.e. consisto of [0, 1, 2, ..., n - 1] in any order.
+ * Ensures that coords and dimensions sizes are compatible
+ * @param coords [c1, c2, ...] Coords, e.g. from VectorEntry or OperatorEntry
+ * @param sizes  [s1, s2, ...] Dimensions sizes
+ * @returns Error when not [0 <= c1 < s1, 0 <= c2 < s2, ...]
+ */
+export function checkCoordsSizesCompability(coords: number[], sizes: number[]): void {
+  if (coords.length !== sizes.length) {
+    throw new Error(`Coordinates [${coords}] incompatible with sizes [${sizes}].`)
+  }
+  coords.forEach((c, i) => {
+    if (c < 0 || c >= sizes[i]) {
+      throw new Error(`Coordinates [${coords}] incompatible with sizes [${sizes}].`)
+    }
+  })
+}
+
+/**
+ * Checks if a given array is a permuation, i.e. consist of [0, 1, 2, ..., n - 1] in any order.
  * @param array Array to be tested
  * @param n Number of elements
  */
