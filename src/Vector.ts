@@ -1,6 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { coordsToIndex, isPermutation } from './helpers'
+import { coordsToIndex, checkCoordsSizesCompability, isPermutation } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
@@ -26,6 +26,10 @@ export default class Vector {
   constructor(entries: VectorEntry[], dimensions: Dimension[]) {
     this.entries = entries
     this.dimensions = dimensions
+
+    this.entries.forEach(entry => {
+      checkCoordsSizesCompability(entry.coord, this.size)
+    })
   }
 
   /**
@@ -105,11 +109,11 @@ export default class Vector {
    * @returns A normalized vector: |v⟩ / √⟨v|v⟩
    */
   normalize(): Vector {
-    const norm = this.normSquared()
+    const norm = Math.sqrt(this.normSquared())
     if (norm === 0) {
       throw new Error('Cannot normalize a zero-length vector!')
     }
-    return this.mulConstant(Cx(norm))
+    return this.mulConstant(Cx(1 / norm))
   }
 
   /**
@@ -281,12 +285,12 @@ export default class Vector {
 
   /**
    * Export to a dense array format
-   * @returns Complex[][] array vector
+   * @returns Complex[] array vector
    */
-  toDense(): Complex[][] {
-    const denseVector: Complex[][] = Array(this.totalSize).fill([Cx(0, 0)])
+  toDense(): Complex[] {
+    const denseVector: Complex[] = Array(this.totalSize).fill(Cx(0, 0))
     this.entries.forEach((entry: VectorEntry) => {
-      denseVector[entry.coord[0]] = [entry.value]
+      denseVector[coordsToIndex(entry.coord, this.size)] = entry.value
     })
     return denseVector
   }

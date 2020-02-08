@@ -3,30 +3,36 @@ import Dimension from '../src/Dimension'
 import VectorEntry from '../src/VectorEntry'
 import Vector from '../src/Vector'
 
-// Vector tests
 describe('Sparse Complex Vector', () => {
-  const dimensions = [Dimension.spin(), Dimension.position(2)]
-  const complex0 = Cx(0, 0)
-  const complex1 = Cx(1, -1)
-  const complex2 = Cx(2, -2)
-  const complex3 = Cx(3, -3)
-  const entry1 = new VectorEntry([0], complex1)
-  const entry2 = new VectorEntry([1], complex2)
-  const entry3 = new VectorEntry([2], complex3)
-  const entries = [entry1, entry2, entry3]
-  const vector = new Vector(entries, dimensions)
-  // it is incorrect, and the file requires complete rewrite
+  const vector = Vector.fromArray(
+    [Cx(1, -1), Cx(2, -2), Cx(3, -3), Cx(0, 0)],
+    [Dimension.spin(), Dimension.position(2)],
+  )
 
-  xit('should create a vector from entries and dimensions', () => {
-    const dimensions = [Dimension.spin(), Dimension.direction(), Dimension.spin()]
-    const entry1 = new VectorEntry([2], complex1)
-    const entry2 = new VectorEntry([4], complex2)
-    const entry3 = new VectorEntry([6], complex3)
+  const vector2 = Vector.fromArray(
+    [Cx(0, 0), Cx(-2, 1), Cx(0, 0.5), Cx(0, 0)],
+    [Dimension.spin(), Dimension.position(2)],
+  )
+
+  it('should create a vector from entries and dimensions', () => {
+    const dimensions = [Dimension.spin(), Dimension.direction()]
+    const entry1 = new VectorEntry([0, 3], Cx(1, -1))
+    const entry2 = new VectorEntry([1, 0], Cx(2, -2))
+    const entry3 = new VectorEntry([1, 3], Cx(3, -3))
     const vector = new Vector([entry1, entry2, entry3], dimensions)
-    expect(vector.toString()).toEqual('')
+    expect(vector.entries.length).toEqual(3)
   })
 
-  // Test vector getters
+  it('should not create a vector if dims are incompatible', () => {
+    const dimensions = [Dimension.spin(), Dimension.direction(), Dimension.polarization()]
+    const entry1 = new VectorEntry([0, 3, 1], Cx(1, -1))
+    const entry2 = new VectorEntry([1, 1, 2], Cx(2, -2))
+    const entry3 = new VectorEntry([1, 3, 0], Cx(3, -3))
+    expect(() => new Vector([entry1, entry2, entry3], dimensions)).toThrowError(
+      'Coordinates [1,1,2] incompatible with sizes [2,4,2].',
+    )
+  })
+
   it('should give vector getter properties', () => {
     expect(vector.size).toEqual([2, 2])
     expect(vector.totalSize).toEqual(4)
@@ -37,99 +43,82 @@ describe('Sparse Complex Vector', () => {
     ])
   })
 
-  // Test export to dense array
   it('should convert a vector to its dense representation', () => {
-    expect(vector.toDense()).toEqual([[complex1], [complex2], [complex3], [complex0]])
+    expect(vector.toDense()).toEqual([Cx(1, -1), Cx(2, -2), Cx(3, -3), Cx(0, 0)])
   })
 
-  // Test export to dense array
   it('should conjugate a vector', () => {
-    const complex0conj = Cx(0, 0)
-    const complex1conj = Cx(1, 1)
-    const complex2conj = Cx(2, 2)
-    const complex3conj = Cx(3, 3)
-    expect(vector.conj().toDense()).toEqual([[complex1conj], [complex2conj], [complex3conj], [complex0conj]])
+    expect(vector.conj().toDense()).toEqual([Cx(1, 1), Cx(2, 2), Cx(3, 3), Cx(0, 0)])
   })
 
-  // TODO: permutations
+  it('should permute a vector', () => {
+    const permuted = vector.permute([1, 0])
+    expect(permuted.names).toEqual(['x', 'spin'])
+    expect(permuted.toDense()).toEqual([Cx(1, -1), Cx(3, -3), Cx(2, -2), Cx(0, 0)])
+  })
 
-  // Norm squared
   it('should compute the norm squared of a vector', () => {
     expect(vector.normSquared()).toEqual(28)
   })
 
-  // Normalize vector
   it('should normalize a vector', () => {
-    expect(vector.normalize().toDense()).toEqual([[Cx(28, -28)], [Cx(56, -56)], [Cx(84, -84)], [Cx(0, 0)]])
+    const vector10 = Vector.fromArray(
+      [Cx(1, 0), Cx(-3, -9), Cx(0, -3), Cx(0, 0)],
+      [Dimension.spin(), Dimension.position(2)],
+    )
+    // since 0.30000000000000004 vs 0.3, we cannot just toEqual
+    // see https://github.com/facebook/jest/issues/4058
+    const res = vector10.normalize().toDense()
+    expect(res[1].re).toBeCloseTo(-0.3)
+    expect(res[2].im).toBeCloseTo(-0.3)
   })
 
-  // Add
   it('should add two vectors', () => {
-    const entries1 = [entry1, entry2, entry3]
-    const entries2 = [entry1, entry2, entry3]
-    const vector1 = new Vector(entries1, dimensions)
-    const vector2 = new Vector(entries2, dimensions)
-    expect(vector1.add(vector2).toDense()).toEqual([[Cx(2, -2)], [Cx(4, -4)], [Cx(6, -6)], [Cx(0, 0)]])
+    expect(vector.add(vector2).toDense()).toEqual([Cx(1, -1), Cx(0, -1), Cx(3, -2.5), Cx(0, 0)])
   })
 
-  // Scale
   it('should scale a vector with a complex scalar', () => {
     const scalar1 = Cx(1, 0)
     expect(vector.mulConstant(scalar1).toDense()).toEqual(vector.toDense())
     const scalar2 = Cx(-1, 0)
-    expect(vector.mulConstant(scalar2).toDense()).toEqual([[Cx(-1, 1)], [Cx(-2, 2)], [Cx(-3, 3)], [Cx(0, 0)]])
+    expect(vector.mulConstant(scalar2).toDense()).toEqual([Cx(-1, 1), Cx(-2, 2), Cx(-3, 3), Cx(0, 0)])
+    const scalar3 = Cx(0, 1)
+    expect(vector.mulConstant(scalar3).toDense()).toEqual([Cx(1, 1), Cx(2, 2), Cx(3, 3), Cx(0, 0)])
   })
 
-  // Substract
   it('should substract a vector from another one', () => {
-    const entries1 = [entry1, entry2, entry3]
-    const vector1 = new Vector(entries1, dimensions)
-    const entries2 = [entry1, entry2, entry3]
-    const vector2 = new Vector(entries2, dimensions)
-    expect(vector1.sub(vector2).toDense()).toEqual([[Cx(0, 0)], [Cx(0, 0)], [Cx(0, 0)], [Cx(0, 0)]])
+    expect(vector.sub(vector).toDense()).toEqual([Cx(0, 0), Cx(0, 0), Cx(0, 0), Cx(0, 0)])
+    expect(vector.sub(vector2).toDense()).toEqual([Cx(1, -1), Cx(4, -3), Cx(3, -3.5), Cx(0, 0)])
   })
 
-  // Dot product
   it('should compute the dot product of two vectors', () => {
-    const entries1 = [entry1, entry2, entry3]
-    const vector1 = new Vector(entries1, dimensions)
-    const entries2 = [entry1, entry2, entry3]
-    const vector2 = new Vector(entries2, dimensions)
-    expect(vector1.dot(vector2)).toEqual(Cx(0, -28))
+    expect(vector.dot(vector)).toEqual(Cx(0, -28))
+    expect(vector.dot(vector2)).toEqual(Cx(-0.5, 7.5))
   })
 
-  // Inner product
   it('should compute the inner product of two vectors', () => {
-    const entries1 = [entry1, entry2, entry3]
-    const vector1 = new Vector(entries1, dimensions)
-    const entries2 = [entry1, entry2, entry3]
-    const vector2 = new Vector(entries2, dimensions)
-    expect(vector1.inner(vector2)).toEqual(Cx(28, 0))
+    expect(vector.inner(vector)).toEqual(Cx(28, 0))
+    expect(vector.inner(vector2)).toEqual(Cx(-7.5, -0.5))
   })
 
-  // Outer product
   it('should compute the outer product of two vectors', () => {
-    const entries1 = [entry1, entry2, entry3]
-    const vector1 = new Vector(entries1, dimensions)
-    const entries2 = [entry1, entry2, entry3]
-    const vector2 = new Vector(entries2, dimensions)
-    expect(vector1.outer(vector2).toDense()).toEqual([
-      [Cx(0, -6)],
-      [Cx(0, -12)],
-      [Cx(0, -18)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
-      [Cx(0, 0)],
+    expect(vector.outer(vector2).toDense()).toEqual([
+      Cx(0),
+      Cx(0),
+      Cx(0),
+      Cx(0),
+      Cx(-1, 3),
+      Cx(-2, 6),
+      Cx(-3, 9),
+      Cx(0),
+      Cx(0.5, 0.5),
+      Cx(1, 1),
+      Cx(1.5, 1.5),
+      Cx(0),
+      Cx(0),
+      Cx(0),
+      Cx(0),
+      Cx(0),
     ])
   })
 })
