@@ -30,6 +30,22 @@ describe('Complex', () => {
     expect(complex3.isZero()).toBe(true)
   })
 
+  it('should give non-negative arg', () => {
+    const z1 = Cx(1, -1)
+    expect(z1.arg()).toEqual(1.75 * Math.PI)
+    const z2 = Cx(0, -1)
+    expect(z2.arg()).toEqual(1.5 * Math.PI)
+  })
+
+  it('should give phase in Tau', () => {
+    const z1 = Cx(1, -1)
+    expect(z1.phiTau).toEqual(0.875)
+    const z2 = Cx(-1)
+    expect(z2.phiTau).toEqual(0.5)
+    const z3 = Cx(0, -1)
+    expect(z3.phiTau).toEqual(0.75)
+  })
+
   it('should add two complex numbers', () => {
     const complex1 = Cx(4, -1)
     const complex2 = Cx(2, 3)
@@ -79,5 +95,45 @@ describe('Complex', () => {
     expect(complex1).toEqual({ im: 1.682941969615793, re: 1.0806046117362795 })
     expect(complex1.r).toBe(2)
     expect(complex1.phi).toBe(1)
+  })
+
+  it('should divide numbers, unless denominator i zero', () => {
+    const z0 = Cx(0)
+    const z1 = Cx(10, -5)
+    const z2 = Cx(-3, 4)
+    expect(z1.div(z2)).toEqual({ re: -2, im: -1 })
+    expect(() => z1.div(z0)).toThrowError('Cannot divide by 0. z1: (10.00 -5.00i) / z2: (0.00 +0.00i)')
+  })
+
+  it('should divide numbers, unless denominator i zero', () => {
+    const z0 = Cx(0)
+    const z1 = Cx(10, -5)
+    const z2 = Cx(-3, 4)
+    expect(z1.div(z2)).toEqual({ re: -2, im: -1 })
+    expect(() => z1.div(z0)).toThrowError('Cannot divide by 0. z1: (10.00 -5.00i) / z2: (0.00 +0.00i)')
+  })
+
+  it('should test if it a unit-length number', () => {
+    expect(Cx(1).isNormal()).toBe(true)
+    expect(Cx(0, -1).isNormal()).toBe(true)
+    expect(Cx(1, -1).isNormal()).toBe(false)
+  })
+
+  it('should print complex number', () => {
+    const z1 = Cx(1, -1)
+    expect(z1.toString()).toEqual('(1.00 -1.00i)')
+    expect(z1.toString('cartesian')).toEqual('(1.00 -1.00i)')
+    expect(z1.toString('cartesian', 1)).toEqual('(1.0 -1.0i)')
+    expect(z1.toString('polar')).toEqual('1.41 exp(5.50i)')
+    expect(z1.toString('polarTau', 4)).toEqual('1.4142 exp(0.8750τi)')
+    expect(() => z1.toString('notAnOption')).toThrowError(
+      "complexFormat 'notAnOption' is not in ['cartesian', 'polar', 'polarTau'].",
+    )
+  })
+
+  it('should generate color for a complex number', () => {
+    expect(Complex.fromPolar(1, 0).toColor()).toEqual('#ff0000')
+    expect(Complex.fromPolar(1, 0.3333 * Math.PI).toColor()).toEqual('#ffff00')
+    expect(Complex.fromPolar(1, 0.6666 * Math.PI).toColor()).toEqual('#00ff00')
   })
 })
