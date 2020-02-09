@@ -346,7 +346,7 @@ export default class Vector {
    * @param dimensions
    * @param coordNames Symbols for each ordinate.
    * For symbols with more than one letter you need to use an array of strings.
-   * 
+   *
    * @note Consider changing arg order, to conform with other parts of this library.
    */
   static indicator(dimensions: Dimension[], coordNames: string | string[]): Vector {
