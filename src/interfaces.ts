@@ -1,4 +1,5 @@
 import Complex from './Complex'
+import Vector from './Vector'
 
 /**
  * PARTICLE INTERFACE
@@ -23,6 +24,14 @@ export interface IPolarization {
   direction: number
   h: Complex
   v: Complex
+}
+
+/**
+ * For turning Operator in a sparse array of rows of columns
+ */
+export interface IColumnOrRow {
+  coord: number[]
+  vector: Vector
 }
 
 /**

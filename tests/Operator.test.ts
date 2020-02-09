@@ -1,5 +1,6 @@
 import { Cx } from '../src/Complex'
 import Dimension from '../src/Dimension'
+import Vector from '../src/Vector'
 import Operator from '../src/Operator'
 
 describe('Sparse Complex Operator', () => {
@@ -41,5 +42,36 @@ describe('Sparse Complex Operator', () => {
       { i: 2, j: 2, v: Cx(1) },
       { i: 3, j: 3, v: Cx(1) },
     ])
+  })
+
+  it('row and column representations', () => {
+    const idPolDir = Operator.identity([Dimension.polarization(), Dimension.spin()])
+    expect(idPolDir.toVectorPerInput()[2].coord).toEqual(idPolDir.toVectorPerInput()[2].vector.entries[0].coord)
+    expect(idPolDir.toVectorPerOutput()[2].coord).toEqual(idPolDir.toVectorPerOutput()[2].vector.entries[0].coord)
+
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'uH', Cx(0, 2)],
+        ['dH', 'uH', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    const vecsIn = op.toVectorPerInput()
+    const vecsOut = op.toVectorPerOutput()
+    expect(vecsIn.length).toEqual(1)
+    expect(vecsOut.length).toEqual(2)
+
+    const vecIn = Vector.fromSparseCoordNames(
+      [
+        ['dH', Cx(0, 2)],
+        ['dH', Cx(-1, -1)],
+        ['dV', Cx(0.5, 2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    expect(vecsIn[0].vector).toEqual(vecIn)
+
+    expect(op.transpose().toVectorPerInput()).toEqual(op.toVectorPerOutput())
   })
 })
