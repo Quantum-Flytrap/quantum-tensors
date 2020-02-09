@@ -46,7 +46,7 @@
     "postversion": "git push && git push --tags && npm run build-and-deploy-docs"
   },
   "files": [
-    "build/**/*"
+    "lib/**/*"
   ],
   "dependencies": {
     "@types/lodash": "^4.14.138",
