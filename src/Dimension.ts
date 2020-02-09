@@ -29,10 +29,11 @@ export default class Dimension {
 
   /**
    * Create dimension for polarization
+   * @param basis denote basis, ['H', 'V'], ['D', 'A'] or ['L', 'R'] (experimental)
    * @returns polarization dimension
    */
-  static polarization(): Dimension {
-    return new Dimension('polarization', 2, ['H', 'V'])
+  static polarization(basis = ['H', 'V']): Dimension {
+    return new Dimension('polarization', 2, basis)
   }
 
   /**
