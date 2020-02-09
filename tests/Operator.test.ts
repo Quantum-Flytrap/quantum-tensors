@@ -4,12 +4,12 @@ import Vector from '../src/Vector'
 import Operator from '../src/Operator'
 
 describe('Sparse Complex Operator', () => {
-  it('should create identity', () => {
+  it('creates identity', () => {
     const idPol = Operator.identity([Dimension.polarization()])
     expect(idPol.toString('cartesian', 2, ' + ', false)).toEqual('(1.00 +0.00i) |H⟩⟨H| + (1.00 +0.00i) |V⟩⟨V|')
   })
 
-  it('should create from array', () => {
+  it('creates from array', () => {
     const spinY = Operator.fromArray(
       [
         [Cx(0), Cx(0, -1)],
@@ -20,7 +20,16 @@ describe('Sparse Complex Operator', () => {
     expect(spinY.toString('cartesian', 2, ' + ', false)).toEqual('(0.00 -1.00i) |u⟩⟨d| + (0.00 +1.00i) |d⟩⟨u|')
   })
 
-  it('should create from sparse', () => {
+  it('exports to dense', () => {
+    const array = [
+      [Cx(0), Cx(0, -1)],
+      [Cx(0, 1), Cx(0)],
+    ]
+    const spinY = Operator.fromArray(array, [Dimension.spin()])
+    expect(spinY.toDense()).toEqual(array)
+  })
+
+  it('creates from sparse', () => {
     const opFromSparse = Operator.fromSparseCoordNames(
       [
         ['uH', 'uH', Cx(0, 2)],
@@ -34,7 +43,7 @@ describe('Sparse Complex Operator', () => {
     )
   })
 
-  it('should export to sparse index index value', () => {
+  it('exports to sparse index index value', () => {
     const idPolDir = Operator.identity([Dimension.polarization(), Dimension.spin()])
     expect(idPolDir.toIndexIndexValues()).toEqual([
       { i: 0, j: 0, v: Cx(1) },
@@ -117,12 +126,33 @@ describe('Sparse Complex Operator', () => {
       ],
       dims,
     )
-    expect(id.mulOp(op).toString('cartesian', 2, ' + ', false)).toEqual(
-      '(0.00 +2.00i) |d,H⟩⟨d,H| + (-1.00 -1.00i) |d,H⟩⟨u,H| + (0.50 +2.50i) |d,V⟩⟨u,H|',
+    expect(id.mulOp(op).toDense()).toEqual(op.toDense())
+    expect(op.mulOp(id).toDense()).toEqual(op.toDense())
+    const op2 = Operator.fromSparseCoordNames(
+      [
+        ['uH', 'dH', Cx(1)],
+        ['dH', 'uH', Cx(1)],
+        ['dV', 'dV', Cx(0, 1)],
+      ],
+      dims,
     )
-    // such things are order-sensitive
-    // expect(op.mulOp(id).toString('cartesian', 2, ' + ', false)).toEqual(
-    //   '(0.00 +2.00i) |d,H⟩⟨d,H| + (-1.00 -1.00i) |d,H⟩⟨u,H| + (0.50 +2.50i) |d,V⟩⟨u,H|',
-    // )
+    const op2right = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'uH', Cx(0, 2)],
+        ['dH', 'dH', Cx(-1, -1)],
+        ['dV', 'dH', Cx(0.5, 2.5)],
+      ],
+      dims,
+    )
+    const op2left = Operator.fromSparseCoordNames(
+      [
+        ['uH', 'dH', Cx(0, 2)],
+        ['uH', 'uH', Cx(-1, -1)],
+        ['dV', 'uH', Cx(-2.5, 0.5)],
+      ],
+      dims,
+    )
+    expect(op.mulOp(op2).toDense()).toEqual(op2right.toDense())
+    expect(op2.mulOp(op).toDense()).toEqual(op2left.toDense())
   })
 })

@@ -435,6 +435,21 @@ export default class Operator {
   }
 
   /**
+   * Export to a dense array format
+   * @returns array m[i][j], where i is output index and j in input index
+   */
+  toDense(): Complex[][] {
+    const denseVector: Complex[][] = _.range(this.totalSizeOut).map(() => _.range(this.totalSizeIn).map(() => Cx(0)))
+    // Array(this.totalSizeOut).fill(Array(this.totalSizeIn).fill(Cx(0, 0)))
+    this.entries.forEach((entry: OperatorEntry) => {
+      const i = coordsToIndex(entry.coordOut, this.sizeOut)
+      const j = coordsToIndex(entry.coordIn, this.sizeIn)
+      denseVector[i][j] = entry.value
+    })
+    return denseVector
+  }
+
+  /**
    * Export entires into a flatten, sparse list.
    * @returns E.g. [{i: 2, j: 0, v: Cx(2, 4)}, {i: 5, j: 3, v: Cx(-1, 0)}, ...]
    */
