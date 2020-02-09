@@ -261,35 +261,9 @@ export default class Operator {
    * @returns u = M v (a vector with dimensions as operator output dimensions)
    */
   mulVec(v: Vector): Vector {
-    const m: Operator = this
-
-    Dimension.checkDimensions(m.dimensionsIn, v.dimensions)
-
-    const vValueMap = new Map<string, Complex>()
-    v.entries.forEach(entry => {
-      vValueMap.set(entry.coord.toString(), entry.value)
-    })
-
-    const entries = _.chain(m.entries)
-      .groupBy((entry: OperatorEntry) => entry.coordOut.toString())
-      .values()
-      .map(
-        (entries: OperatorEntry[]): VectorEntry => {
-          const coordOut = entries[0].coordOut
-          const sum = entries
-            .map(entry => {
-              const coordInStr = entry.coordIn.toString()
-              const val = vValueMap.get(coordInStr) || Cx(0)
-              return entry.value.mul(val)
-            })
-            .reduce((a, b) => a.add(b))
-          return new VectorEntry(coordOut, sum)
-        },
-      )
-      .filter(entry => !entry.value.isZero())
-      .value()
-
-    return new Vector(entries, m.dimensionsOut)
+    Dimension.checkDimensions(this.dimensionsIn, v.dimensions)
+    const vecEntries = this.toVectorPerOutput().map(row => new VectorEntry(row.coord, row.vector.dot(v)))
+    return new Vector(vecEntries, [...this.dimensionsOut])
   }
 
   /**
