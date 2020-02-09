@@ -6,7 +6,7 @@ import VectorEntry from './VectorEntry'
 import OperatorEntry from './OperatorEntry'
 import Vector from './Vector'
 import Dimension from './Dimension'
-import { IEntryIndexIndexValue } from './interfaces'
+import { IColumnOrRow, IEntryIndexIndexValue } from './interfaces'
 
 /**
  * Operator class.
@@ -219,6 +219,42 @@ export default class Operator {
   }
 
   /**
+   * An operator as row (output) vectors.
+   * Mostly for internal use (e.g. multiplication).
+   * @returns a sparse array of vector per output.
+   */
+  toVectorPerOutput(): IColumnOrRow[] {
+    return _(this.entries)
+      .groupBy(entry => entry.coordOut.toString())
+      .values()
+      .map(entries => {
+        const coord = entries[0].coordOut
+        const vecEntries = entries.map(opEntry => new VectorEntry(opEntry.coordIn, opEntry.value))
+        const vector = new Vector(vecEntries, [...this.dimensionsIn])
+        return { coord, vector }
+      })
+      .value()
+  }
+
+  /**
+   * An operator as column (input) vectors.
+   * Mostly for internal use (e.g. multiplication).
+   * @returns a sparse array of vector per input
+   */
+  toVectorPerInput(): IColumnOrRow[] {
+    return _(this.entries)
+      .groupBy(entry => entry.coordIn.toString())
+      .values()
+      .map(entries => {
+        const coord = entries[0].coordIn
+        const vecEntries = entries.map(opEntry => new VectorEntry(opEntry.coordOut, opEntry.value))
+        const vector = new Vector(vecEntries, [...this.dimensionsOut])
+        return { coord, vector }
+      })
+      .value()
+  }
+
+  /**
    * Multiply a operator times a vector.
    * @param v Vector with dimensions compatible with operators input dimensions
    *
@@ -255,6 +291,17 @@ export default class Operator {
 
     return new Vector(entries, m.dimensionsOut)
   }
+
+  /**
+   * operator-operator sparse multiplication
+   * @param m2
+   */
+  // mulOp(m2: Operator): Operator {
+  //   const m1: Operator = this
+
+  //   _.chain()
+
+  // }
 
   /**
    * Perform an multiplication on a vector, (M v), on some dimensions.
