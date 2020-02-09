@@ -275,6 +275,18 @@ export default class Vector {
   }
 
   /**
+   * Generates a string for kets.
+   * See {@link Vector.toString} for formatting options.
+   * @param complexFormat ['cartesian', 'polar', 'polarTau'].
+   * @param precision Float precision.
+   *
+   * @returns A ket string, e.g. 0.71 exp(0.00τi) |3,1,>,V⟩ + 0.71 exp(1.00τi) |2,2,v,V⟩.
+   */
+  toKetString(complexFormat = 'polarTau', precision = 2): string {
+    return this.toString(complexFormat, precision, ' + ', false)
+  }
+
+  /**
    * Export to a dense array format
    * @returns Complex[] array vector
    */
