@@ -1,6 +1,6 @@
 {
   "name": "quantum-tensors",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Tensor numerics for quantum information and quantum optics. Used in Quantum Game with Photons.",
   "main": "lib/main.js",
   "types": "lib/main.d.js",
