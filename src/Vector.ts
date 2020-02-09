@@ -33,15 +33,6 @@ export default class Vector {
   }
 
   /**
-   * @deprecated
-   * A getter to for entries.
-   * Use this.entires instead; here only to make sure it is not a breaking change.
-   */
-  get cells(): VectorEntry[] {
-    return this.entries
-  }
-
-  /**
    * @returns Sizes of dimensions.
    * @see {@link Dimension}
    */
