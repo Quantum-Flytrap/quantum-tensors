@@ -37,7 +37,7 @@
     "build": "tsc --pretty",
     "test": "tsc --noEmit -p . && jest --coverage --no-cache",
     "build-docs": "typedoc --out docs src",
-    "build-and-deploy-docs": "build-docs && touch docs/.nojekyll && push-dir --dir=docs --branch=gh-pages --cleanup",
+    "build-and-deploy-docs": "typedoc --out docs src && touch docs/.nojekyll && push-dir --dir=docs --branch=gh-pages --cleanup",
     "build-defs": "tsc --declaration --outDir . --emitDeclarationOnly",
     "eslint-fix": "eslint --fix src/*.ts",
     "lint": "eslint src/*.ts",
