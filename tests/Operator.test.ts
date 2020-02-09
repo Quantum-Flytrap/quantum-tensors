@@ -52,7 +52,7 @@ describe('Sparse Complex Operator', () => {
     const op = Operator.fromSparseCoordNames(
       [
         ['dH', 'uH', Cx(0, 2)],
-        ['dH', 'uH', Cx(-1, -1)],
+        ['uH', 'uH', Cx(-1, -1)],
         ['dV', 'uH', Cx(0.5, 2.5)],
       ],
       [Dimension.spin(), Dimension.polarization()],
@@ -60,12 +60,12 @@ describe('Sparse Complex Operator', () => {
     const vecsIn = op.toVectorPerInput()
     const vecsOut = op.toVectorPerOutput()
     expect(vecsIn.length).toEqual(1)
-    expect(vecsOut.length).toEqual(2)
+    expect(vecsOut.length).toEqual(3)
 
     const vecIn = Vector.fromSparseCoordNames(
       [
         ['dH', Cx(0, 2)],
-        ['dH', Cx(-1, -1)],
+        ['uH', Cx(-1, -1)],
         ['dV', Cx(0.5, 2.5)],
       ],
       [Dimension.spin(), Dimension.polarization()],
@@ -73,5 +73,36 @@ describe('Sparse Complex Operator', () => {
     expect(vecsIn[0].vector).toEqual(vecIn)
 
     expect(op.transpose().toVectorPerInput()).toEqual(op.toVectorPerOutput())
+  })
+
+  it('op-vec multiplication', () => {
+    const dims = [Dimension.spin(), Dimension.polarization()]
+    const id = Operator.identity(dims)
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uH', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+      ],
+      dims,
+    )
+    const vec = Vector.fromSparseCoordNames(
+      [
+        ['dH', Cx(0, 1)],
+        ['uH', Cx(2, 0)],
+        ['dV', Cx(0, 1)],
+      ],
+      dims,
+    )
+    expect(id.mulVec(vec).toDense()).toEqual(vec.toDense())
+    const vec2 = Vector.fromSparseCoordNames(
+      [
+        ['dH', Cx(-4, -2)],
+        ['dV', Cx(1, 5)],
+      ],
+      dims,
+    )
+    expect(op.mulVec(vec).toKetString('cartesian')).toEqual('(-4.00 -2.00i) |d,H⟩ + (1.00 +5.00i) |d,V⟩')
+    expect(op.mulVec(vec).toDense()).toEqual(vec2.toDense())
   })
 })
