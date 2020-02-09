@@ -162,6 +162,10 @@ describe('Sparse Complex Vector', () => {
     )
   })
 
+  it('creates siplified ket string', () => {
+    expect(vector.toKetString()).toEqual('1.41 exp(0.88τi) |u,0⟩ + 2.83 exp(0.88τi) |d,0⟩ + 4.24 exp(0.88τi) |u,1⟩')
+  })
+
   it('creates index values output', () => {
     expect(vector.toIndexValues()).toEqual([
       { i: 0, v: Cx(1, -1) },
