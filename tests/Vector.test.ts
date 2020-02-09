@@ -4,6 +4,8 @@ import VectorEntry from '../src/VectorEntry'
 import Vector from '../src/Vector'
 
 describe('Sparse Complex Vector', () => {
+  const vector0 = Vector.fromArray([Cx(0), Cx(0), Cx(0), Cx(0)], [Dimension.spin(), Dimension.position(2)])
+
   const vector = Vector.fromArray(
     [Cx(1, -1), Cx(2, -2), Cx(3, -3), Cx(0, 0)],
     [Dimension.spin(), Dimension.position(2)],
@@ -13,6 +15,12 @@ describe('Sparse Complex Vector', () => {
     [Cx(0, 0), Cx(-2, 1), Cx(0, 0.5), Cx(0, 0)],
     [Dimension.spin(), Dimension.position(2)],
   )
+
+  it('throw error for fromArray of wrong size', () => {
+    const array = [Cx(1, -1), Cx(2, -2), Cx(3, -3)]
+    const dimensions = [Dimension.spin(), Dimension.position(2)]
+    expect(() => Vector.fromArray(array, dimensions)).toThrowError('Dimension inconsistency: entry count 3 != total: 4')
+  })
 
   it('should create a vector from entries and dimensions', () => {
     const dimensions = [Dimension.spin(), Dimension.direction()]
@@ -31,6 +39,17 @@ describe('Sparse Complex Vector', () => {
     expect(() => new Vector([entry1, entry2, entry3], dimensions)).toThrowError(
       'Coordinates [1,1,2] incompatible with sizes [2,4,2].',
     )
+  })
+
+  it('creates vector from sparse entries', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['uH', Cx(1)],
+        ['dV', Cx(-1)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    expect(vector.toDense()).toEqual([Cx(1), Cx(0), Cx(0), Cx(-1)])
   })
 
   it('should give vector getter properties', () => {
@@ -55,6 +74,9 @@ describe('Sparse Complex Vector', () => {
     const permuted = vector.permute([1, 0])
     expect(permuted.names).toEqual(['x', 'spin'])
     expect(permuted.toDense()).toEqual([Cx(1, -1), Cx(3, -3), Cx(2, -2), Cx(0, 0)])
+    expect(() => vector.permute([0, 1, 2])).toThrowError('0,1,2 is not a valid permutation for 2 dimensions.')
+    expect(() => vector.permute([0, 0])).toThrowError('0,0 is not a valid permutation for 2 dimensions.')
+    expect(() => vector.permute([2, 0])).toThrowError('2,0 is not a valid permutation for 2 dimensions.')
   })
 
   it('should compute the norm squared of a vector', () => {
@@ -71,6 +93,7 @@ describe('Sparse Complex Vector', () => {
     const res = vector10.normalize().toDense()
     expect(res[1].re).toBeCloseTo(-0.3)
     expect(res[2].im).toBeCloseTo(-0.3)
+    expect(() => vector0.normalize()).toThrowError('Cannot normalize a zero-length vector!')
   })
 
   it('should add two vectors', () => {
@@ -120,5 +143,59 @@ describe('Sparse Complex Vector', () => {
       Cx(0),
       Cx(0),
     ])
+  })
+
+  it('creates a vector copy', () => {
+    const vectorCopy = vector.copy()
+    expect(vectorCopy.toDense()).toEqual(vector.toDense())
+    vectorCopy.entries[0].value.re = 999
+    expect(vector.entries[0].value.re).toEqual(1)
+    vectorCopy.dimensions[0].name = 'qqq'
+    expect(vector.dimensions[0].name).toEqual('spin')
+  })
+
+  it('creates string', () => {
+    // eslint-disable-next-line prettier/prettier, max-len
+    expect(vector.toString()).toEqual('Vector with 3 entries of max size [2,2] with dimensions [spin,x]\n(1.00 -1.00i) |u,0⟩ + (2.00 -2.00i) |d,0⟩ + (3.00 -3.00i) |u,1⟩\n')
+    expect(vector.toString('polarTau', 3, ' ', false)).toEqual(
+      '1.414 exp(0.875τi) |u,0⟩ 2.828 exp(0.875τi) |d,0⟩ 4.243 exp(0.875τi) |u,1⟩',
+    )
+  })
+
+  it('creates index values output', () => {
+    expect(vector.toIndexValues()).toEqual([
+      { i: 0, v: Cx(1, -1) },
+      { i: 1, v: Cx(2, -2) },
+      { i: 2, v: Cx(3, -3) },
+    ])
+  })
+
+  it('creates vector with a single entry', () => {
+    const dims = [Dimension.polarization(), Dimension.spin()]
+    const vec = Vector.indicator(dims, 'Hd')
+    expect(vec.entries.length).toEqual(1)
+    expect(vec.entries[0].value).toEqual(Cx(1))
+    expect(() => Vector.indicator(dims, 'H')).toThrowError('')
+    expect(() => Vector.indicator(dims, 'dH')).toThrowError('')
+  })
+
+  it('does outer product for many entires', () => {
+    const outer = Vector.outer([
+      Vector.fromArray([Cx(1), Cx(-1)], [Dimension.spin()]),
+      Vector.fromArray([Cx(0), Cx(0, 1), Cx(0), Cx(0)], [Dimension.direction()]),
+      Vector.fromArray([Cx(1), Cx(0), Cx(2)], [Dimension.position(3)]),
+    ])
+    expect(outer.size).toEqual([2, 4, 3])
+    // eslint-disable-next-line prettier/prettier, max-len
+    expect(outer.toString()).toEqual('Vector with 4 entries of max size [2,4,3] with dimensions [spin,direction,x]\n(0.00 +1.00i) |u,^,0⟩ + (0.00 +2.00i) |u,^,2⟩ + (0.00 -1.00i) |d,^,0⟩ + (0.00 -2.00i) |d,^,2⟩\n')
+  })
+
+  it('does sum product for many entires', () => {
+    const sum = Vector.add([
+      Vector.fromArray([Cx(1), Cx(-1)], [Dimension.spin()]),
+      Vector.fromArray([Cx(3, 2), Cx(1, 1)], [Dimension.spin()]),
+      Vector.fromArray([Cx(1), Cx(0)], [Dimension.spin()]),
+    ])
+    expect(sum.toDense()).toEqual([Cx(5, 2), Cx(0, 1)])
   })
 })
