@@ -105,4 +105,24 @@ describe('Sparse Complex Operator', () => {
     expect(op.mulVec(vec).toKetString('cartesian')).toEqual('(-4.00 -2.00i) |d,H⟩ + (1.00 +5.00i) |d,V⟩')
     expect(op.mulVec(vec).toDense()).toEqual(vec2.toDense())
   })
+
+  it('op-op multiplication', () => {
+    const dims = [Dimension.spin(), Dimension.polarization()]
+    const id = Operator.identity(dims)
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uH', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+      ],
+      dims,
+    )
+    expect(id.mulOp(op).toString('cartesian', 2, ' + ', false)).toEqual(
+      '(0.00 +2.00i) |d,H⟩⟨d,H| + (-1.00 -1.00i) |d,H⟩⟨u,H| + (0.50 +2.50i) |d,V⟩⟨u,H|',
+    )
+    // such things are order-sensitive
+    // expect(op.mulOp(id).toString('cartesian', 2, ' + ', false)).toEqual(
+    //   '(0.00 +2.00i) |d,H⟩⟨d,H| + (-1.00 -1.00i) |d,H⟩⟨u,H| + (0.50 +2.50i) |d,V⟩⟨u,H|',
+    // )
+  })
 })
