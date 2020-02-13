@@ -178,7 +178,7 @@ export function CCX(): Operator {
       ['111', '110', Cx(1)], // this and
       ['110', '111', Cx(1)], // that differs from identity
     ],
-    [Dimension.qubit(), Dimension.qubit()],
+    [Dimension.qubit(), Dimension.qubit(), Dimension.qubit()],
   )
 }
 
@@ -199,6 +199,6 @@ export function CSwap(): Operator {
       ['101', '110', Cx(1)], // that differs from identity
       ['111', '111', Cx(1)],
     ],
-    [Dimension.qubit(), Dimension.qubit()],
+    [Dimension.qubit(), Dimension.qubit(), Dimension.qubit()],
   )
 }

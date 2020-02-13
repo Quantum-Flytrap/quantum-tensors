@@ -9,4 +9,5 @@ export * from './helpers'
 export * from './Constants'
 import * as Elements from './Elements'
 import * as Ops from './Ops'
-export { Elements, Ops }
+import * as Gates from './Gates'
+export { Elements, Ops, Gates }
