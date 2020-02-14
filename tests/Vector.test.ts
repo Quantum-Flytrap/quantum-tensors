@@ -2,6 +2,7 @@ import { Cx } from '../src/Complex'
 import Dimension from '../src/Dimension'
 import VectorEntry from '../src/VectorEntry'
 import Vector from '../src/Vector'
+import './customMatchers'
 
 describe('Sparse Complex Vector', () => {
   const vector0 = Vector.fromArray([Cx(0), Cx(0), Cx(0), Cx(0)], [Dimension.spin(), Dimension.position(2)])
@@ -88,11 +89,7 @@ describe('Sparse Complex Vector', () => {
       [Cx(1, 0), Cx(-3, -9), Cx(0, -3), Cx(0, 0)],
       [Dimension.spin(), Dimension.position(2)],
     )
-    // since 0.30000000000000004 vs 0.3, we cannot just toEqual
-    // see https://github.com/facebook/jest/issues/4058
-    const res = vector10.normalize().toDense()
-    expect(res[1].re).toBeCloseTo(-0.3)
-    expect(res[2].im).toBeCloseTo(-0.3)
+    expect(vector10.normalize()).vectorCloseToNumbers([Cx(0.1, 0), Cx(-0.3, -0.9), Cx(0, -0.3), Cx(0, 0)])
     expect(() => vector0.normalize()).toThrowError('Cannot normalize a zero-length vector!')
   })
 

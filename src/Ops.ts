@@ -64,7 +64,7 @@ export function phaseShiftForRealEigenvectors(
 export const polH = Vector.fromArray([Cx(1), Cx(0)], [dimPol])
 export const polV = Vector.fromArray([Cx(0), Cx(1)], [dimPol])
 export const polD = Vector.fromArray([Cx(1), Cx(1)], [dimPol]).normalize()
-export const polA = Vector.fromArray([Cx(1), Cx(-1)], [dimPol]).normalize()
+export const polA = Vector.fromArray([Cx(-1), Cx(1)], [dimPol]).normalize()
 // below needs checking, as it is all +- left/right
 export const polL = Vector.fromArray([Cx(1), Cx(0, 1)], [dimPol]).normalize()
 export const polR = Vector.fromArray([Cx(1), Cx(0, -1)], [dimPol]).normalize()
