@@ -56,14 +56,35 @@ describe('All gates', () => {
     expect(Gates.T().isCloseToUnitary()).toBe(true)
   })
 
+  it('some 1-qubit gates are Hermitian', () => {
+    expect(Gates.I().isCloseToHermitian()).toBe(true)
+    expect(Gates.X().isCloseToHermitian()).toBe(true)
+    expect(Gates.Y().isCloseToHermitian()).toBe(true)
+    expect(Gates.Z().isCloseToHermitian()).toBe(true)
+    expect(Gates.H().isCloseToHermitian()).toBe(true)
+    expect(Gates.S().isCloseToHermitian()).toBe(false)
+    expect(Gates.T().isCloseToHermitian()).toBe(false)
+  })
+
   it('all 2-qubit gates are unitary', () => {
     expect(Gates.CX().isCloseToUnitary()).toBe(true)
     expect(Gates.CZ().isCloseToUnitary()).toBe(true)
     expect(Gates.Swap().isCloseToUnitary()).toBe(true)
   })
 
-  it('all 3qubit gates are unitary', () => {
+  it('all 2-qubit gates are Hermitian', () => {
+    expect(Gates.CX().isCloseToHermitian()).toBe(true)
+    expect(Gates.CZ().isCloseToHermitian()).toBe(true)
+    expect(Gates.Swap().isCloseToHermitian()).toBe(true)
+  })
+
+  it('all 3-qubit gates are unitary', () => {
     expect(Gates.CCX().isCloseToUnitary()).toBe(true)
     expect(Gates.CSwap().isCloseToUnitary()).toBe(true)
+  })
+
+  it('all 3-qubit gates are Hermitian', () => {
+    expect(Gates.CCX().isCloseToHermitian()).toBe(true)
+    expect(Gates.CSwap().isCloseToHermitian()).toBe(true)
   })
 })
