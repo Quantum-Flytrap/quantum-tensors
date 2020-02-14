@@ -142,6 +142,16 @@ export default class Complex {
   }
 
   /**
+   * Tests if a complex is close to another
+   * @param z2 complex to test proximity
+   * @param eps tolerance for the Euclidean norm
+   * @returns z1 ~= z2
+   */
+  isCloseTo(z2: Complex, eps = 1e-6): boolean {
+    return this.sub(z2).r < eps
+  }
+
+  /**
    * Tests if a complex is equal to another
    * @param z2 complex to test equality
    * @returns z1 === z2
@@ -156,6 +166,15 @@ export default class Complex {
    */
   isZero(): boolean {
     return this.re === 0 && this.im === 0
+  }
+
+  /**
+   * Check if a complex number is zero
+   * @param eps tolerance for the Euclidean norm
+   * @return z1 ~= 0
+   */
+  isAlmostZero(eps = 1e-6): boolean {
+    return this.r < eps
   }
 
   /**

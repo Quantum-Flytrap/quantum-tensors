@@ -5,10 +5,6 @@ import Operator from '../src/Operator'
 import './customMatchers'
 
 describe('Sparse Complex Operator', () => {
-  it('test extend', () => {
-    expect('sdvnkj').myMatcher('sdvnkj')
-  })
-
   it('creates identity', () => {
     const idPol = Operator.identity([Dimension.polarization()])
     expect(idPol.toString('cartesian', 2, ' + ', false)).toEqual('(1.00 +0.00i) |H⟩⟨H| + (1.00 +0.00i) |V⟩⟨V|')

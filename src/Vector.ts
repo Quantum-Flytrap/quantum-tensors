@@ -78,6 +78,19 @@ export default class Vector {
   }
 
   /**
+   * Vector norm (vector length).
+   * In quantum physics, it is probability of a quantum state.
+   *
+   * @note Would be equivalent to inner product with itself,
+   * but we use a more straightforward implementation (plus, to make sure we get a real number).
+   *
+   * @returns sqrt⟨v|v⟩
+   */
+  get norm(): number {
+    return Math.sqrt(this.normSquared())
+  }
+
+  /**
    * Create a copy of the vector.
    * @todo Make it more lightweight than using lodash.
    */
