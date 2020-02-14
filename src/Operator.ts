@@ -622,6 +622,75 @@ export default class Operator {
   }
 
   /**
+   * L2 norm, Frobenius norm, or Hilbert-Schmidt norm. Squared.
+   * https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm
+   */
+  normSquared(): number {
+    return this.entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b, 0)
+  }
+
+  /**
+   * Is it close to zero?
+   * @param eps Euclidean distance tolerance.
+   * @return Checks M ~= 0
+   */
+  isCloseToZero(eps = 1e-6): boolean {
+    return Math.sqrt(this.normSquared()) < eps
+  }
+
+  /**
+   * Is it close to another operator?
+   * @param m2 An operator to compare
+   * @param eps Euclidean distance tolerance.
+   * @return Checks M1 ~= M2
+   */
+  isCloseTo(m2: Operator, eps = 1e-6): boolean {
+    return this.sub(m2).isCloseToZero(eps)
+  }
+
+  /**
+   * Is it close to a Hermitian matrix?
+   * @param eps Euclidean distance tolerance.
+   *  @return Checks M^dag ~= M
+   */
+  isCloseToHermitian(eps = 1e-6): boolean {
+    return this.dag().isCloseTo(this, eps)
+  }
+
+  /**
+   * Is it close to identity?
+   * Checks only with in and out dimensions are the same,
+   * otherwise there is an error.
+   * @param eps Euclidean distance tolerance.
+   * @return Checks M ~= Id
+   */
+  isCloseToIdentity(eps = 1e-6): boolean {
+    Dimension.checkDimensions(this.dimensionsIn, this.dimensionsOut)
+    const idOp = Operator.identity([...this.dimensionsIn])
+    return this.isCloseTo(idOp, eps)
+  }
+
+  /**
+   * Is it close to identity?
+   * @param eps Euclidean distance tolerance.
+   * @return Checks M M ~= M
+   */
+  isCloseToProjection(eps = 1e-6): boolean {
+    return this.mulOp(this).isCloseTo(this, eps)
+  }
+
+  /**
+   * Is it close to an unitary operator?
+   * @param eps Euclidean distance tolerance.
+   * @return Checks M^dag M ~= Id
+   */
+  isCloseToUnitary(eps = 1e-6): boolean {
+    return this.dag()
+      .mulOp(this)
+      .isCloseToIdentity(eps)
+  }
+
+  /**
    * Outer product (tensor product) between two or more operators.
    *
    * @see {@link Operator.outer} for the actual implementation.
