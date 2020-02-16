@@ -150,7 +150,7 @@ export function polarizerWE(angle: number): Operator {
  * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
  * @todo Check convention, etc
  */
-export function PolarizerNS(angle: number): Operator {
+export function polarizerNS(angle: number): Operator {
   return polarizer(90, angle / 360)
 }
 
