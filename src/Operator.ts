@@ -650,8 +650,9 @@ export default class Operator {
 
   /**
    * Is it close to a Hermitian matrix?
+   * @see https://en.wikipedia.org/wiki/Hermitian_matrix
    * @param eps Euclidean distance tolerance.
-   *  @return Checks M^dag ~= M
+   * @return Checks M^dag ~= M
    */
   isCloseToHermitian(eps = 1e-6): boolean {
     return this.dag().isCloseTo(this, eps)
@@ -672,6 +673,7 @@ export default class Operator {
 
   /**
    * Is it close to identity?
+   * @see https://en.wikipedia.org/wiki/Projection_(linear_algebra)
    * @param eps Euclidean distance tolerance.
    * @return Checks M M ~= M
    */
@@ -681,13 +683,38 @@ export default class Operator {
 
   /**
    * Is it close to an unitary operator?
+   * @see https://en.wikipedia.org/wiki/Unitary_operator
    * @param eps Euclidean distance tolerance.
-   * @return Checks M^dag M ~= Id
+   * @return Checks M^dag M ~= M M^dag
    */
   isCloseToUnitary(eps = 1e-6): boolean {
     return this.dag()
       .mulOp(this)
       .isCloseToIdentity(eps)
+  }
+
+  /**
+   * Is it close to a normal operator?
+   * @see https://en.wikipedia.org/wiki/Normal_operator
+   * @param eps Euclidean distance tolerance.
+   * @return Checks M^dag M ~= Id
+   */
+  isCloseToNormal(eps = 1e-6): boolean {
+    const lhs = this.dag().mulOp(this)
+    const rhs = this.mulOp(this.dag())
+    return lhs.isCloseTo(rhs, eps)
+  }
+
+  /**
+   * Is it close to an unitary, when restricted to of the subspace defines by its image.
+   * A stronger condition than the partial isometry https://en.wikipedia.org/wiki/Partial_isometry.
+   * E.g. spin-up operator |u><d| is a partial isometry, but not unitary on subspace.
+   * @param eps Euclidean distance tolerance.
+   * @returns M^dag M ~= M M^dag ~= P, P P = P
+   */
+  isCloseToUnitaryOnSubspace(eps = 1e-6): boolean {
+    const proj = this.dag().mulOp(this)
+    return this.isCloseToNormal(eps) && proj.isCloseToProjection(eps)
   }
 
   /**
