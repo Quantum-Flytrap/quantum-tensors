@@ -4,7 +4,7 @@ import Vector from '../src/Vector'
 import * as Ops from '../src/Ops'
 import './customMatchers'
 
-describe('Basis change', () => {
+describe('Auxiliary operators', () => {
   const TAU = 2 * Math.PI
 
   it('For basis vectors', () => {
@@ -65,10 +65,11 @@ describe('Basis change', () => {
   })
 
   it('reflections from a plane', () => {
-    // add this partial unitary?
     expect(Ops.reflectFromPlaneDirection(0).isCloseToUnitary()).toBe(false)
+    expect(Ops.reflectFromPlaneDirection(0).isCloseToUnitaryOnSubspace()).toBe(true)
     expect(Ops.reflectFromPlaneDirection(45).isCloseToUnitary()).toBe(true)
     expect(Ops.reflectFromPlaneDirection(90).isCloseToUnitary()).toBe(false)
+    expect(Ops.reflectFromPlaneDirection(90).isCloseToUnitaryOnSubspace()).toBe(true)
     expect(Ops.reflectFromPlaneDirection(135).isCloseToUnitary()).toBe(true)
 
     expect(Ops.reflectFromPlaneDirection(0).isCloseToHermitian()).toBe(true)
