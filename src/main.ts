@@ -7,7 +7,8 @@ export { default as VectorEntry } from './VectorEntry'
 export { default as OperatorEntry } from './OperatorEntry'
 export * from './helpers'
 export * from './Constants'
+import * as Basis from './Basis'
 import * as Elements from './Elements'
 import * as Ops from './Ops'
 import * as Gates from './Gates'
-export { Elements, Ops, Gates }
+export { Basis, Elements, Ops, Gates }
