@@ -5,10 +5,10 @@ export { default as Photons } from './Photons'
 export { Cx, default as Complex } from './Complex'
 export { default as VectorEntry } from './VectorEntry'
 export { default as OperatorEntry } from './OperatorEntry'
+export { default as Basis } from './Basis'
 export * from './helpers'
 export * from './Constants'
-import * as Basis from './Basis'
 import * as Elements from './Elements'
 import * as Ops from './Ops'
 import * as Gates from './Gates'
-export { Basis, Elements, Ops, Gates }
+export { Elements, Ops, Gates }
