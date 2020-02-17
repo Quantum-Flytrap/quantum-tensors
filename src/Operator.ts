@@ -362,27 +362,6 @@ export default class Operator {
     return new Vector(newEntries, v.dimensions)
   }
 
-  // mulOp(m2: Operator): Operator {
-  //     const m1 = this
-  //     // TODO: check dimensions here
-  //     const result = _
-  //         .chain(v1.cells.concat(v2.cells))
-  //         .groupBy((entry: VectorEntry) => entry.coord.toString())
-  //         .values()
-  //         .map((grouped: VectorEntry[]) => {
-  //             if (grouped.length === 2) {
-  //                 return (grouped[0].value).mul(grouped[1].value)
-  //             } else {
-  //                 return Cx(0, 0)
-  //             }
-  //         })
-  //         .reduce((a, b) => a.add(b))
-  //         .value()
-
-  //     return result
-
-  // }
-
   /**
    * Changing order of dimensions for a vector, from [0, 1, 2, ...] to something else.
    * @param orderOut  E.g. [2, 0, 1]
