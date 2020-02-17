@@ -121,6 +121,89 @@ describe('Sparse Complex Vector', () => {
     expect(vector.inner(vector2)).toEqual(Cx(-7.5, -0.5))
   })
 
+  it('partial dot and inner', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['dH0', Cx(1)],
+        ['dV1', Cx(-1)],
+        ['dV2', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    )
+
+    const vcs1 = vector.toGroupedByCoords([2])
+    expect(vcs1.length).toEqual(2)
+    expect(vcs1[0].coord.length).toEqual(2)
+    expect(vcs1[0].vector.size).toEqual([3])
+
+    const vcs2 = vector.toGroupedByCoords([0])
+    expect(vcs2.length).toEqual(3)
+    expect(vcs2[0].coord.length).toEqual(2)
+    expect(vcs2[0].vector.size).toEqual([2])
+
+    const vcs3 = vector.toGroupedByCoords([1, 2])
+    expect(vcs3.length).toEqual(1)
+    expect(vcs3[0].coord.length).toEqual(1)
+    expect(vcs3[0].vector.size).toEqual([2, 3])
+    expect(vcs3[0].vector.toKetString('cartesian')).toEqual(
+      '(1.00 +0.00i) |H,0⟩ + (-1.00 +0.00i) |V,1⟩ + (0.00 +1.00i) |V,2⟩',
+    )
+  })
+
+  it('partial dot and inner', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['dH0', Cx(1)],
+        ['dV1', Cx(-1)],
+        ['dV2', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    )
+    const smallVector1 = Vector.fromSparseCoordNames(
+      [
+        ['0', Cx(10)],
+        ['2', Cx(0, 3)],
+      ],
+      [Dimension.position(3)],
+    )
+    const res1 = Vector.fromSparseCoordNames(
+      [
+        ['dH', Cx(10)],
+        ['dV', Cx(-3)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    expect(smallVector1.dotPartial([2], vector).toKetString('cartesian')).toEqual(
+      '(10.00 +0.00i) |d,H⟩ + (-3.00 +0.00i) |d,V⟩',
+    )
+    expect(smallVector1.dotPartial([2], vector)).vectorCloseTo(res1)
+
+    expect(smallVector1.innerPartial([2], vector).toKetString('cartesian')).toEqual(
+      '(10.00 +0.00i) |d,H⟩ + (3.00 +0.00i) |d,V⟩',
+    )
+
+    const smallVector2 = Vector.fromSparseCoordNames([['H', Cx(0, 1)]], [Dimension.polarization()])
+    const res2inner = Vector.fromSparseCoordNames([['d0', Cx(0, -1)]], [Dimension.spin(), Dimension.position(3)])
+    expect(smallVector2.innerPartial([1], vector).toString()).toEqual(
+      'Vector with 1 entries of max size [2,3] with dimensions [spin,x]\n(0.00 -1.00i) |d,0⟩\n',
+    )
+    expect(smallVector2.innerPartial([1], vector)).vectorCloseToNumbers(res2inner.toDense())
+
+    const smallVector3 = Vector.fromSparseCoordNames([['u', Cx(0, 1)]], [Dimension.spin()])
+    expect(smallVector3.innerPartial([0], vector).normSquared()).toBeCloseTo(0)
+
+    const smallVector4 = Vector.fromSparseCoordNames(
+      [
+        ['d1', Cx(0, 1)],
+        ['d2', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.position(3)],
+    )
+    expect(smallVector4.innerPartial([0, 2], vector).toString()).toEqual(
+      'Vector with 1 entries of max size [2] with dimensions [polarization]\n(1.00 +1.00i) |V⟩\n',
+    )
+  })
+
   it('should compute the outer product of two vectors', () => {
     expect(vector.outer(vector2).toDense()).toEqual([
       Cx(0),

@@ -4,7 +4,7 @@ import { coordsToIndex, checkCoordsSizesCompability, isPermutation } from './hel
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
-import { IEntryIndexValue } from './interfaces'
+import { IColumnOrRow, IEntryIndexValue } from './interfaces'
 
 /**
  * Vector class.
@@ -192,19 +192,75 @@ export default class Vector {
     return result
   }
 
-  // dotPartial(coordIndices: number[], v: Vector): Vector {
-  // TODO: Implement dotPartial
-  // }
-
   /**
    * Inner product, the classic ⟨bra|ket⟩ for complex vectors.
    * https://en.wikipedia.org/wiki/Bra%E2%80%93ket_notation
-   * It is anti-linear in the first argument, and linear in the seconf.
+   * It is anti-linear in the first argument, and linear in the second.
    * @param v2 The other vector (ket).
    * @returns v1^† . v2 or ⟨v1|v2⟩
    */
   inner(v2: Vector): Complex {
     return this.conj().dot(v2)
+  }
+
+  /**
+   * Groups some of vector coordinates.
+   * Mostly for intrnal use, e.g. partial inner product, Schmidt decomposition, etc.
+   * @param coordIndices Sorted indices of dimensions for vectors. Complementary ones are used for grouping.
+   */
+  toGroupedByCoords(coordIndices: number[]): IColumnOrRow[] {
+    if (
+      !_.chain(coordIndices)
+        .sortBy()
+        .sortedUniq()
+        .isEqual(coordIndices)
+    ) {
+      throw `Entries of coordIndices ${coordIndices} are not sorted unique.`
+    }
+
+    const complementIndices = _.range(this.dimensions.length).filter(i => !_.includes(coordIndices, i))
+    const contractionDimensions = _.at(this.dimensions, coordIndices)
+
+    return _(this.entries)
+      .groupBy(entry => _.at(entry.coord, complementIndices))
+      .values()
+      .map(entries => {
+        const coord = _.at(entries[0].coord, complementIndices)
+        const vecEntries = entries.map(entry => new VectorEntry(_.at(entry.coord, coordIndices), entry.value))
+        const vector = new Vector(vecEntries, contractionDimensions)
+        return { coord, vector }
+      })
+      .value()
+  }
+
+  /**
+   * Dot product for all dimensions of v1 and some for v2.
+   * @param coordIndices Indices of dimensions for v2.
+   * @param v The other vector
+   * @returns sum_i v1_i v2_ij
+   */
+  dotPartial(coordIndices: number[], v: Vector): Vector {
+    const groupedByCoords = v.toGroupedByCoords(coordIndices)
+    const contractionDimensions = groupedByCoords[0].vector.dimensions
+    const complementDimensions = v.dimensions.filter((_dim, i) => !_.includes(coordIndices, i))
+
+    Dimension.checkDimensions(this.dimensions, contractionDimensions)
+
+    const vecEntries = groupedByCoords
+      .map(row => new VectorEntry(row.coord, this.dot(row.vector)))
+      .filter(entry => !entry.value.isAlmostZero())
+    return new Vector(vecEntries, complementDimensions)
+  }
+
+  /**
+   * Inner product, the classic ⟨bra_indices|ket⟩ for complex vectors.
+   * https://en.wikipedia.org/wiki/Bra%E2%80%93ket_notation
+   * It is anti-linear in the first argument, and linear in the seconf.
+   * @param v2 The other vector (ket).
+   * @returns |v2⟩_reduced = v1_indices^† . v2 or ⟨v1_indices|v2⟩
+   */
+  innerPartial(coordIndices: number[], v2: Vector): Vector {
+    return this.conj().dotPartial(coordIndices, v2)
   }
 
   /**
