@@ -94,16 +94,17 @@ export function cornerCube(): Operator {
 /**
  * A polarizing beam splitter.
  * Think: a very thin slab of glass.
- * 45: [/], 135: [\]
- * @angle Angle in degrees, from -> CCW. Needs to be 45 or 135deg, up to 180deg.
+ * 0: [/], 90: [\]
+ * @note Changed convention from 45 and 135deg!
+ * @angle Angle in degrees, from -> CCW. Needs to be 0 or 90, up to 180deg.
  * @returns Operator with dimensions [dimDir, dimPol].
  */
 export function polarizingBeamsplitter(angle: number): Operator {
-  if (!_.includes([45, 135], mod(angle, 180))) {
-    throw new Error(`polarizingBeamsplitter: angle ${angle} mod 180 not in [45, 135].`)
+  if (!_.includes([0, 90], mod(angle, 180))) {
+    throw new Error(`polarizingBeamsplitter: angle ${angle} mod 180 not in [0, 90].`)
   }
 
-  return Operator.add([idDir.outer(projH), ops.reflectFromPlaneDirection(angle).outer(projV)])
+  return Operator.add([idDir.outer(projH), ops.reflectFromPlaneDirection(angle + 45).outer(projV)])
 }
 
 /**

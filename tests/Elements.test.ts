@@ -60,11 +60,11 @@ describe('Optical elements', () => {
   })
 
   it('Polarizing beam splitter', () => {
-    expect(Elements.polarizingBeamsplitter(45).isCloseToUnitary()).toBe(true)
-    expect(Elements.polarizingBeamsplitter(45).isCloseToHermitian()).toBe(true)
+    expect(Elements.polarizingBeamsplitter(0).isCloseToUnitary()).toBe(true)
+    expect(Elements.polarizingBeamsplitter(0).isCloseToHermitian()).toBe(true)
 
-    expect(Elements.polarizingBeamsplitter(135).isCloseToUnitary()).toBe(true)
-    expect(Elements.polarizingBeamsplitter(135).isCloseToHermitian()).toBe(true)
+    expect(Elements.polarizingBeamsplitter(90).isCloseToUnitary()).toBe(true)
+    expect(Elements.polarizingBeamsplitter(90).isCloseToHermitian()).toBe(true)
   })
 
   it('Faraday rotator', () => {
