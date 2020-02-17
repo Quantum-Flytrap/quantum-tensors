@@ -242,7 +242,7 @@ export default class Photons {
         const outputProjectedProbability = localizedOperator.mulVecPartial([...allId], vectorProjected).normSquared()
         const p = inputProjectedProbabability - outputProjectedProbability
 
-        const proj = Operator.indicator(
+        const proj = Vector.indicator(
           [this.dimX, this.dimY, dimDir, dimPol],
           [`${posX}`, `${posY}`, coordStr[0], coordStr[1]],
         )
@@ -250,7 +250,7 @@ export default class Photons {
         const newPhotons = this.copy()
         newPhotons.nPhotons -= 1
 
-        newPhotons.vector = proj.mulVecPartial([...allId], this.vector)._removeDimension([...allId])
+        newPhotons.vector = proj.innerPartial([...allId], this.vector)
         return {
           photonId: photonId,
           x: posX,
