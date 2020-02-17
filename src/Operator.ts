@@ -193,6 +193,7 @@ export default class Operator {
         const value = grouped.map(entry => entry.value).reduce((a, b) => a.add(b))
         return new OperatorEntry(coordOut, coordIn, value)
       })
+      .filter(entry => !entry.value.isAlmostZero())
       .value()
 
     return new Operator(entries, m1.dimensionsOut, m1.dimensionsIn)
@@ -262,7 +263,9 @@ export default class Operator {
    */
   mulVec(v: Vector): Vector {
     Dimension.checkDimensions(this.dimensionsIn, v.dimensions)
-    const vecEntries = this.toVectorPerOutput().map(row => new VectorEntry(row.coord, row.vector.dot(v)))
+    const vecEntries = this.toVectorPerOutput()
+      .map(row => new VectorEntry(row.coord, row.vector.dot(v)))
+      .filter(entry => !entry.value.isAlmostZero())
     return new Vector(vecEntries, [...this.dimensionsOut])
   }
 
@@ -282,7 +285,7 @@ export default class Operator {
       .flatMap(row =>
         m2.toVectorPerInput().map(col => new OperatorEntry(row.coord, col.coord, row.vector.dot(col.vector))),
       )
-      .filter(entry => !entry.value.isZero())
+      .filter(entry => !entry.value.isAlmostZero())
     return new Operator(entries, [...m1.dimensionsOut], [...m2.dimensionsIn])
   }
 
