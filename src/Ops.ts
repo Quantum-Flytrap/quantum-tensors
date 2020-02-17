@@ -1,5 +1,4 @@
 import Complex, { Cx } from './Complex'
-import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
 import { TAU } from './Constants'
@@ -60,36 +59,6 @@ export function phaseShiftForRealEigenvectors(
     projectionMatrix(alpha + 0.25 * TAU, dimension).mulConstant(Complex.fromPolar(1, phaseOrthogonal * TAU)),
   ])
 }
-
-export const polH = Vector.fromArray([Cx(1), Cx(0)], [dimPol])
-export const polV = Vector.fromArray([Cx(0), Cx(1)], [dimPol])
-export const polD = Vector.fromArray([Cx(1), Cx(1)], [dimPol]).normalize()
-export const polA = Vector.fromArray([Cx(-1), Cx(1)], [dimPol]).normalize()
-// below needs checking, as it is all +- left/right
-export const polL = Vector.fromArray([Cx(1), Cx(0, 1)], [dimPol]).normalize()
-export const polR = Vector.fromArray([Cx(1), Cx(0, -1)], [dimPol]).normalize()
-
-export const basisToDA = Operator.fromSparseCoordNames(
-  [
-    ['D', 'H', polD.inner(polH)],
-    ['D', 'V', polD.inner(polV)],
-    ['A', 'H', polA.inner(polH)],
-    ['A', 'V', polA.inner(polV)],
-  ],
-  [Dimension.polarization(['D', 'A'])],
-  [dimPol],
-)
-
-export const basisToLR = Operator.fromSparseCoordNames(
-  [
-    ['L', 'H', polL.inner(polH)],
-    ['L', 'V', polL.inner(polV)],
-    ['R', 'H', polR.inner(polH)],
-    ['R', 'V', polR.inner(polV)],
-  ],
-  [Dimension.polarization(['L', 'R'])],
-  [dimPol],
-)
 
 /**
  * Reflection from an optically lighter material.
