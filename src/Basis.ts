@@ -2,74 +2,226 @@ import Complex, { Cx } from './Complex'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
-
-const dimPol = Dimension.polarization()
-
-const polVectorsValues = [
-  { name: 'H', values: [Cx(1), Cx(0)] },
-  { name: 'V', values: [Cx(0), Cx(1)] },
-  { name: 'D', values: [Cx(1), Cx(1)] },
-  { name: 'A', values: [Cx(-1), Cx(1)] },
-  // below needs checking, as it is all +- left/right
-  { name: 'L', values: [Cx(1), Cx(0, 1)] },
-  { name: 'R', values: [Cx(1), Cx(0, -1)] },
-]
-const polVectors = new Map<string, Vector>()
-polVectorsValues.forEach(d => {
-  polVectors.set(d.name, Vector.fromArray(d.values, [dimPol]).normalize())
-})
+import { INamedVector } from './interfaces'
 
 /**
- *
- * @param basisTo E.g. ['L', 'R']
- * @param basisFrom  E.g. ['H', 'V']
+ * Class for dealing with bases.
  */
-export function basisChangeOp(basisTo: string[], basisFrom: string[]): Operator {
-  const entries = basisTo.flatMap(toName =>
-    basisFrom.map((fromName): [string, string, Complex] => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return [toName, fromName, polVectors.get(toName)!.inner(polVectors.get(fromName)!)]
-    }),
-  )
-  return Operator.fromSparseCoordNames(
-    entries,
-    [Dimension.polarization([...basisTo])],
-    [Dimension.polarization([...basisFrom])],
-  )
-}
+export default class Basis {
+  namedVectors: INamedVector[]
 
-/**
- *
- * @param basisTo E.g. ['L', 'R']
- * @param dims Dimensions for 'from' basis
- */
-export function opThatChangesAllPolarizationBasesTo(basisTo: string[], dims: Dimension[]): Operator {
-  const ops = dims.map(dim => {
-    if (dim.name !== 'polarization') {
-      return Operator.identity([dim])
-    } else {
-      return basisChangeOp(basisTo, dim.coordNames)
+  /**
+   * As most constructors, for intenal use only.
+   * @param namedVectorValues
+   * @param dimension
+   */
+  constructor(namedVectorValues: { name: string; values: Complex[] }[], computationalDimension: Dimension) {
+    if (namedVectorValues.length !== computationalDimension.size) {
+      throw new Error(
+        `There are ${namedVectorValues.length} vectors` +
+          ` - incorrect for a basis for ${computationalDimension.toString()}`,
+      )
     }
-  })
-  return Operator.outer(ops)
-}
+    if (namedVectorValues.length !== computationalDimension.size) {
+      throw new Error(
+        `There are ${namedVectorValues.length} vectors` +
+          ` - incorrect for a basis for ${computationalDimension.toString()}`,
+      )
+    }
+    this.namedVectors = namedVectorValues.map(d => ({
+      name: d.name,
+      vector: Vector.fromArray(d.values, [computationalDimension]).normalize(),
+    }))
+  }
 
-/**
- * Turn a vector
- * @param vector Vector in question.
- * @param basisTo  Target basis, e.g. ['L', 'R']
- */
-export function vectorAllPolarizationBasesTo(vector: Vector, basisTo: string[]): Vector {
-  return opThatChangesAllPolarizationBasesTo(basisTo, vector.dimensions).mulVec(vector)
-}
+  /**
+   * Get dimension.
+   */
+  get computationalDimension(): Dimension {
+    return this.namedVectors[0].vector.dimensions[0]
+  }
 
-/**
- * Turn an operator
- * @param operator Operator in question.
- * @param basisTo  Target basis, e.g. ['L', 'R']
- */
-export function operatorAllPolarizationBasesTo(operator: Operator, basisTo: string[]): Operator {
-  const changeOut = opThatChangesAllPolarizationBasesTo(basisTo, operator.dimensionsOut)
-  const changeIn = opThatChangesAllPolarizationBasesTo(basisTo, operator.dimensionsIn).dag()
-  return changeOut.mulOp(operator).mulOp(changeIn)
+  get basisCoordNames(): string[] {
+    return this.namedVectors.map(d => d.name)
+  }
+
+  /**
+   * Get basis string.
+   */
+  get basisStr(): string {
+    return this.basisCoordNames.join('')
+  }
+
+  get basisDimension(): Dimension {
+    return this.computationalDimension.reassignCoordNames(this.basisCoordNames)
+  }
+
+  /**
+   * Generates a string.
+   */
+  toString(): string {
+    const intro = `Basis ${this.basisStr} for dimension ${this.computationalDimension.name}`
+    const listStr = this.namedVectors.map(d => `|${d.name}⟩ = ${d.vector.toKetString('cartesian')}`)
+    return `${intro}\n${listStr.join('\n')}`
+  }
+
+  /**
+   * Bases for polarization {@link Dimension.polarization}
+   * @param basisStr 'HV' for horizontal, 'DA' for diagonal, 'LR' for circular
+   */
+  static polarization(basisStr: string): Basis {
+    switch (basisStr) {
+      case 'HV':
+        return new Basis(
+          [
+            { name: 'H', values: [Cx(1), Cx(0)] },
+            { name: 'V', values: [Cx(0), Cx(1)] },
+          ],
+          Dimension.polarization(),
+        )
+      case 'DA':
+        return new Basis(
+          [
+            { name: 'D', values: [Cx(1), Cx(1)] },
+            { name: 'A', values: [Cx(-1), Cx(1)] },
+          ],
+          Dimension.polarization(),
+        )
+      case 'LR':
+        return new Basis(
+          [
+            { name: 'L', values: [Cx(1), Cx(0, 1)] },
+            { name: 'R', values: [Cx(1), Cx(0, -1)] },
+          ],
+          Dimension.polarization(),
+        )
+      default:
+        throw new Error(`Basis ${basisStr} not aviable bases for polarization ['HV', 'DA', 'LR'].`)
+    }
+  }
+
+  /**
+   * Bases for qubit {@link Dimension.qubit}
+   * @note Different from polarization, as |-⟩ ~ |0⟩ - |1⟩.
+   * @note |i+⟩ and |i-⟩ will test the ground for multichar coord names.
+   * @param basisStr '01' for computational, '+-' for diagonal, '+i-i' for circular
+   */
+  static qubit(basisStr: string): Basis {
+    switch (basisStr) {
+      case '01':
+        return new Basis(
+          [
+            { name: '0', values: [Cx(1), Cx(0)] },
+            { name: '1', values: [Cx(0), Cx(1)] },
+          ],
+          Dimension.qubit(),
+        )
+      case '+-':
+        return new Basis(
+          [
+            { name: '+', values: [Cx(1), Cx(1)] },
+            { name: '-', values: [Cx(1), Cx(-1)] },
+          ],
+          Dimension.qubit(),
+        )
+      case '+i-i':
+        return new Basis(
+          [
+            { name: '+i', values: [Cx(1), Cx(0, 1)] },
+            { name: '-i', values: [Cx(1), Cx(0, -1)] },
+          ],
+          Dimension.qubit(),
+        )
+      default:
+        throw new Error(`Basis ${basisStr} not aviable bases for qubits ['01', '+-', '+i-i'].`)
+    }
+  }
+
+  /**
+   * Bases for spin-1/2 {@link Dimension.spin}
+   * @note Let's test multiple names.
+   * @param basisStr 'ud' or 'spin-z' or 'uzdz' for z, 'spin-x' or 'uxdx', 'spin-y' or 'uydy'
+   */
+  static spin(basisStr: string): Basis {
+    switch (basisStr) {
+      case 'spin-z':
+      case 'ud':
+      case 'uzdz':
+        return new Basis(
+          [
+            { name: 'u', values: [Cx(1), Cx(0)] },
+            { name: 'd', values: [Cx(0), Cx(1)] },
+          ],
+          Dimension.spin(),
+        )
+      case 'spin-x':
+      case 'uxdx':
+        return new Basis(
+          [
+            { name: 'ux', values: [Cx(1), Cx(1)] },
+            { name: 'dx', values: [Cx(-1), Cx(1)] },
+          ],
+          Dimension.spin(),
+        )
+      case 'spin-y':
+      case 'uydy':
+        return new Basis(
+          [
+            { name: 'uy', values: [Cx(1), Cx(0, 1)] },
+            { name: 'dy', values: [Cx(1), Cx(0, -1)] },
+          ],
+          Dimension.spin(),
+        )
+      default:
+        throw new Error(`Basis ${basisStr} not aviable bases for spin.`)
+    }
+  }
+
+  static basisChangeU(basisTo: Basis, basisFrom: Basis): Operator {
+    const entries = basisTo.namedVectors.flatMap(to =>
+      basisFrom.namedVectors.map((from): [string[], string[], Complex] => {
+        return [[to.name], [from.name], to.vector.inner(from.vector)]
+      }),
+    )
+    return Operator.fromSparseCoordNames(entries, [basisTo.basisDimension], [basisFrom.basisDimension])
+  }
+
+  basisChangeUnitary(basisFrom: Basis): Operator {
+    return Basis.basisChangeU(this, basisFrom)
+  }
+
+  basisChangeUnitaryFromDimension(dimension: Dimension): Operator {
+    const basisStr = dimension.coordNames.join('')
+    switch (dimension.name) {
+      case 'polarization':
+        return this.basisChangeUnitary(Basis.polarization(basisStr))
+      case 'qubit':
+        return this.basisChangeUnitary(Basis.qubit(basisStr))
+      case 'spin':
+        return this.basisChangeUnitary(Basis.spin(basisStr))
+      default:
+        throw new Error(`Basis change not yet implemented for ${dimension}.`)
+    }
+  }
+
+  changeAllBasesUnitary(dimensions: Dimension[]): Operator {
+    const ops = dimensions.map(dimension => {
+      if (dimension.name !== this.basisDimension.name) {
+        return Operator.identity([dimension])
+      } else {
+        return this.basisChangeUnitaryFromDimension(dimension)
+      }
+    })
+    return Operator.outer(ops)
+  }
+
+  changeAllDimsOfVector(vector: Vector): Vector {
+    return this.changeAllBasesUnitary(vector.dimensions).mulVec(vector)
+  }
+
+  changeAllDimsOfOperator(operator: Operator): Operator {
+    const changeOut = this.changeAllBasesUnitary(operator.dimensionsOut)
+    const changeIn = this.changeAllBasesUnitary(operator.dimensionsIn).dag()
+    return changeOut.mulOp(operator).mulOp(changeIn)
+  }
 }

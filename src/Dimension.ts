@@ -29,7 +29,7 @@ export default class Dimension {
 
   /**
    * Create dimension for polarization
-   * @param basis denote basis, ['H', 'V'], ['D', 'A'] or ['L', 'R'] (experimental)
+   * @param basis denote basis, ['H', 'V'], ['D', 'A'] or ['L', 'R']
    * @returns polarization dimension
    */
   static polarization(basis = ['H', 'V']): Dimension {
@@ -46,10 +46,11 @@ export default class Dimension {
 
   /**
    * Create dimension for spin
+   * @param basis denote basis, ['u', 'd'], ['ux', 'dx'] or ['dy', 'dy']
    * @returns spin dimensions
    */
-  static spin(): Dimension {
-    return new Dimension('spin', 2, ['u', 'd'])
+  static spin(basis = ['u', 'd']): Dimension {
+    return new Dimension('spin', 2, basis)
   }
 
   /**
@@ -65,10 +66,20 @@ export default class Dimension {
   /**
    * Create dimension for qubit (an abstract two-level system)
    * @note Equivalent to {@link Dimension.position}(2, 'qubit')
+   * @param basis denote basis, ['0', '1'], ['+', '-'] or ['+i', '-i']
    * @returns qubit dimensions
    */
-  static qubit(): Dimension {
-    return new Dimension('qubit', 2, ['0', '1'])
+  static qubit(basis = ['0', '1']): Dimension {
+    return new Dimension('qubit', 2, basis)
+  }
+
+  /**
+   * Creates a copy with different coord names.
+   * Used in operators that change basis.
+   * @param coordNames
+   */
+  reassignCoordNames(coordNames: string[]): Dimension {
+    return new Dimension(this.name, this.size, coordNames)
   }
 
   /**

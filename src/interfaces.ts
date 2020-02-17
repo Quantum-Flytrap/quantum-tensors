@@ -50,3 +50,11 @@ export interface IEntryIndexIndexValue {
   j: number
   v: Complex
 }
+
+/**
+ * For basis changes.
+ */
+export interface INamedVector {
+  name: string
+  vector: Vector
+}

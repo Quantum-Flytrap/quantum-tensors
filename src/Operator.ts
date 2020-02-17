@@ -609,7 +609,7 @@ export default class Operator {
    *
    */
   static fromSparseCoordNames(
-    stringedEntries: [string, string, Complex][],
+    stringedEntries: [string | string[], string | string[], Complex][],
     dimensionsOut: Dimension[],
     dimensionsIn: Dimension[] = dimensionsOut,
   ): Operator {
