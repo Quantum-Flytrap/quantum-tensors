@@ -85,6 +85,68 @@ describe('Sparse Complex Operator', () => {
     expect(op.transpose().toVectorPerInput()).toEqual(op.toVectorPerOutput())
   })
 
+  it('complex and Hermitian conjugation', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uH', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+
+    const opConj = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, -2)],
+        ['dH', 'uH', Cx(-1, 1)],
+        ['dV', 'uH', Cx(0.5, -2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+
+    const opDag = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, -2)],
+        ['uH', 'dH', Cx(-1, 1)],
+        ['uH', 'dV', Cx(0.5, -2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+
+    expect(op.conj()).operatorCloseToNumbers(opConj.toDense())
+    expect(op.dag()).operatorCloseToNumbers(opDag.toDense())
+  })
+
+  it('permute an operator', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['0H0', 'dH1', Cx(0, 2)],
+        ['1H0', 'uH1', Cx(-1, -1)],
+        ['0V1', 'uH2', Cx(0.5, 2.5)],
+      ],
+      [Dimension.qubit(), Dimension.polarization(), Dimension.position(3)],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    )
+
+    const opPerm = Operator.fromSparseCoordNames(
+      [
+        ['H00', 'H1d', Cx(0, 2)],
+        ['H01', 'H1u', Cx(-1, -1)],
+        ['V10', 'H2u', Cx(0.5, 2.5)],
+      ],
+      [Dimension.polarization(), Dimension.position(3), Dimension.qubit()],
+      [Dimension.polarization(), Dimension.position(3), Dimension.spin()],
+    )
+
+    const permuted = op.permute([1, 2, 0])
+    expect(permuted.namesOut).toEqual(['polarization', 'x', 'qubit'])
+    expect(permuted.namesIn).toEqual(['polarization', 'x', 'spin'])
+    expect(permuted).operatorCloseToNumbers(opPerm.toDense())
+    expect(() => op.permute([0, 1, 2, 3])).toThrowError('0,1,2,3 is not a valid permutation for 3 dimensions.')
+    expect(() => op.permute([0, 0, 0])).toThrowError('0,0,0 is not a valid permutation for 3 dimensions.')
+    expect(() => op.permute([2, 0, 0])).toThrowError('2,0,0 is not a valid permutation for 3 dimensions.')
+  })
+
   it('op-vec multiplication', () => {
     const dims = [Dimension.spin(), Dimension.polarization()]
     const id = Operator.identity(dims)
@@ -155,5 +217,71 @@ describe('Sparse Complex Operator', () => {
     )
     expect(op.mulOp(op2).toDense()).toEqual(op2right.toDense())
     expect(op2.mulOp(op).toDense()).toEqual(op2left.toDense())
+  })
+
+  it('op partial vec multiplication', () => {
+    const vec = Vector.fromSparseCoordNames(
+      [
+        ['0dH0', Cx(0, 1)],
+        ['1uH0', Cx(2, 0)],
+        ['2dV1', Cx(0, 1)],
+        ['3dH1', Cx(0, 1)],
+        ['4uH2', Cx(2, 0)],
+        ['5dV2', Cx(0, 1)],
+        ['6dV3', Cx(0, 1)],
+      ],
+      [Dimension.position(7), Dimension.spin(), Dimension.polarization(), Dimension.position(5)],
+    )
+
+    const idSpin = Operator.identity([Dimension.spin()])
+    expect(idSpin.mulVecPartial([1], vec)).vectorCloseTo(vec)
+    expect(() => idSpin.mulVecPartial([2], vec)).toThrowError('Dimensions array order mismatch...')
+    expect(() => idSpin.mulVecPartial([2, 3], vec)).toThrowError('Dimensions array size mismatch...')
+    expect(() => idSpin.mulVecPartial([4], vec)).toThrowError("Cannot read property 'name' of undefined")
+
+    const op1 = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uH', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    const vec1res = Vector.fromSparseCoordNames(
+      [
+        ['0dH0', Cx(-2, 0)],
+        ['1dH0', Cx(-2, -2)],
+        ['1dV0', Cx(1, 5)],
+        ['3dH1', Cx(-2, 0)],
+        ['4dH2', Cx(-2, -2)],
+        ['4dV2', Cx(1, 5)],
+      ],
+      [Dimension.position(7), Dimension.spin(), Dimension.polarization(), Dimension.position(5)],
+    )
+    expect(op1.mulVecPartial([1, 2], vec)).vectorCloseTo(vec1res)
+    const op2a = Operator.fromSparseCoordNames(
+      [
+        ['4', '2', Cx(1)],
+        ['4', '5', Cx(1)],
+        ['4', '6', Cx(1)],
+      ],
+      [Dimension.position(7)],
+    )
+    const op2b = Operator.fromSparseCoordNames(
+      [
+        ['1', '0', Cx(0)],
+        ['1', '1', Cx(1)],
+        ['1', '2', Cx(2)],
+        ['1', '3', Cx(3)],
+      ],
+      [Dimension.position(5)],
+    )
+    const vec2res = Vector.fromSparseCoordNames(
+      [['4dV1', Cx(0, 6)]],
+      [Dimension.position(7), Dimension.spin(), Dimension.polarization(), Dimension.position(5)],
+    )
+
+    const vec2 = op2b.mulVecPartial([3], op2a.mulVecPartial([0], vec))
+    expect(vec2).vectorCloseTo(vec2res)
   })
 })
