@@ -74,9 +74,24 @@ export function isPermutation(array: number[], n = array.length): boolean {
 }
 
 /**
- *
- * @param coordIndices
- * @param complementIndices
+ * Creates complement indices, sorted.
+ * @param indices E.g. [3, 1]
+ * @param n E.g. 5
+ * @return E.g. [0, 2, 4]
+ */
+export function indicesComplement(indices: number[], n: number): number[] {
+  const res = _.range(n).filter(i => !_.includes(indices, i))
+  if (!isPermutation(indices.concat(res))) {
+    throw new Error(`In [${indices}] are not unique integer, between 0 and ${n - 1}.`)
+  }
+  return _.range(n).filter(i => !_.includes(indices, i))
+}
+
+/**
+ * A function to merge coordinates.
+ * @param coordIndices E.g. [3, 1]
+ * @param complementIndices E.g. [0, 2, 4]
+ * @returns A function that for [2, 3, 5], [7, 11] -> [2, 11, 3, 7, 5]
  */
 export function joinCoordsFunc(coordIndices: number[], complementIndices: number[]) {
   return (coordGroup: number[], coordContraction: number[]): number[] => {

@@ -6,9 +6,9 @@ export { Cx, default as Complex } from './Complex'
 export { default as VectorEntry } from './VectorEntry'
 export { default as OperatorEntry } from './OperatorEntry'
 export { default as Basis } from './Basis'
-export * from './helpers'
+import * as helpers from './helpers'
 export * from './Constants'
 import * as Elements from './Elements'
 import * as Ops from './Ops'
 import * as Gates from './Gates'
-export { Elements, Ops, Gates }
+export { helpers, Elements, Ops, Gates }

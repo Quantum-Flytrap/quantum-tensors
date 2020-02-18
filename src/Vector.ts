@@ -1,6 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { coordsToIndex, checkCoordsSizesCompability, isPermutation } from './helpers'
+import { coordsToIndex, checkCoordsSizesCompability, indicesComplement, isPermutation } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
@@ -209,16 +209,7 @@ export default class Vector {
    * @param coordIndices Sorted indices of dimensions for vectors. Complementary ones are used for grouping.
    */
   toGroupedByCoords(coordIndices: number[]): IColumnOrRow[] {
-    if (
-      !_.chain(coordIndices)
-        .sortBy()
-        .sortedUniq()
-        .isEqual(coordIndices)
-    ) {
-      throw `Entries of coordIndices ${coordIndices} are not sorted unique.`
-    }
-
-    const complementIndices = _.range(this.dimensions.length).filter(i => !_.includes(coordIndices, i))
+    const complementIndices = indicesComplement(coordIndices, this.dimensions.length)
     const contractionDimensions = _.at(this.dimensions, coordIndices)
 
     return _(this.entries)
