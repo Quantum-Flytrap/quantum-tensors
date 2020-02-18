@@ -1,6 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { coordsToIndex, checkCoordsSizesCompability, isPermutation, joinCoordsFunc } from './helpers'
+import { coordsToIndex, checkCoordsSizesCompability, isPermutation, indicesComplement, joinCoordsFunc } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import OperatorEntry from './OperatorEntry'
@@ -301,17 +301,7 @@ export default class Operator {
    * @returns M_(coord_indices) ⊗ I_(everywhere_else) v
    */
   mulVecPartial(coordIndices: number[], v: Vector): Vector {
-    if (
-      !_.chain(coordIndices)
-        .sortBy()
-        .sortedUniq()
-        .isEqual(coordIndices)
-    ) {
-      throw `Entries of coordIndices ${coordIndices} are not sorted unique.`
-    }
-
-    const complementIndices = _.range(v.dimensions.length).filter(i => !_.includes(coordIndices, i))
-
+    const complementIndices = indicesComplement(coordIndices, v.dimensions.length)
     const joinCoords = joinCoordsFunc(coordIndices, complementIndices)
 
     const newEntries = v
