@@ -205,23 +205,25 @@ describe('Sparse Complex Vector', () => {
   })
 
   it('should compute the outer product of two vectors', () => {
-    expect(vector.outer(vector2).toDense()).toEqual([
+    const v1 = Vector.fromArray([Cx(0), Cx(1), Cx(2), Cx(3)], [Dimension.spin(), Dimension.position(2)])
+    const v2 = Vector.fromArray([Cx(1), Cx(0, 1), Cx(-1), Cx(0, -1)], [Dimension.spin(), Dimension.position(2)])
+    expect(v1.outer(v2)).vectorCloseToNumbers([
       Cx(0),
       Cx(0),
       Cx(0),
       Cx(0),
-      Cx(-1, 3),
-      Cx(-2, 6),
-      Cx(-3, 9),
-      Cx(0),
-      Cx(0.5, 0.5),
-      Cx(1, 1),
-      Cx(1.5, 1.5),
-      Cx(0),
-      Cx(0),
-      Cx(0),
-      Cx(0),
-      Cx(0),
+      Cx(1, 0),
+      Cx(0, 1),
+      Cx(-1, 0),
+      Cx(0, -1),
+      Cx(2, 0),
+      Cx(0, 2),
+      Cx(-2, 0),
+      Cx(0, -2),
+      Cx(3, 0),
+      Cx(0, 3),
+      Cx(-3, 0),
+      Cx(0, -3),
     ])
   })
 
@@ -236,14 +238,14 @@ describe('Sparse Complex Vector', () => {
 
   it('creates string', () => {
     // eslint-disable-next-line prettier/prettier, max-len
-    expect(vector.toString()).toEqual('Vector with 3 entries of max size [2,2] with dimensions [spin,x]\n(1.00 -1.00i) |u,0⟩ + (2.00 -2.00i) |d,0⟩ + (3.00 -3.00i) |u,1⟩\n')
+    expect(vector.toString()).toEqual('Vector with 3 entries of max size [2,2] with dimensions [spin,x]\n(1.00 -1.00i) |u,0⟩ + (2.00 -2.00i) |u,1⟩ + (3.00 -3.00i) |d,0⟩\n')
     expect(vector.toString('polarTau', 3, ' ', false)).toEqual(
-      '1.414 exp(0.875τi) |u,0⟩ 2.828 exp(0.875τi) |d,0⟩ 4.243 exp(0.875τi) |u,1⟩',
+      '1.414 exp(0.875τi) |u,0⟩ 2.828 exp(0.875τi) |u,1⟩ 4.243 exp(0.875τi) |d,0⟩',
     )
   })
 
-  it('creates siplified ket string', () => {
-    expect(vector.toKetString()).toEqual('1.41 exp(0.88τi) |u,0⟩ + 2.83 exp(0.88τi) |d,0⟩ + 4.24 exp(0.88τi) |u,1⟩')
+  it('creates simplified ket string', () => {
+    expect(vector.toKetString()).toEqual('1.41 exp(0.88τi) |u,0⟩ + 2.83 exp(0.88τi) |u,1⟩ + 4.24 exp(0.88τi) |d,0⟩')
   })
 
   it('creates index values output', () => {

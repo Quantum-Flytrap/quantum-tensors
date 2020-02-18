@@ -6,6 +6,6 @@ describe('VectorEntry', () => {
   it('should convert from index (uid) to coordinates of dimension array', () => {
     const complex = Cx(4, -4)
     const cell = VectorEntry.fromIndexValue(23, [2, 4, 2], complex)
-    expect(cell.coord).toEqual([1, 3, 0]) // now it is small endian; possible to fix
+    expect(cell.coord).toEqual([0, 3, 1])
   })
 })

@@ -3,8 +3,9 @@ import _ from 'lodash'
 
 /**
  * Turns an index into a multi-index, according to dimension sizes.
- * @note It uses little-endian,
+ * @note It uses big-endian,
  * https://chortle.ccsu.edu/AssemblyTutorial/Chapter-15/ass15_3.html.
+ * Until 0.2.12 it used small endian.
  * @param index An integer
  * @param sizes Sizes of each dimension
  *
@@ -12,18 +13,19 @@ import _ from 'lodash'
  */
 export function coordsFromIndex(index: number, sizes: number[]): number[] {
   let i = index
-  const coords = sizes.map(dimSize => {
+  const coords = [...sizes].reverse().map(dimSize => {
     const coord = i % dimSize
     i = (i - coord) / dimSize
     return coord
   })
-  return coords
+  return coords.reverse()
 }
 
 /**
  * Turns a multi-index into an index, inverse of {@link coordsFromIndex}
- * @note It uses little-endian,
+ * @note It uses big-endian,
  * https://chortle.ccsu.edu/AssemblyTutorial/Chapter-15/ass15_3.html.
+ * Until 0.2.12 it used small endian.
  * @param coords Index in each dimension
  * @param sizes Sizes of each dimension
  *
@@ -33,11 +35,14 @@ export function coordsToIndex(coords: number[], sizes: number[]): number {
   if (coords.length !== sizes.length) {
     throw new Error(`Coordinates ${coords} and sizes ${sizes} are of different lengths}.`)
   }
+  const coordsRev = [...coords].reverse()
+  const sizesRev = [...sizes].reverse()
+
   let factor = 1
   let res = 0
-  coords.forEach((coord, dim) => {
+  coordsRev.forEach((coord, dim) => {
     res += factor * coord
-    factor *= sizes[dim]
+    factor *= sizesRev[dim]
   })
   return res
 }

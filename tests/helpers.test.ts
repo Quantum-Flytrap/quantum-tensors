@@ -9,18 +9,18 @@ describe('coordsFromIndex', () => {
   it('should work with binary', () => {
     const sizes = [2, 2, 2]
     expect(coordsFromIndex(0, sizes)).toEqual([0, 0, 0])
-    expect(coordsFromIndex(1, sizes)).toEqual([1, 0, 0])
+    expect(coordsFromIndex(1, sizes)).toEqual([0, 0, 1])
     expect(coordsFromIndex(2, sizes)).toEqual([0, 1, 0])
-    expect(coordsFromIndex(3, sizes)).toEqual([1, 1, 0])
-    expect(coordsFromIndex(4, sizes)).toEqual([0, 0, 1])
+    expect(coordsFromIndex(3, sizes)).toEqual([0, 1, 1])
+    expect(coordsFromIndex(4, sizes)).toEqual([1, 0, 0])
     expect(coordsFromIndex(5, sizes)).toEqual([1, 0, 1])
-    expect(coordsFromIndex(6, sizes)).toEqual([0, 1, 1])
+    expect(coordsFromIndex(6, sizes)).toEqual([1, 1, 0])
     expect(coordsFromIndex(7, sizes)).toEqual([1, 1, 1])
   })
   it('should with other cases', () => {
-    expect(coordsFromIndex(7, [3, 2, 5])).toEqual([1, 0, 1])
-    expect(coordsFromIndex(7, [3, 2, 5, 9])).toEqual([1, 0, 1, 0])
-    expect(coordsFromIndex(23, [5, 3, 4, 7])).toEqual([3, 1, 1, 0])
+    expect(coordsFromIndex(7, [5, 2, 3])).toEqual([1, 0, 1])
+    expect(coordsFromIndex(7, [9, 5, 2, 3])).toEqual([0, 1, 0, 1])
+    expect(coordsFromIndex(23, [7, 4, 3, 5])).toEqual([0, 1, 1, 3])
   })
 })
 
@@ -33,18 +33,18 @@ describe('coordsToIndex', () => {
   it('should work with binary', () => {
     const sizes = [2, 2, 2]
     expect(coordsToIndex([0, 0, 0], sizes)).toEqual(0)
-    expect(coordsToIndex([1, 0, 0], sizes)).toEqual(1)
+    expect(coordsToIndex([0, 0, 1], sizes)).toEqual(1)
     expect(coordsToIndex([0, 1, 0], sizes)).toEqual(2)
-    expect(coordsToIndex([1, 1, 0], sizes)).toEqual(3)
-    expect(coordsToIndex([0, 0, 1], sizes)).toEqual(4)
+    expect(coordsToIndex([0, 1, 1], sizes)).toEqual(3)
+    expect(coordsToIndex([1, 0, 0], sizes)).toEqual(4)
     expect(coordsToIndex([1, 0, 1], sizes)).toEqual(5)
-    expect(coordsToIndex([0, 1, 1], sizes)).toEqual(6)
+    expect(coordsToIndex([1, 1, 0], sizes)).toEqual(6)
     expect(coordsToIndex([1, 1, 1], sizes)).toEqual(7)
   })
   it('should with other cases', () => {
-    expect(coordsToIndex([1, 0, 1], [3, 2, 5])).toEqual(7)
-    expect(coordsToIndex([1, 0, 1, 0], [3, 2, 5, 9])).toEqual(7)
-    expect(coordsToIndex([3, 1, 1, 0], [5, 3, 4, 7])).toEqual(23)
+    expect(coordsToIndex([1, 0, 1], [5, 2, 3])).toEqual(7)
+    expect(coordsToIndex([0, 1, 0, 1], [9, 5, 2, 3])).toEqual(7)
+    expect(coordsToIndex([0, 1, 1, 3], [7, 4, 3, 5])).toEqual(23)
   })
   it('should be inverse of coordsFromIndex', () => {
     const sizes = [3, 2, 5, 4, 3, 5, 1]
