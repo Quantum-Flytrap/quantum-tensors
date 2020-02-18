@@ -5,6 +5,16 @@ import Operator from '../src/Operator'
 import './customMatchers'
 
 describe('Sparse Complex Operator', () => {
+  const original = console.error
+
+  beforeEach(() => {
+    console.error = jest.fn()
+  })
+
+  afterEach(() => {
+    console.error = original
+  })
+
   it('creates identity', () => {
     const idPol = Operator.identity([Dimension.polarization()])
     expect(idPol.toString('cartesian', 2, ' + ', false)).toEqual('(1.00 +0.00i) |H⟩⟨H| + (1.00 +0.00i) |V⟩⟨V|')
@@ -237,7 +247,7 @@ describe('Sparse Complex Operator', () => {
     expect(idSpin.mulVecPartial([1], vec)).vectorCloseTo(vec)
     expect(() => idSpin.mulVecPartial([2], vec)).toThrowError('Dimensions array order mismatch...')
     expect(() => idSpin.mulVecPartial([2, 3], vec)).toThrowError('Dimensions array size mismatch...')
-    expect(() => idSpin.mulVecPartial([4], vec)).toThrowError("Cannot read property 'name' of undefined")
+    expect(() => idSpin.mulVecPartial([4], vec)).toThrowError()
 
     const op1 = Operator.fromSparseCoordNames(
       [
