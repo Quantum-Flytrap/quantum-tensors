@@ -74,6 +74,24 @@ export function isPermutation(array: number[], n = array.length): boolean {
 }
 
 /**
+ *
+ * @param coordIndices
+ * @param complementIndices
+ */
+export function joinCoordsFunc(coordIndices: number[], complementIndices: number[]) {
+  return (coordGroup: number[], coordContraction: number[]): number[] => {
+    const coord = new Array(coordIndices.length + complementIndices.length)
+    coordGroup.forEach((c, i) => {
+      coord[complementIndices[i]] = c
+    })
+    coordContraction.forEach((c, i) => {
+      coord[coordIndices[i]] = c
+    })
+    return coord
+  }
+}
+
+/**
  * Stolen from https://stackoverflow.com/questions/36721830/convert-hsl-to-rgb-and-hex
  * Alternatively: d3.hsl
  */
