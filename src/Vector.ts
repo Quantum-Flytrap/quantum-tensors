@@ -4,6 +4,7 @@ import { coordsToIndex, checkCoordsSizesCompability, indicesComplement, isPermut
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
+import Basis from './Basis'
 import { IColumnOrRow, IEntryIndexValue } from './interfaces'
 
 /**
@@ -285,6 +286,17 @@ export default class Vector {
     const dimensions = _.at(this.dimensions, order)
     const entries = this.entries.map(entry => new VectorEntry(_.at(entry.coord, order), entry.value))
     return new Vector(entries, dimensions)
+  }
+
+  /**
+   * Change all dimensions with a given dimName to the desired basis.
+   * @see {@link Basis.fromString} and {@link changeAllDimsOfVector}
+   * @param dimName 'polarization', 'spin' or 'qubit'
+   * @param basisStr basis
+   */
+  toBasisAll(dimName: string, basisStr: string): Vector {
+    const basis = Basis.fromString(dimName, basisStr)
+    return basis.changeAllDimsOfVector(this)
   }
 
   /**

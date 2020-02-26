@@ -2,6 +2,7 @@ import { Cx } from '../src/Complex'
 import Dimension from '../src/Dimension'
 import Vector from '../src/Vector'
 import Operator from '../src/Operator'
+import * as Elements from '../src/Elements'
 import './customMatchers'
 
 describe('Sparse Complex Operator', () => {
@@ -293,5 +294,20 @@ describe('Sparse Complex Operator', () => {
 
     const vec2 = op2b.mulVecPartial([3], op2a.mulVecPartial([0], vec))
     expect(vec2).vectorCloseTo(vec2res)
+  })
+
+  it('polarization: change all dims for operator', () => {
+    const faradayRotator = Elements.faradayRotator(90)
+    const rotatorRotated = faradayRotator.toBasisAll('polarization', 'LR')
+    expect(rotatorRotated.dimensionsOut[0].name).toEqual('direction')
+    expect(rotatorRotated.dimensionsOut[1].name).toEqual('polarization')
+    expect(rotatorRotated.dimensionsOut[1].coordString).toEqual('LR')
+    expect(rotatorRotated.dimensionsIn[0].name).toEqual('direction')
+    expect(rotatorRotated.dimensionsIn[1].name).toEqual('polarization')
+    expect(rotatorRotated.dimensionsIn[1].coordString).toEqual('LR')
+    expect(rotatorRotated.toString('polarTau', 2, ' + ', false)).toEqual(
+      '1.00 exp(0.88τi) |^,L⟩⟨^,L| + 1.00 exp(0.13τi) |^,R⟩⟨^,R|' +
+        ' + 1.00 exp(0.13τi) |v,L⟩⟨v,L| + 1.00 exp(0.88τi) |v,R⟩⟨v,R|',
+    )
   })
 })

@@ -177,6 +177,24 @@ export default class Basis {
     }
   }
 
+  /**
+   * A shorthand method for {@link Basis.polarization}, {@link Basis.spin} and {@link Basis.qubit}.
+   * @param dimName One of: ['polarization', 'spin', 'qubit']
+   * @param basisStr Basis string.
+   */
+  static fromString(dimName: string, basisStr: string): Basis {
+    switch (dimName) {
+      case 'polarization':
+        return Basis.polarization(basisStr)
+      case 'spin':
+        return Basis.spin(basisStr)
+      case 'qubit':
+        return Basis.qubit(basisStr)
+      default:
+        throw new Error(`Basis.fromString: dimName ${dimName} not in ['polarization', 'spin', 'qubit'].`)
+    }
+  }
+
   static basisChangeU(basisTo: Basis, basisFrom: Basis): Operator {
     const entries = basisTo.namedVectors.flatMap(to =>
       basisFrom.namedVectors.map((from): [string[], string[], Complex] => {
