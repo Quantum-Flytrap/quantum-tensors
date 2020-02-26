@@ -6,6 +6,7 @@ import VectorEntry from './VectorEntry'
 import OperatorEntry from './OperatorEntry'
 import Vector from './Vector'
 import Dimension from './Dimension'
+import Basis from './Basis'
 import { IColumnOrRow, IEntryIndexIndexValue } from './interfaces'
 
 /**
@@ -334,6 +335,17 @@ export default class Operator {
       entry => new OperatorEntry(_.at(entry.coordOut, orderOut), _.at(entry.coordIn, orderIn), entry.value),
     )
     return new Operator(entries, dimensionsOut, dimensionsIn)
+  }
+
+  /**
+   * Change all dimensions with a given dimName to the desired basis.
+   * @see {@link Basis.fromString} and {@link changeAllDimsOfVector}
+   * @param dimName 'polarization', 'spin' or 'qubit'
+   * @param basisStr basis
+   */
+  toBasisAll(dimName: string, basisStr: string): Operator {
+    const basis = Basis.fromString(dimName, basisStr)
+    return basis.changeAllDimsOfOperator(this)
   }
 
   /**

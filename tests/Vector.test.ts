@@ -227,6 +227,31 @@ describe('Sparse Complex Vector', () => {
     ])
   })
 
+  it('change all dims for vector', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['0u0HH', Cx(0.5)],
+        ['0u0HV', Cx(0.5)],
+        ['2u1VV', Cx(0.5)],
+        ['2d1VV', Cx(0.0, -0.5)],
+      ],
+      [Dimension.position(5), Dimension.spin(), Dimension.qubit(), Dimension.polarization(), Dimension.polarization()],
+    )
+
+    expect(vector.toBasisAll('polarization', 'HV').toKetString('cartesian')).toEqual(
+      '(0.50 +0.00i) |0,u,0,H,H⟩ + (0.50 +0.00i) |0,u,0,H,V⟩ + (0.50 +0.00i) |2,u,1,V,V⟩ + (0.00 -0.50i) |2,d,1,V,V⟩',
+    )
+    expect(vector.toBasisAll('polarization', 'DA').toKetString('cartesian')).toEqual(
+      '(0.50 +0.00i) |0,u,0,D,D⟩ + (-0.50 +0.00i) |0,u,0,A,D⟩ + (0.25 +0.00i) |2,u,1,D,D⟩ + (0.25 +0.00i) |2,u,1,D,A⟩' +
+        ' + (0.25 +0.00i) |2,u,1,A,D⟩ + (0.25 +0.00i) |2,u,1,A,A⟩ + (0.00 -0.25i) |2,d,1,D,D⟩' +
+        ' + (0.00 -0.25i) |2,d,1,D,A⟩ + (0.00 -0.25i) |2,d,1,A,D⟩ + (0.00 -0.25i) |2,d,1,A,A⟩',
+    )
+    expect(vector.toBasisAll('spin', 'spin-y').toKetString('cartesian')).toEqual(
+      '(0.35 +0.00i) |0,uy,0,H,H⟩ + (0.35 +0.00i) |0,uy,0,H,V⟩ + (0.35 +0.00i) |0,dy,0,H,H⟩' +
+        ' + (0.35 +0.00i) |0,dy,0,H,V⟩ + (0.71 +0.00i) |2,dy,1,V,V⟩',
+    )
+  })
+
   it('creates a vector copy', () => {
     const vectorCopy = vector.copy()
     expect(vectorCopy.toDense()).toEqual(vector.toDense())
