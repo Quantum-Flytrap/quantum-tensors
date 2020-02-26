@@ -310,4 +310,21 @@ describe('Sparse Complex Operator', () => {
         ' + 1.00 exp(0.13τi) |v,L⟩⟨v,L| + 1.00 exp(0.88τi) |v,R⟩⟨v,R|',
     )
   })
+
+  it('creates a operator copy', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uH', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    const opCopy = op.copy()
+    expect(opCopy.toDense()).toEqual(op.toDense())
+    opCopy.entries[0].value.im = 999
+    expect(op.entries[0].value.im).toEqual(2)
+    opCopy.dimensionsOut[0].name = 'qqq'
+    expect(op.dimensionsOut[0].name).toEqual('spin')
+  })
 })
