@@ -109,6 +109,14 @@ export default class Operator {
   }
 
   /**
+   * Create a copy of the vector.
+   * @todo Make it more lightweight than using lodash.
+   */
+  copy(): Operator {
+    return _.cloneDeep(this)
+  }
+
+  /**
    * Elementwise complex conjugation (no transpose!).
    * https://en.wikipedia.org/wiki/Complex_conjugate
    * @returns A^* - simple conjugate of an operator.
