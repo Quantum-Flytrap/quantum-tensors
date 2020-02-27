@@ -299,12 +299,11 @@ export default class Operator {
   }
 
   /**
-   * Perform an multiplication on a vector, (M v), on some dimensions.
+   * Perform multiplication on a vector, (M v), on some dimensions.
    * E.g. if there are 3 particles, and you want to apply an operation only on the first: M_0 v.
-   * Or if you want to apply an operation on the first and the third M_02 v.
+   * Or if you want to apply an operation on the first and the third: M_02 v.
    * In principle, you can do the same by mutlipying matrices with identities, but wouldnot scale.
-   * @param coordIndices Dimension indices at which be perform the opration.
-   * They need to be unique. Right now we accept only when they are sorted.
+   * @param coordIndices Dimension indices at which we perform the opration. They need to be unique.
    * @param v Vector on which we apply the operation.
    *
    * @returns M_(coord_indices) ⊗ I_(everywhere_else) v
