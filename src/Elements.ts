@@ -28,6 +28,7 @@ export function sugarSolution(polarizationRotation = 0.125): Operator {
  * An attenuator, or: neutral density filter
  * @param r Amplitude attenuation factor. Intensity is changed by r^2.
  * By default it absorbs 50% photons.
+ * @todo Might be interesting to specify the absorption rate instead of the current argument.
  */
 export function attenuator(r = Math.SQRT1_2): Operator {
   return ops.amplitudeIntensity(r, 0)
@@ -35,16 +36,18 @@ export function attenuator(r = Math.SQRT1_2): Operator {
 
 /**
  * A vacuum jar - advances phase by lambda/4.
+ * @param percentage Phase advance percentage
  */
-export function vacuumJar(): Operator {
-  return ops.amplitudeIntensity(1, -0.25)
+export function vacuumJar(percentage = 0.25): Operator {
+  return ops.amplitudeIntensity(1, -percentage)
 }
 
 /**
  * A glass slab - delays phase by lambda/4.
+ * @param percentage Phase delay percentage
  */
-export function glassSlab(): Operator {
-  return ops.amplitudeIntensity(1, +0.25)
+export function glassSlab(percentage = 0.25): Operator {
+  return ops.amplitudeIntensity(1, +percentage)
 }
 
 /**
@@ -64,6 +67,7 @@ export function mirror(angle: number): Operator {
  * @angle Angle in degrees, from -> CCW. Needs to be multiple of 45deg.
  * @returns Operator with dimensions [dimDir, dimPol].
  * @todo CHECK reflection phase.
+ * @todo Might be interesting to check the transmission / reflection percentage.
  */
 export function beamSplitter(angle: number): Operator {
   return Operator.outer([ops.reflectFromPlaneDirection(angle), ops.reflectPhaseFromDenser()])
