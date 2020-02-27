@@ -139,7 +139,7 @@ export default class Operator {
   }
 
   /**
-   * Conjdugate transpose (Hermitian transpose, dagger operator).
+   * Conjugate transpose (Hermitian transpose, dagger operator).
    * https://en.wikipedia.org/wiki/Conjugate_transpose
    * @returns a^† Hermitian conjugate of an operator.
    */
@@ -165,17 +165,9 @@ export default class Operator {
     const dimensionsIn: Dimension[] = m1.dimensionsIn.concat(m2.dimensionsIn)
     const entries: OperatorEntry[] = []
 
-    m1.entries.forEach((entry1: OperatorEntry) =>
-      m2.entries.forEach((entry2: OperatorEntry) => entries.push(entry1.outer(entry2))),
+    m1.entries.flatMap((entry1: OperatorEntry) =>
+      m2.entries.map((entry2: OperatorEntry) => entries.push(entry1.outer(entry2))),
     )
-
-    // local issues with TypeScipt/npm/NVM make it harder
-    // const entries: OperatorEntry[] = m1.entries
-    //  .flatMap((entry1: OperatorEntry) =>
-    //     (m2.entries).map((entry2: OperatorEntry) =>
-    //         entry1.outer(entry2)
-    //     )
-    // )
     return new Operator(entries, dimensionsOut, dimensionsIn)
   }
 
@@ -209,7 +201,7 @@ export default class Operator {
   }
 
   /**
-   * Returns the operator multipied by a complex constant.
+   * Multiplies an operator by a complex constant.
    * @param c
    * @returns c M
    */
@@ -265,10 +257,10 @@ export default class Operator {
   }
 
   /**
-   * Multiply a operator times a vector.
-   * @param v Vector with dimensions compatible with operators input dimensions
+   * Multiply an operator by a vector.
+   * @param v Vector with dimensions compatible with operators input dimensions.
    *
-   * @returns u = M v (a vector with dimensions as operator output dimensions)
+   * @returns u = M v (a vector with dimensions as operator output dimensions).
    */
   mulVec(v: Vector): Vector {
     Dimension.checkDimensions(this.dimensionsIn, v.dimensions)
@@ -279,9 +271,9 @@ export default class Operator {
   }
 
   /**
-   * Multiply a operator times a operator.
-   * Order as in the syntax (M1 this operator, M2 - the argument)
-   * @param m Operator M2 with dimensions compatible with operators input dimensions of M1
+   * Multiply an operator by another operator.
+   * Order as in the syntax (M1 this operator, M2 - the argument).
+   * @param m Operator M2 with dimensions compatible with operators input dimensions of M1.
    *
    * @returns M = M1 M2
    */
@@ -389,8 +381,8 @@ export default class Operator {
   }
 
   /**
-   * Export to a dense array format
-   * @returns array m[i][j], where i is output index and j in input index
+   * Export to a dense array format.
+   * @returns array m[i][j], where i is output index and j in input index.
    */
   toDense(): Complex[][] {
     const denseVector: Complex[][] = _.range(this.totalSizeOut).map(() => _.range(this.totalSizeIn).map(() => Cx(0)))
@@ -614,7 +606,7 @@ export default class Operator {
 
   /**
    * Is it close to identity?
-   * Checks only with in and out dimensions are the same,
+   * @note Checks only if in and out dimensions are the same,
    * otherwise there is an error.
    * @param eps Euclidean distance tolerance.
    * @return Checks M ~= Id
@@ -626,7 +618,7 @@ export default class Operator {
   }
 
   /**
-   * Is it close to identity?
+   * Is it close to a projection?
    * @see https://en.wikipedia.org/wiki/Projection_(linear_algebra)
    * @param eps Euclidean distance tolerance.
    * @return Checks M M ~= M
@@ -639,7 +631,7 @@ export default class Operator {
    * Is it close to an unitary operator?
    * @see https://en.wikipedia.org/wiki/Unitary_operator
    * @param eps Euclidean distance tolerance.
-   * @return Checks M^dag M ~= M M^dag
+   * @return Checks M^dag M ~= Id
    */
   isCloseToUnitary(eps = 1e-6): boolean {
     return this.dag()
@@ -651,7 +643,7 @@ export default class Operator {
    * Is it close to a normal operator?
    * @see https://en.wikipedia.org/wiki/Normal_operator
    * @param eps Euclidean distance tolerance.
-   * @return Checks M^dag M ~= Id
+   * @return Checks M^dag M ~= M M^dag
    */
   isCloseToNormal(eps = 1e-6): boolean {
     const lhs = this.dag().mulOp(this)
