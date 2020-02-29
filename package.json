@@ -28,12 +28,7 @@
     "typescript": "^3.6.3"
   },
   "scripts": {
-    "start": "tsc && node ./lib/main.js",
-    "try-simple": "tsc && node ./lib/demos/simple.js",
-    "try-tensor": "tsc && node ./lib/demos/tensor.js",
-    "try-step": "tsc && node ./lib/demos/step.js",
-    "try-board": "tsc && node ./lib/demos/board.js",
-    "try-debugging": "tsc && node ./lib/demos/debugging.js",
+    "try-example": "tsc && node ./lib/demos/example.js",
     "build": "tsc --pretty",
     "test": "tsc --noEmit -p . && jest --coverage --no-cache",
     "build-docs": "typedoc --out docs src",
