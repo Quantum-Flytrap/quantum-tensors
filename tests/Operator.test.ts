@@ -42,6 +42,18 @@ describe('Sparse Complex Operator', () => {
   })
 
   it('creates from sparse', () => {
+    const opX = Operator.fromSparseCoordNames(
+      [
+        ['V', 'H', Cx(1)],
+        ['H', 'V', Cx(1)],
+      ],
+      [Dimension.polarization()],
+    )
+    expect(opX.toString()).toBe(
+      'Operator with 2 entires of max size [[2], [2]] with dimensions [[polarization], [polarization]]\n' +
+        '(1.00 +0.00i) |V⟩⟨H| + (1.00 +0.00i) |H⟩⟨V|\n',
+    )
+
     const opFromSparse = Operator.fromSparseCoordNames(
       [
         ['uH', 'uH', Cx(0, 2)],
@@ -294,6 +306,46 @@ describe('Sparse Complex Operator', () => {
 
     const vec2 = op2b.mulVecPartial([3], op2a.mulVecPartial([0], vec))
     expect(vec2).vectorCloseTo(vec2res)
+  })
+
+  it('outer', () => {
+    const opX = Operator.fromSparseCoordNames(
+      [
+        ['V', 'H', Cx(1)],
+        ['H', 'V', Cx(1)],
+      ],
+      [Dimension.polarization()],
+    )
+    const opZ = Operator.fromSparseCoordNames(
+      [
+        ['0', '0', Cx(1)],
+        ['1', '1', Cx(-1)],
+      ],
+      [Dimension.qubit()],
+    )
+    const opY = Operator.fromSparseCoordNames(
+      [
+        ['d', 'u', Cx(0, 1)],
+        ['u', 'd', Cx(0, -1)],
+      ],
+      [Dimension.spin()],
+    )
+    const opRes = Operator.fromSparseCoordNames(
+      [
+        ['V0', 'H0', Cx(1)],
+        ['V1', 'H1', Cx(-1)],
+        ['H0', 'V0', Cx(1)],
+        ['H1', 'V1', Cx(-1)],
+      ],
+      [Dimension.polarization(), Dimension.qubit()],
+    )
+    const opOut = opX.outer(opZ)
+    expect(opOut.dimensionsIn).toEqual([Dimension.polarization(), Dimension.qubit()])
+    expect(opOut.dimensionsOut).toEqual([Dimension.polarization(), Dimension.qubit()])
+    expect(opOut).operatorCloseToNumbers(opRes.toDense())
+    expect(Operator.outer([opX, opZ, opY])).operatorCloseToNumbers(opOut.outer(opY).toDense())
+    expect(Operator.outer([opY, opX, opZ])).operatorCloseToNumbers(opY.outer(opOut).toDense())
+    expect(Operator.outer([opY, opX, opZ])).not.operatorCloseToNumbers(opOut.outer(opY).toDense())
   })
 
   it('polarization: change all dims for operator', () => {

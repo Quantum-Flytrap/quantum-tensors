@@ -3,11 +3,6 @@ import Dimension from '../src/Dimension'
 import Vector from '../src/Vector'
 import Operator from '../src/Operator'
 
-// const complex1 = Cx(1)
-// const complex2 = Cx(0)
-// const complex3 = Cx(2, 1)
-// const complex4 = Cx(1)
-
 // const vectorComplex = [new Complex(1, 0), new Complex(0, 0), new Complex(2, 1), new Complex(0, -1)]
 const dim1 = Dimension.direction()
 const dim2 = Dimension.spin()
@@ -121,16 +116,3 @@ const spinH = Operator.fromArray(
 )
 console.log(spinH.toString())
 console.log(spinH.mulVec(vector2).toString())
-
-console.log('And now a place for an error')
-const vector4 = Vector.fromArray(
-  [Cx(0, 1), Cx(0), Cx(-1, 2), Cx(0)],
-  [Dimension.spin(), Dimension.polarization()],
-  false,
-)
-console.log(
-  spinY
-    .outer(spinX)
-    .mulVec(vector4)
-    .toString(),
-)

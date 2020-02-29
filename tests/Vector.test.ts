@@ -45,12 +45,21 @@ describe('Sparse Complex Vector', () => {
   it('creates vector from sparse entries', () => {
     const vector = Vector.fromSparseCoordNames(
       [
+        ['H', Cx(1.23)],
+        ['V', Cx(-1, -1)],
+      ],
+      [Dimension.polarization()],
+    )
+    expect(vector.toKetString('cartesian')).toBe('(1.23 +0.00i) |H⟩ + (-1.00 -1.00i) |V⟩')
+
+    const vector2 = Vector.fromSparseCoordNames(
+      [
         ['uH', Cx(1)],
         ['dV', Cx(-1)],
       ],
       [Dimension.spin(), Dimension.polarization()],
     )
-    expect(vector.toDense()).toEqual([Cx(1), Cx(0), Cx(0), Cx(-1)])
+    expect(vector2).vectorCloseToNumbers([Cx(1), Cx(0), Cx(0), Cx(-1)])
   })
 
   it('should give vector getter properties', () => {
