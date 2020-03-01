@@ -12,7 +12,7 @@ describe('Photons', () => {
     expect(photons.dimY).toEqual(Dimension.position(5, 'y'))
     expect(photons.nPhotons).toBe(0)
 
-    photons.addPhotonIndicator(0, 2, '>', 'V')
+    photons.addPhotonFromIndicator(0, 2, '>', 'V')
 
     expect(photons.nPhotons).toBe(1)
 
@@ -21,7 +21,7 @@ describe('Photons', () => {
 
   it('propagates a photon', () => {
     const photons = new Photons(3, 5)
-    photons.addPhotonIndicator(0, 2, '>', 'V')
+    photons.addPhotonFromIndicator(0, 2, '>', 'V')
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
     photons.propagatePhotons()
@@ -34,7 +34,7 @@ describe('Photons', () => {
 
   it('interacts a photon', () => {
     const photons = new Photons(7, 6)
-    photons.addPhotonIndicator(0, 2, '>', 'V')
+    photons.addPhotonFromIndicator(0, 2, '>', 'V')
 
     const operations: [number, number, Operator][] = [
       [1, 5, Elements.sugarSolution(0.125)],
@@ -70,7 +70,7 @@ describe('Photons', () => {
     // .......
 
     const photons = new Photons(7, 4)
-    photons.addPhotonIndicator(1, 1, '>', 'H')
+    photons.addPhotonFromIndicator(1, 1, '>', 'H')
     const operations: [number, number, Operator][] = [
       [3, 1, Elements.sugarSolution(0.125)],
       [5, 1, Elements.mirror(135)],
@@ -113,7 +113,7 @@ describe('Photons', () => {
     // .......
 
     const photons = new Photons(8, 3)
-    photons.addPhotonIndicator(0, 0, '>', 'H')
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
     const operations: [number, number, Operator][] = [
       [2, 0, Elements.beamSplitter(135)],
       [5, 0, Elements.mirror(135)],
@@ -152,7 +152,7 @@ describe('Photons', () => {
     // .......
 
     const photons = new Photons(8, 3)
-    photons.addPhotonIndicator(0, 0, '>', 'H')
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
     const operations: [number, number, Operator][] = [
       [2, 0, Elements.sugarSolution()],
       [4, 0, Elements.polarizingBeamsplitter(90)],
@@ -183,8 +183,8 @@ describe('Photons', () => {
     // .....
 
     const photons = new Photons(4, 4)
-    photons.addPhotonIndicator(0, 2, '>', 'H')
-    photons.addPhotonIndicator(2, 0, 'v', 'H')
+    photons.addPhotonFromIndicator(0, 2, '>', 'H')
+    photons.addPhotonFromIndicator(2, 0, 'v', 'H')
     expect(photons.nPhotons).toBe(2)
 
     const operations: [number, number, Operator][] = [[2, 2, Elements.beamSplitter(135)]]
