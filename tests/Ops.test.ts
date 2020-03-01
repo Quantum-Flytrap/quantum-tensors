@@ -6,6 +6,11 @@ import './customMatchers'
 describe('Auxiliary operators', () => {
   const TAU = 2 * Math.PI
 
+  it('polarization', () => {
+    expect(Ops.polStates['D'].toKetString('cartesian')).toBe('(0.71 +0.00i) |H⟩ + (0.71 +0.00i) |V⟩')
+    expect(Ops.polStates['Z']).toBe(undefined)
+  })
+
   it('rotation', () => {
     expect(Ops.rotationMatrix(0, Dimension.qubit()).isCloseToIdentity()).toBe(true)
     expect(Ops.rotationMatrix(-13 * TAU, Dimension.qubit()).isCloseToIdentity()).toBe(true)

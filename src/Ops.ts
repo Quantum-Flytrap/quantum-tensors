@@ -1,4 +1,5 @@
 import Complex, { Cx } from './Complex'
+import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
 import { TAU } from './Constants'
@@ -14,6 +15,20 @@ const mod = (x: number, n: number): number => ((x % n) + n) % n
 
 // not as fast as this one: https://en.wikipedia.org/wiki/Fast_inverse_square_root
 export const isqrt2 = Cx(Math.SQRT1_2)
+
+const toPolVec = (array: Complex[]): Vector => Vector.fromArray(array, [dimPol]).normalize()
+
+/**
+ * Vectors for polarization states: H, V, D, A, L, R.
+ */
+export const polStates: Record<string, Vector> = {
+  H: toPolVec([Cx(1), Cx(0)]),
+  V: toPolVec([Cx(0), Cx(1)]),
+  D: toPolVec([Cx(1), Cx(1)]),
+  A: toPolVec([Cx(-1), Cx(1)]),
+  L: toPolVec([Cx(1), Cx(0, 1)]),
+  R: toPolVec([Cx(1), Cx(0, -1)]),
+}
 
 /**
  * A 2d matrix, a rotation for complex numbers.

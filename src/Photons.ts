@@ -4,6 +4,7 @@ import { IParticle, IXYOperator } from './interfaces'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
+import { polStates } from './Ops'
 import Complex, { Cx } from './Complex'
 
 /**
@@ -118,7 +119,7 @@ export default class Photons {
    * @param posX Position of the photon, x.
    * @param posY Position of the photon, y.
    * @param dirDirection Direction from ['>', '^', '<', 'v].
-   * @param pol Polarization from ['H', 'V'].
+   * @param pol Polarization from ['H', 'V', 'D', 'A', 'L', 'R'].
    *
    * @returns A vector [dimX, DimY, dir, pol], does not modify the object.
    */
@@ -130,15 +131,14 @@ export default class Photons {
     dir: string,
     pol: string,
   ): Vector {
-    const dimensions = [
-      Dimension.position(sizeX, 'x'),
-      Dimension.position(sizeY, 'y'),
-      Dimension.direction(),
-      Dimension.polarization(),
-    ]
-    const state = [posX.toString(), posY.toString(), dir, pol]
+    if (polStates[pol] === undefined) {
+      throw new Error(`Polarization string ${pol} not supported.`)
+    }
 
-    return Vector.indicator(dimensions, state)
+    const dimensions = [Dimension.position(sizeX, 'x'), Dimension.position(sizeY, 'y'), Dimension.direction()]
+    const state = [posX.toString(), posY.toString(), dir]
+
+    return Vector.indicator(dimensions, state).outer(polStates[pol])
   }
 
   /**
@@ -147,7 +147,7 @@ export default class Photons {
    * @param posX Position of the photon, x.
    * @param posY Position of the photon, y.
    * @param dir Direction from ['>', '^', '<', 'v].
-   * @param pol Polarization from ['H', 'V'].
+   * @param pol Polarization from ['H', 'V', 'D', 'A', 'L', 'R'].
    *
    * @returns Itself, for chaining.
    */
