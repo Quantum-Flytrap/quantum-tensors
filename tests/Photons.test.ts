@@ -1,7 +1,7 @@
 import Dimension from '../src/Dimension'
-import Operator from '../src/Operator'
 import Photons from '../src/Photons'
 import * as Elements from '../src/Elements'
+import { IXYOperator } from '../src/interfaces'
 import './customMatchers'
 
 describe('Photons', () => {
@@ -34,10 +34,10 @@ describe('Photons', () => {
   it('interacts a photon', () => {
     const photons = Photons.emptySpace(7, 6).addPhotonFromIndicator(0, 2, '>', 'V')
 
-    const operations: [number, number, Operator][] = [
-      [1, 5, Elements.sugarSolution(0.125)],
-      [1, 2, Elements.mirror(135)],
-      [1, 4, Elements.attenuator()],
+    const operations: IXYOperator[] = [
+      { x: 1, y: 5, op: Elements.sugarSolution(0.125) },
+      { x: 1, y: 2, op: Elements.mirror(135) },
+      { x: 1, y: 4, op: Elements.attenuator() },
     ]
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
@@ -61,11 +61,11 @@ describe('Photons', () => {
 
     const photons = Photons.emptySpace(7, 4)
     photons.addPhotonFromIndicator(1, 1, '>', 'H')
-    const operations: [number, number, Operator][] = [
-      [3, 1, Elements.sugarSolution(0.125)],
-      [5, 1, Elements.mirror(135)],
-      [5, 2, Elements.mirror(45)],
-      [3, 2, Elements.mirror(135)],
+    const operations: IXYOperator[] = [
+      { x: 3, y: 1, op: Elements.sugarSolution(0.125) },
+      { x: 5, y: 1, op: Elements.mirror(135) },
+      { x: 5, y: 2, op: Elements.mirror(45) },
+      { x: 3, y: 2, op: Elements.mirror(135) },
     ]
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,1,>,H⟩')
@@ -96,13 +96,13 @@ describe('Photons', () => {
 
     const photons = Photons.emptySpace(8, 3)
     photons.addPhotonFromIndicator(0, 0, '>', 'H')
-    const operations: [number, number, Operator][] = [
-      [2, 0, Elements.beamSplitter(135)],
-      [5, 0, Elements.mirror(135)],
-      [2, 1, Elements.mirror(135)],
-      [3, 1, Elements.vacuumJar()],
-      [4, 1, Elements.vacuumJar()],
-      [5, 1, Elements.beamSplitter(135)],
+    const operations: IXYOperator[] = [
+      { x: 2, y: 0, op: Elements.beamSplitter(135) },
+      { x: 5, y: 0, op: Elements.mirror(135) },
+      { x: 2, y: 1, op: Elements.mirror(135) },
+      { x: 3, y: 1, op: Elements.vacuumJar() },
+      { x: 4, y: 1, op: Elements.vacuumJar() },
+      { x: 5, y: 1, op: Elements.beamSplitter(135) },
     ]
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
@@ -129,11 +129,11 @@ describe('Photons', () => {
 
     const photons = Photons.emptySpace(8, 3)
     photons.addPhotonFromIndicator(0, 0, '>', 'H')
-    const operations: [number, number, Operator][] = [
-      [2, 0, Elements.sugarSolution()],
-      [4, 0, Elements.polarizingBeamsplitter(90)],
-      [4, 1, Elements.polarizingBeamsplitter(0)],
-      [5, 0, Elements.polarizingBeamsplitter(0)],
+    const operations: IXYOperator[] = [
+      { x: 2, y: 0, op: Elements.sugarSolution() },
+      { x: 4, y: 0, op: Elements.polarizingBeamsplitter(90) },
+      { x: 4, y: 1, op: Elements.polarizingBeamsplitter(0) },
+      { x: 5, y: 0, op: Elements.polarizingBeamsplitter(0) },
     ]
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
@@ -163,7 +163,7 @@ describe('Photons', () => {
       .addPhotonFromIndicator(2, 0, 'v', 'H')
     expect(photons.nPhotons).toBe(2)
 
-    const operations: [number, number, Operator][] = [[2, 2, Elements.beamSplitter(135)]]
+    const operations: IXYOperator[] = [{ x: 2, y: 2, op: Elements.beamSplitter(135) }]
 
     expect(photons.ketString()).toBe('(0.71 +0.00i) |0,2,>,H,2,0,v,H⟩ + (0.71 +0.00i) |2,0,v,H,0,2,>,H⟩')
     photons.propagatePhotons().actOnSinglePhotons(operations)
