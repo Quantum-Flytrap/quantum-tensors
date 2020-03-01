@@ -72,19 +72,12 @@ export default class Photons {
   }
 
   /**
-   * Normalize in-place
-   */
-  normalizeInplace(): void {
-    this.vector = this.vector.normalize()
-  }
-
-  /**
-   * Normalize a copy
+   * Normalize
+   * @returns Itself, for chaining.
    */
   normalize(): Photons {
-    const newPhotons = this.copy()
-    this.normalizeInplace()
-    return newPhotons
+    this.vector = this.vector.normalize()
+    return this
   }
 
   /**
@@ -156,9 +149,9 @@ export default class Photons {
    * @param dir Direction from ['>', '^', '<', 'v].
    * @param pol Polarization from ['H', 'V'].
    *
-   * @returns Nothings, acts in-place.
+   * @returns Itself, for chaining.
    */
-  addPhotonFromIndicator(posX: number, posY: number, dir: string, pol: string): void {
+  addPhotonFromIndicator(posX: number, posY: number, dir: string, pol: string): Photons {
     const newPhoton = Photons.vectorFromIndicator(this.sizeX, this.sizeY, posX, posY, dir, pol)
     const oldPhotons = this.vector
     if (this.nPhotons === 0) {
@@ -172,6 +165,7 @@ export default class Photons {
     } else {
       throw `Adding 3 or more particles not yet implemented. We already have: ${this.nPhotons} photons.`
     }
+    return this
   }
 
   /**
@@ -200,13 +194,14 @@ export default class Photons {
    * Propagate all particles, using {@link createPhotonPropagator}.
    * @param yDirMeansDown or true, direction 'v' increments dimY.
    *
-   * @returns Nothing, acts in-place.
+   * @returns Itself, for chaining.
    */
-  propagatePhotons(yDirMeansDown = true): void {
+  propagatePhotons(yDirMeansDown = true): Photons {
     const photonPropagator = Photons.propagator(this.sizeX, this.sizeY, yDirMeansDown)
     _.range(this.nPhotons).forEach(i => {
       this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
     })
+    return this
   }
 
   /**
@@ -338,13 +333,14 @@ export default class Photons {
    * - it tracks only a fixed-number of photons subspace.
    * @param opsWithPos A list of [x, y, operator with [dir, pol]].
    *
-   * @returns Nothing, as acts in-place.
+   * @returns Itself, for chaining.
    */
-  actOnSinglePhotons(opsWithPos: [number, number, Operator][]): void {
+  actOnSinglePhotons(opsWithPos: [number, number, Operator][]): Photons {
     const singlePhotonInteraction = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, opsWithPos)
     _.range(this.nPhotons).forEach(i => {
       this.vector = singlePhotonInteraction.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
     })
+    return this
   }
 
   /**
