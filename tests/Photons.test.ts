@@ -6,7 +6,7 @@ import './customMatchers'
 
 describe('Photons', () => {
   it('creates a photon', () => {
-    const photons = new Photons(7, 5)
+    const photons = Photons.emptySpace(7, 5)
 
     expect(photons.dimX).toEqual(Dimension.position(7, 'x'))
     expect(photons.dimY).toEqual(Dimension.position(5, 'y'))
@@ -20,7 +20,7 @@ describe('Photons', () => {
   })
 
   it('propagates a photon', () => {
-    const photons = new Photons(3, 5)
+    const photons = Photons.emptySpace(3, 5)
     photons.addPhotonFromIndicator(0, 2, '>', 'V')
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
@@ -33,7 +33,7 @@ describe('Photons', () => {
   })
 
   it('interacts a photon', () => {
-    const photons = new Photons(7, 6)
+    const photons = Photons.emptySpace(7, 6)
     photons.addPhotonFromIndicator(0, 2, '>', 'V')
 
     const operations: [number, number, Operator][] = [
@@ -69,7 +69,7 @@ describe('Photons', () => {
     // ...\./.
     // .......
 
-    const photons = new Photons(7, 4)
+    const photons = Photons.emptySpace(7, 4)
     photons.addPhotonFromIndicator(1, 1, '>', 'H')
     const operations: [number, number, Operator][] = [
       [3, 1, Elements.sugarSolution(0.125)],
@@ -112,7 +112,7 @@ describe('Photons', () => {
     // ..\VV\.
     // .......
 
-    const photons = new Photons(8, 3)
+    const photons = Photons.emptySpace(8, 3)
     photons.addPhotonFromIndicator(0, 0, '>', 'H')
     const operations: [number, number, Operator][] = [
       [2, 0, Elements.beamSplitter(135)],
@@ -151,7 +151,7 @@ describe('Photons', () => {
     // ..../..
     // .......
 
-    const photons = new Photons(8, 3)
+    const photons = Photons.emptySpace(8, 3)
     photons.addPhotonFromIndicator(0, 0, '>', 'H')
     const operations: [number, number, Operator][] = [
       [2, 0, Elements.sugarSolution()],
@@ -182,7 +182,7 @@ describe('Photons', () => {
     // >.\..
     // .....
 
-    const photons = new Photons(4, 4)
+    const photons = Photons.emptySpace(4, 4)
     photons.addPhotonFromIndicator(0, 2, '>', 'H')
     photons.addPhotonFromIndicator(2, 0, 'v', 'H')
     expect(photons.nPhotons).toBe(2)
