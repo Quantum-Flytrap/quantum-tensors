@@ -1,6 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { IParticle } from './interfaces'
+import { IParticle, IXYOperator } from './interfaces'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
@@ -311,11 +311,12 @@ export default class Photons {
    * @param sizeY Board size, y.
    * @param opsWithPos A list of [x, y, operator with [dir, pol]].
    */
-  static singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: [number, number, Operator][]): Operator {
-    const localizedOpsShifted = opsWithPos.map((x: [number, number, Operator]) => {
-      const [posX, posY, op] = x
-      const shiftedOp = op.sub(Operator.identity([Dimension.direction(), Dimension.polarization()]))
-      return Photons.localizeOperator(sizeX, sizeY, posX, posY, shiftedOp)
+  static singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
+    const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
+      const { x, y, op } = d
+      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
+      const shiftedOp = op.sub(idDirPol)
+      return Photons.localizeOperator(sizeX, sizeY, x, y, shiftedOp)
     })
 
     const dimX = Dimension.position(sizeX, 'x')
@@ -335,7 +336,7 @@ export default class Photons {
    *
    * @returns Itself, for chaining.
    */
-  actOnSinglePhotons(opsWithPos: [number, number, Operator][]): Photons {
+  actOnSinglePhotons(opsWithPos: IXYOperator[]): Photons {
     const singlePhotonInteraction = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, opsWithPos)
     _.range(this.nPhotons).forEach(i => {
       this.vector = singlePhotonInteraction.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)

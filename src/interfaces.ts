@@ -1,5 +1,6 @@
 import Complex from './Complex'
 import Vector from './Vector'
+import Operator from './Operator'
 
 /**
  * PARTICLE INTERFACE
@@ -57,4 +58,13 @@ export interface IEntryIndexIndexValue {
 export interface INamedVector {
   name: string
   vector: Vector
+}
+
+/**
+ * For position (x, y) and operator with direction and polarization dimensions.
+ */
+export interface IXYOperator {
+  x: number
+  y: number
+  op: Operator
 }
