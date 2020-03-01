@@ -19,6 +19,17 @@ describe('Photons', () => {
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
   })
 
+  it('creates a photon in antidiagonal state', () => {
+    const photons = Photons.emptySpace(7, 5)
+    photons.addPhotonFromIndicator(6, 1, '^', 'A')
+    expect(photons.ketString()).toBe('(-0.71 +0.00i) |6,1,^,H⟩ + (0.71 +0.00i) |6,1,^,V⟩')
+  })
+
+  it('does not create photon in an nonexisting state', () => {
+    const photons = Photons.emptySpace(7, 5)
+    expect(() => photons.addPhotonFromIndicator(6, 1, '^', 'h')).toThrowError('Polarization string h not supported.')
+  })
+
   it('propagates a photon', () => {
     const photons = Photons.emptySpace(3, 5).addPhotonFromIndicator(0, 2, '>', 'V')
 
