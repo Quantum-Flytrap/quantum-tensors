@@ -17,20 +17,30 @@ import Complex, { Cx } from './Complex'
  */
 export default class Photons {
   vector: Vector
-  nPhotons: number
   readonly dimX: Dimension
   readonly dimY: Dimension
 
   /**
    * Create a board for photons.
+   * Mostly for internal use.
+   * @param sizeX An integer, size x (width) of the board.
+   * @param sizeY An integer, size y (height) of the board.
+   * @param vector Vector with [x1, y1, dir1, pol1, ..., xn, yn, dirn, poln].
+   */
+  constructor(sizeX: number, sizeY: number, vector: Vector) {
+    this.vector = vector
+    this.dimX = Dimension.position(sizeX, 'x')
+    this.dimY = Dimension.position(sizeY, 'y')
+  }
+
+  /**
+   * Create an empty board for photons, with a given size.
    * @param sizeX An integer, size x (width) of the board.
    * @param sizeY An integer, size y (height) of the board.
    */
-  constructor(sizeX: number, sizeY: number) {
-    this.vector = new Vector([], [])
-    this.nPhotons = 0
-    this.dimX = Dimension.position(sizeX, 'x')
-    this.dimY = Dimension.position(sizeY, 'y')
+  static emptySpace(sizeX: number, sizeY: number): Photons {
+    const vector = new Vector([], [])
+    return new Photons(sizeX, sizeY, vector)
   }
 
   /**
@@ -48,13 +58,17 @@ export default class Photons {
   }
 
   /**
+   * The total number of photons.
+   */
+  get nPhotons(): number {
+    return this.vector.dimensions.length / 4
+  }
+
+  /**
    * @returns A deep copy of the same object.
    */
   copy(): Photons {
-    const newPhotons = new Photons(this.sizeX, this.sizeY)
-    newPhotons.vector = this.vector.copy()
-    newPhotons.nPhotons = this.nPhotons
-    return newPhotons
+    return new Photons(this.sizeX, this.sizeY, this.vector.copy())
   }
 
   /**
@@ -147,17 +161,16 @@ export default class Photons {
   addPhotonFromIndicator(posX: number, posY: number, dir: string, pol: string): void {
     const newPhoton = Photons.vectorFromIndicator(this.sizeX, this.sizeY, posX, posY, dir, pol)
     const oldPhotons = this.vector
-    this.nPhotons += 1
-    if (this.nPhotons === 1) {
+    if (this.nPhotons === 0) {
       this.vector = newPhoton
-    } else if (this.nPhotons === 2) {
+    } else if (this.nPhotons === 1) {
       if (!newPhoton.dot(this.vector).isZero) {
         throw `Adding photons not yet implemented for non-ortogonal states.` +
           `Old photon:\n${this.vector}\nand new photon:\n${newPhoton}`
       }
       this.vector = Vector.add([oldPhotons.outer(newPhoton), newPhoton.outer(oldPhotons)]).mulConstant(Cx(Math.SQRT1_2))
     } else {
-      throw `Adding 3 or more particles not yet implemented`
+      throw `Adding 3 or more particles not yet implemented. We already have: ${this.nPhotons} photons.`
     }
   }
 
@@ -279,7 +292,6 @@ export default class Photons {
         )
 
         const newPhotons = this.copy()
-        newPhotons.nPhotons -= 1
 
         newPhotons.vector = proj.innerPartial([...allId], this.vector)
         return {
