@@ -379,4 +379,30 @@ describe('Sparse Complex Operator', () => {
     opCopy.dimensionsOut[0].name = 'qqq'
     expect(op.dimensionsOut[0].name).toEqual('spin')
   })
+
+  it('contract left and right', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uV', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    const vec = Vector.fromSparseCoordNames(
+      [
+        ['H', Cx(2)],
+        ['V', Cx(1)],
+      ],
+      [Dimension.polarization()],
+    )
+    expect(op.contractLeft([1], vec).toString()).toBe(
+      'Operator with 3 entires of max size [[2], [2,2]] with dimensions [[spin], [spin,polarization]]\n' +
+        '(0.00 +4.00i) |d⟩⟨d,H| + (-2.00 -2.00i) |d⟩⟨u,V| + (0.50 +2.50i) |d⟩⟨u,H|\n',
+    )
+    expect(op.contractRight([1], vec).toString()).toBe(
+      'Operator with 3 entires of max size [[2,2], [2]] with dimensions [[spin,polarization], [spin]]\n' +
+        '(-1.00 -1.00i) |d,H⟩⟨u| + (0.00 +4.00i) |d,H⟩⟨d| + (1.00 +5.00i) |d,V⟩⟨u|\n',
+    )
+  })
 })
