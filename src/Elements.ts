@@ -2,6 +2,7 @@
 import _ from 'lodash'
 import { Cx } from './Complex'
 import Dimension from './Dimension'
+import Vector from './Vector'
 import Operator from './Operator'
 import { TAU } from './Constants'
 import * as ops from './Ops'
@@ -192,4 +193,16 @@ export function quarterWavePlateWE(angle: number): Operator {
  */
 export function quarterWavePlateNS(angle: number): Operator {
   return phasePlate(90, angle / 360)
+}
+
+/**
+ * Turn operator from coherent, polarized light, to incoherent, non-polarized intensity.
+ * @param opDirPol Operator with [direction,polarization] dimensions.
+ * @return Operator with real values and dimenson [direction].
+ */
+export function incoherentLightOperator(opDirPol: Operator): Operator {
+  const opIntensity = opDirPol.mapValues(z => z.mul(z.conj()))
+  const polInputs = Vector.fromArray([Cx(0.5), Cx(0.5)], [Dimension.polarization()])
+  const polOutpus = Vector.fromArray([Cx(1), Cx(1)], [Dimension.polarization()])
+  return opIntensity.contractLeft([1], polOutpus).contractRight([1], polInputs)
 }
