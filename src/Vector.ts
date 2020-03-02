@@ -401,6 +401,22 @@ export default class Vector {
   }
 
   /**
+   * Vector with only zeros.
+   * @param dimensions
+   */
+  static zeros(dimensions: Dimension[]): Vector {
+    return new Vector([], dimensions)
+  }
+
+  /**
+   * Scalar.
+   * @z
+   */
+  static scalar(z = Cx(1)): Vector {
+    return new Vector([new VectorEntry([], z)], [])
+  }
+
+  /**
    * Creates a vector with a single 1 value and all zeros, e.g. |H,u⟩.
    *
    * @example
