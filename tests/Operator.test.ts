@@ -140,6 +140,28 @@ describe('Sparse Complex Operator', () => {
     expect(op.dag()).operatorCloseToNumbers(opDag.toDense())
   })
 
+  it('map values', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uH', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+
+    const opAbs2 = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(4)],
+        ['dH', 'uH', Cx(2)],
+        ['dV', 'uH', Cx(6.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+
+    expect(op.mapValues(z => z.mul(z.conj()))).operatorCloseToNumbers(opAbs2.toDense())
+  })
+
   it('permute an operator', () => {
     const op = Operator.fromSparseCoordNames(
       [

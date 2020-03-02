@@ -115,6 +115,28 @@ describe('Sparse Complex Vector', () => {
     expect(vector.mulConstant(scalar3).toDense()).toEqual([Cx(1, 1), Cx(2, 2), Cx(3, 3), Cx(0, 0)])
   })
 
+  it('map values', () => {
+    const vec = Vector.fromSparseCoordNames(
+      [
+        ['dH', Cx(0, 2)],
+        ['uH', Cx(-1, -1)],
+        ['dV', Cx(0.5, 2.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+
+    const vecAbs2 = Vector.fromSparseCoordNames(
+      [
+        ['dH', Cx(4)],
+        ['uH', Cx(2)],
+        ['dV', Cx(6.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+
+    expect(vec.mapValues(z => z.mul(z.conj()))).vectorCloseTo(vecAbs2)
+  })
+
   it('should substract a vector from another one', () => {
     expect(vector.sub(vector).toDense()).toEqual([Cx(0, 0), Cx(0, 0), Cx(0, 0), Cx(0, 0)])
     expect(vector.sub(vector2).toDense()).toEqual([Cx(1, -1), Cx(4, -3), Cx(3, -3.5), Cx(0, 0)])
