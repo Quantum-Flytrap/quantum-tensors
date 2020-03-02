@@ -221,6 +221,14 @@ export default class Operator {
   }
 
   /**
+   * Map values
+   */
+  mapValues(func: (x: Complex) => Complex): Operator {
+    const entries = this.entries.map(entry => new OperatorEntry(entry.coordOut, entry.coordIn, func(entry.value)))
+    return new Operator(entries, this.dimensionsOut, this.dimensionsIn)
+  }
+
+  /**
    * An operator as row (output) vectors.
    * Mostly for internal use (e.g. multiplication).
    * @returns a sparse array of vector per output.

@@ -205,6 +205,14 @@ export default class Vector {
   }
 
   /**
+   * Map values
+   */
+  mapValues(func: (x: Complex) => Complex): Vector {
+    const entries = this.entries.map(entry => new VectorEntry(entry.coord, func(entry.value)))
+    return new Vector(entries, this.dimensions)
+  }
+
+  /**
    * Groups some of vector coordinates.
    * Mostly for intrnal use, e.g. partial inner product, Schmidt decomposition, etc.
    * @param coordIndices Sorted indices of dimensions for vectors. Complementary ones are used for grouping.
