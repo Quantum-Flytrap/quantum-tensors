@@ -316,6 +316,44 @@ export default class Operator {
   }
 
   /**
+   * Operator contraction with a vector, reducing 'output' dimensions.
+   * @param coordIndices Dimension indices at which we perform the opration. They need to be unique.
+   * @param v Vector to contract with.
+   * @returns  sum_i1 v_i1 A_(i1 i2),j
+   */
+  contractLeft(coordIndices: number[], v: Vector): Operator {
+    const complementIndices = indicesComplement(coordIndices, this.dimensionsIn.length)
+
+    const newEntries = this.toVectorPerInput()
+      .map(col => ({
+        coord: col.coord,
+        vector: v.dotPartial(coordIndices, col.vector),
+      }))
+      .flatMap(col => col.vector.entries.map(entry => new OperatorEntry(entry.coord, col.coord, entry.value)))
+
+    return new Operator(newEntries, _.at(this.dimensionsIn, complementIndices), [...this.dimensionsOut])
+  }
+
+  /**
+   * Operator contraction with a vector, reducing 'input' dimensions.
+   * @param coordIndices Dimension indices at which we perform the opration. They need to be unique.
+   * @param v Vector to contract with.
+   * @returns  sum_j1 A_i,(j1 j2) v_j1
+   */
+  contractRight(coordIndices: number[], v: Vector): Operator {
+    const complementIndices = indicesComplement(coordIndices, this.dimensionsIn.length)
+
+    const newEntries = this.toVectorPerOutput()
+      .map(row => ({
+        coord: row.coord,
+        vector: v.dotPartial(coordIndices, row.vector),
+      }))
+      .flatMap(row => row.vector.entries.map(entry => new OperatorEntry(row.coord, entry.coord, entry.value)))
+
+    return new Operator(newEntries, [...this.dimensionsIn], _.at(this.dimensionsOut, complementIndices))
+  }
+
+  /**
    * Changing order of dimensions for a vector, from [0, 1, 2, ...] to something else.
    * @param orderOut  E.g. [2, 0, 1]
    * @param orderIn  E.g. [2, 0, 1]
