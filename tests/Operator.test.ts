@@ -404,5 +404,14 @@ describe('Sparse Complex Operator', () => {
       'Operator with 3 entires of max size [[2,2], [2]] with dimensions [[spin,polarization], [spin]]\n' +
         '(-1.00 -1.00i) |d,H⟩⟨u| + (0.00 +4.00i) |d,H⟩⟨d| + (1.00 +5.00i) |d,V⟩⟨u|\n',
     )
+    expect(
+      op
+        .contractLeft([1], vec)
+        .contractRight([1], vec)
+        .toString(),
+    ).toBe(
+      'Operator with 2 entires of max size [[2], [2]] with dimensions [[spin], [spin]]\n' +
+        '(-1.00 +3.00i) |d⟩⟨u| + (0.00 +8.00i) |d⟩⟨d|\n',
+    )
   })
 })

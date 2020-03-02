@@ -322,7 +322,7 @@ export default class Operator {
    * @returns  sum_i1 v_i1 A_(i1 i2),j
    */
   contractLeft(coordIndices: number[], v: Vector): Operator {
-    const complementIndices = indicesComplement(coordIndices, this.dimensionsIn.length)
+    const complementIndices = indicesComplement(coordIndices, this.dimensionsOut.length)
 
     const newEntries = this.toVectorPerInput()
       .map(col => ({
@@ -331,7 +331,7 @@ export default class Operator {
       }))
       .flatMap(col => col.vector.entries.map(entry => new OperatorEntry(entry.coord, col.coord, entry.value)))
 
-    return new Operator(newEntries, _.at(this.dimensionsIn, complementIndices), [...this.dimensionsOut])
+    return new Operator(newEntries, _.at(this.dimensionsOut, complementIndices), [...this.dimensionsIn])
   }
 
   /**
@@ -350,7 +350,7 @@ export default class Operator {
       }))
       .flatMap(row => row.vector.entries.map(entry => new OperatorEntry(row.coord, entry.coord, entry.value)))
 
-    return new Operator(newEntries, [...this.dimensionsIn], _.at(this.dimensionsOut, complementIndices))
+    return new Operator(newEntries, [...this.dimensionsOut], _.at(this.dimensionsIn, complementIndices))
   }
 
   /**
