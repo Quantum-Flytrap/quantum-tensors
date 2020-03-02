@@ -344,6 +344,21 @@ export default class Photons {
     return this
   }
 
+  // propagateAndInteract(opsWithPos: IXYOperator[]): void {
+  //   this.propagatePhotons()
+  //   const absorptions = opsWithPos
+  //     .map(({ x, y, op }): any => {
+  //       return {
+  //         x,
+  //         y,
+  //         probability: this.measureAbsorptionAtOperator(x, y, op),
+  //       }
+  //      }
+  //     )
+  //     .filter((d): boolean => d.probability > this.probThreshold)
+  //   this.actOnSinglePhotons(opsWithPos)
+  // }
+
   /**
    * Combine H and V polarization, to
    * Right now kind od dirty, but should work
