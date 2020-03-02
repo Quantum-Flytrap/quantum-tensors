@@ -205,13 +205,15 @@ export default class IncoherentLight {
 
   /**
    * Generates a string for kets.
-   * See {@link Vector.toString} for formatting options.
-   * @param complexFormat ['cartesian', 'polar', 'polarTau'].
+   * As there are only real number, I remove others.
    * @param precision Float precision.
    *
-   * @returns A ket string, e.g. (0.75 + 0.00i) |3,1,>⟩ + (0.25 + 0.00i) |2,2,v⟩.
+   * @returns A ket string, e.g. 0.75 |3,1,>⟩ + 0.25 |2,2,v⟩.
    */
-  ketString(complexFormat = 'cartesian', precision = 2): string {
-    return this.vector.toString(complexFormat, precision, ' + ', false)
+  ketString(precision = 2): string {
+    return this.vector
+      .toString('cartesian', precision, ' + ', false)
+      .replace(/\(/g, '')
+      .replace(/ \+0\.0*i\)/g, '')
   }
 }

@@ -14,17 +14,17 @@ describe('IncoherentLight', () => {
     space.addIntensityFromIndicator(0, 2, '>')
 
     expect(space.totalIntensity).toBeCloseTo(1)
-    expect(space.ketString()).toBe('(1.00 +0.00i) |0,2,>⟩')
+    expect(space.ketString()).toBe('1.00 |0,2,>⟩')
   })
 
   it('propagates a beam', () => {
     const space = IncoherentLight.emptySpace(3, 5).addIntensityFromIndicator(0, 2, '>')
 
-    expect(space.ketString()).toBe('(1.00 +0.00i) |0,2,>⟩')
+    expect(space.ketString()).toBe('1.00 |0,2,>⟩')
     space.propagateBeam()
-    expect(space.ketString()).toBe('(1.00 +0.00i) |1,2,>⟩')
+    expect(space.ketString()).toBe('1.00 |1,2,>⟩')
     space.propagateBeam()
-    expect(space.ketString()).toBe('(1.00 +0.00i) |2,2,>⟩')
+    expect(space.ketString()).toBe('1.00 |2,2,>⟩')
     space.propagateBeam()
     expect(space.ketString()).toBe('')
   })
@@ -38,15 +38,15 @@ describe('IncoherentLight', () => {
       { x: 1, y: 4, op: Elements.attenuator() },
     ])
 
-    expect(space.ketString()).toBe('(1.00 +0.00i) |0,2,>⟩')
+    expect(space.ketString()).toBe('1.00 |0,2,>⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(1.00 +0.00i) |1,2,v⟩')
+    expect(space.ketString()).toBe('1.00 |1,2,v⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(1.00 +0.00i) |1,3,v⟩')
+    expect(space.ketString()).toBe('1.00 |1,3,v⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |1,4,v⟩')
+    expect(space.ketString()).toBe('0.50 |1,4,v⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |1,5,v⟩')
+    expect(space.ketString()).toBe('0.50 |1,5,v⟩')
   })
 
   it('no interference', () => {
@@ -66,19 +66,19 @@ describe('IncoherentLight', () => {
       { x: 5, y: 1, op: Elements.beamSplitter(135) },
     ])
 
-    expect(space.ketString()).toBe('(1.00 +0.00i) |0,0,>⟩')
+    expect(space.ketString()).toBe('1.00 |0,0,>⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(1.00 +0.00i) |1,0,>⟩')
+    expect(space.ketString()).toBe('1.00 |1,0,>⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |2,0,>⟩ + (0.50 +0.00i) |2,0,v⟩')
+    expect(space.ketString()).toBe('0.50 |2,0,>⟩ + 0.50 |2,0,v⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |3,0,>⟩ + (0.50 +0.00i) |2,1,>⟩')
+    expect(space.ketString()).toBe('0.50 |3,0,>⟩ + 0.50 |2,1,>⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |3,1,>⟩ + (0.50 +0.00i) |4,0,>⟩')
+    expect(space.ketString()).toBe('0.50 |3,1,>⟩ + 0.50 |4,0,>⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |4,1,>⟩ + (0.50 +0.00i) |5,0,v⟩')
+    expect(space.ketString()).toBe('0.50 |4,1,>⟩ + 0.50 |5,0,v⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |5,1,>⟩ + (0.50 +0.00i) |5,1,v⟩')
+    expect(space.ketString()).toBe('0.50 |5,1,>⟩ + 0.50 |5,1,v⟩')
   })
 
   it('polarizing beam splitters', () => {
@@ -96,20 +96,18 @@ describe('IncoherentLight', () => {
       { x: 5, y: 0, op: Elements.polarizingBeamsplitter(0) },
     ])
 
-    expect(space.ketString()).toBe('(1.00 +0.00i) |0,0,>⟩')
+    expect(space.ketString()).toBe('1.00 |0,0,>⟩')
     space.propagateBeam()
     space.propagateBeam()
     space.interact(operations)
-    expect(space.ketString()).toBe('(1.00 +0.00i) |2,0,>⟩')
+    expect(space.ketString()).toBe('1.00 |2,0,>⟩')
     space.propagateBeam()
     space.propagateBeam()
     space.interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |4,0,>⟩ + (0.50 +0.00i) |4,0,v⟩')
+    expect(space.ketString()).toBe('0.50 |4,0,>⟩ + 0.50 |4,0,v⟩')
     space.propagateBeam()
     space.interact(operations)
-    expect(space.ketString()).toBe(
-      '(0.25 +0.00i) |4,1,<⟩ + (0.25 +0.00i) |4,1,v⟩ + (0.25 +0.00i) |5,0,>⟩ + (0.25 +0.00i) |5,0,^⟩',
-    )
+    expect(space.ketString()).toBe('0.25 |4,1,<⟩ + 0.25 |4,1,v⟩ + 0.25 |5,0,>⟩ + 0.25 |5,0,^⟩')
   })
 
   it('attenuation', () => {
@@ -126,14 +124,14 @@ describe('IncoherentLight', () => {
       { x: 4, y: 0, op: Elements.attenuator() },
       { x: 2, y: 2, op: Elements.attenuator() },
     ])
-    expect(space.ketString()).toBe('(1.00 +0.00i) |0,0,>⟩')
+    expect(space.ketString()).toBe('1.00 |0,0,>⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(1.00 +0.00i) |1,0,>⟩')
+    expect(space.ketString()).toBe('1.00 |1,0,>⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |2,0,>⟩ + (0.50 +0.00i) |2,0,v⟩')
+    expect(space.ketString()).toBe('0.50 |2,0,>⟩ + 0.50 |2,0,v⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.50 +0.00i) |2,1,v⟩ + (0.25 +0.00i) |3,0,>⟩')
+    expect(space.ketString()).toBe('0.50 |2,1,v⟩ + 0.25 |3,0,>⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('(0.25 +0.00i) |2,2,v⟩ + (0.13 +0.00i) |4,0,>⟩')
+    expect(space.ketString(3)).toBe('0.250 |2,2,v⟩ + 0.125 |4,0,>⟩')
   })
 })
