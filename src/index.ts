@@ -8,8 +8,9 @@ export { default as OperatorEntry } from './OperatorEntry'
 export { default as Basis } from './Basis'
 export { default as Circuit } from './Circuit'
 import * as helpers from './helpers'
+import * as interfaces from './interfaces'
 export * from './Constants'
 import * as Elements from './Elements'
 import * as Ops from './Ops'
 import * as Gates from './Gates'
-export { helpers, Elements, Ops, Gates }
+export { helpers, interfaces, Elements, Ops, Gates }
