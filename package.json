@@ -2,8 +2,15 @@
   "name": "quantum-tensors",
   "version": "0.4.0",
   "description": "Tensor numerics for quantum information and quantum optics. Used in Quantum Game with Photons.",
-  "main": "lib/src/main.js",
-  "types": "lib/src/main.d.ts",
+	"main": "dist/index.js",
+	"module": "dist/index.esm.js",
+  "browser": "dist/index.min.js",
+  "types": "dist/src/index.d.ts",
+	"files": [
+		"dist",
+    "README.md",
+    "imgs"
+	],
   "repository": "https://github.com/Quantum-Game/quantum-tensors",
   "author": "Piotr Migdal",
   "license": "MIT",
@@ -23,13 +30,17 @@
     "eslint-plugin-react": "^7.17.0",
     "jest": "^25.1.0",
     "prettier": "^1.19.1",
+    "rollup": "^2.0.2",
+    "rollup-plugin-terser": "^5.2.0",
+    "rollup-plugin-typescript2": "^0.26.0",
     "ts-jest": "^25.2.0",
     "typedoc": "^0.16.9",
     "typescript": "^3.6.3"
   },
   "scripts": {
     "try-example": "tsc && node ./lib/demos/example.js",
-    "build": "tsc --pretty",
+    "build-old": "tsc --pretty",
+    "build": "rollup -c && tsc",
     "test": "tsc --noEmit -p . && jest --coverage --no-cache",
     "build-docs": "typedoc --out docs src",
     "build-and-deploy-docs": "typedoc --out docs src && touch docs/.nojekyll && push-dir --dir=docs --branch=gh-pages --cleanup",
@@ -40,9 +51,6 @@
     "prepublishOnly": "npm run lint && npm run test",
     "postversion": "git push && git push --tags && npm run build-and-deploy-docs"
   },
-  "files": [
-    "lib/**/*"
-  ],
   "dependencies": {
     "@types/lodash": "^4.14.138",
     "lodash": "^4.17.15"
