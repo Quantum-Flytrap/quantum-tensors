@@ -1,16 +1,16 @@
 {
   "name": "quantum-tensors",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Tensor numerics for quantum information and quantum optics. Used in Quantum Game with Photons.",
-	"main": "dist/index.js",
-	"module": "dist/index.esm.js",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
   "browser": "dist/index.min.js",
   "types": "dist/src/index.d.ts",
-	"files": [
-		"dist",
+  "files": [
+    "dist",
     "README.md",
     "imgs"
-	],
+  ],
   "repository": "https://github.com/Quantum-Game/quantum-tensors",
   "author": "Piotr Migdal",
   "license": "MIT",
