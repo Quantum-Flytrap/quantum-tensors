@@ -1,14 +1,12 @@
 import typescript from 'rollup-plugin-typescript2'
 import pkg from './package.json'
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
 import { terser } from 'rollup-plugin-terser'
 
 // delete old typings to avoid issues
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 require('fs').unlink('dist/src/index.d.ts', () => {})
-
-const globals = {
-  lodash: '_',
-}
 
 export default {
   input: 'src/index.ts',
@@ -19,14 +17,12 @@ export default {
       name: 'QuantumTensors',
       compact: true,
       exports: 'named',
-      globals,
     },
     {
       file: pkg.module,
       format: 'esm',
       name: 'QuantumTensors',
       exports: 'named',
-      globals,
     },
     {
       file: pkg.browser,
@@ -34,11 +30,11 @@ export default {
       name: 'QuantumTensors',
       compact: true,
       exports: 'named',
-      globals,
     },
   ],
-  external: [...Object.keys(pkg.dependencies || {})],
   plugins: [
+    commonjs(),
+    resolve(),
     typescript({
       typescript: require('typescript'),
     }),

@@ -53,6 +53,8 @@
     "postversion": "git push && git push --tags && npm run build-and-deploy-docs"
   },
   "dependencies": {
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
     "@types/lodash": "^4.14.138",
     "lodash": "^4.17.15"
   },
