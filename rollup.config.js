@@ -6,6 +6,10 @@ import { terser } from 'rollup-plugin-terser'
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 require('fs').unlink('dist/src/index.d.ts', () => {})
 
+const globals = {
+  lodash: '_',
+}
+
 export default {
   input: 'src/index.ts',
   output: [
@@ -15,12 +19,14 @@ export default {
       name: 'QuantumTensors',
       compact: true,
       exports: 'named',
+      globals,
     },
     {
       file: pkg.module,
       format: 'esm',
       name: 'QuantumTensors',
       exports: 'named',
+      globals,
     },
     {
       file: pkg.browser,
@@ -28,6 +34,7 @@ export default {
       name: 'QuantumTensors',
       compact: true,
       exports: 'named',
+      globals,
     },
   ],
   external: [...Object.keys(pkg.dependencies || {})],
