@@ -113,7 +113,7 @@ export default class Circuit {
   }
 
   TOFFOLI(control1: number, control2: number, target: number): Circuit {
-    return this.applyGate(Gates.Swap(), [control1, control2, target])
+    return this.applyGate(Gates.CCX(), [control1, control2, target])
   }
 
   FREDKIN(control: number, target1: number, target2: number): Circuit {
