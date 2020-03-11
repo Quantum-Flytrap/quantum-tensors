@@ -4,7 +4,6 @@
   "description": "Tensor numerics for quantum information and quantum optics. Used in Quantum Game with Photons.",
   "main": "dist/quantum-tensors.js",
   "module": "dist/quantum-tensors.esm.js",
-  "browser": "dist/quantum-tensors.min.js",
   "unpkg": "dist/quantum-tensors.min.js",
   "types": "dist/src/index.d.ts",
   "files": [
