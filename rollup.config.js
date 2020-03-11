@@ -25,7 +25,7 @@ export default {
       exports: 'named',
     },
     {
-      file: pkg.browser,
+      file: pkg.unpkg,
       format: 'iife',
       name: 'QuantumTensors',
       compact: true,
