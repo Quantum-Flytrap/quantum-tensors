@@ -158,8 +158,10 @@ export default class Photons {
       this.vector = newPhoton
     } else if (this.nPhotons === 1) {
       if (!newPhoton.dot(this.vector).isZero) {
-        throw `Adding photons not yet implemented for non-ortogonal states.` +
+        throw (
+          `Adding photons not yet implemented for non-ortogonal states.` +
           `Old photon:\n${this.vector}\nand new photon:\n${newPhoton}`
+        )
       }
       this.vector = Vector.add([oldPhotons.outer(newPhoton), newPhoton.outer(oldPhotons)]).mulConstant(Cx(Math.SQRT1_2))
     } else {
@@ -198,7 +200,7 @@ export default class Photons {
    */
   propagatePhotons(yDirMeansDown = true): Photons {
     const photonPropagator = Photons.propagator(this.sizeX, this.sizeY, yDirMeansDown)
-    _.range(this.nPhotons).forEach(i => {
+    _.range(this.nPhotons).forEach((i) => {
       this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
     })
     return this
@@ -273,7 +275,7 @@ export default class Photons {
     const oldVectorHere = localizedId.mulVecPartial([...posInd], this.vector)
 
     return basis
-      .map(coordStr => {
+      .map((coordStr) => {
         const projection = Operator.indicator([dimDir, dimPol], coordStr)
         const vectorProjected = projection.mulVecPartial(dirPolInd, oldVectorHere)
         const inputProjectedProbabability = vectorProjected.normSquared()
@@ -300,7 +302,7 @@ export default class Photons {
           projectedState: newPhotons.ketString(), // for now just print  // not normalized
         }
       })
-      .filter(d => d.inputProb > 0)
+      .filter((d) => d.inputProb > 0)
   }
 
   /**
@@ -338,7 +340,7 @@ export default class Photons {
    */
   actOnSinglePhotons(opsWithPos: IXYOperator[]): Photons {
     const singlePhotonInteraction = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, opsWithPos)
-    _.range(this.nPhotons).forEach(i => {
+    _.range(this.nPhotons).forEach((i) => {
       this.vector = singlePhotonInteraction.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
     })
     return this
@@ -373,14 +375,14 @@ export default class Photons {
       throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
     }
     const aggregated = _.chain(this.vector.entries)
-      .groupBy(entry => _.at(entry.coord, [0, 1, 2]))
+      .groupBy((entry) => _.at(entry.coord, [0, 1, 2]))
       .values()
-      .map(entries => {
+      .map((entries) => {
         const first = entries[0]
         /* eslint-disable @typescript-eslint/no-unused-vars */
         const [x, y, dir, _pol] = first.coord
         const amplitudes: [Complex, Complex] = [Cx(0), Cx(0)]
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           amplitudes[entry.coord[3]] = entry.value
         })
         return {
@@ -408,12 +410,12 @@ export default class Photons {
     }
 
     const aggregated = _.chain(this.vector.entries)
-      .groupBy(entry => _.at(entry.coord, [0, 1]))
+      .groupBy((entry) => _.at(entry.coord, [0, 1]))
       .values()
-      .map(entries => {
+      .map((entries) => {
         const first = entries[0]
         const [x, y, _dir, _pol] = first.coord
-        const probability = entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b)
+        const probability = entries.map((entry) => entry.value.abs2()).reduce((a, b) => a + b)
 
         return { x, y, probability }
       })

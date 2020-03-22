@@ -75,7 +75,7 @@ export default class IncoherentLight {
    * Total intensity
    */
   get totalIntensity(): number {
-    return this.vector.entries.map(entry => entry.value).reduce((a, b) => a.add(b), Cx(0)).re
+    return this.vector.entries.map((entry) => entry.value).reduce((a, b) => a.add(b), Cx(0)).re
   }
 
   /**

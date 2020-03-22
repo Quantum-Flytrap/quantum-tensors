@@ -13,7 +13,7 @@ import _ from 'lodash'
  */
 export function coordsFromIndex(index: number, sizes: number[]): number[] {
   let i = index
-  const coords = [...sizes].reverse().map(dimSize => {
+  const coords = [...sizes].reverse().map((dimSize) => {
     const coord = i % dimSize
     i = (i - coord) / dimSize
     return coord
@@ -74,7 +74,7 @@ export function isPermutation(array: number[], n = array.length): boolean {
     return false
   }
   const counts = new Array(array.length).fill(0)
-  array.forEach(x => (counts[x] += 1))
+  array.forEach((x) => (counts[x] += 1))
   return _.every(counts)
 }
 
@@ -85,11 +85,11 @@ export function isPermutation(array: number[], n = array.length): boolean {
  * @return E.g. [0, 2, 4]
  */
 export function indicesComplement(indices: number[], n: number): number[] {
-  const res = _.range(n).filter(i => !_.includes(indices, i))
+  const res = _.range(n).filter((i) => !_.includes(indices, i))
   if (!isPermutation(indices.concat(res))) {
     throw new Error(`In [${indices}] are not unique integer, between 0 and ${n - 1}.`)
   }
-  return _.range(n).filter(i => !_.includes(indices, i))
+  return _.range(n).filter((i) => !_.includes(indices, i))
 }
 
 /**

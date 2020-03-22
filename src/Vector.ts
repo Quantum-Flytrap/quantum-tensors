@@ -28,7 +28,7 @@ export default class Vector {
     this.entries = entries
     this.dimensions = dimensions
 
-    this.entries.forEach(entry => {
+    this.entries.forEach((entry) => {
       checkCoordsSizesCompability(entry.coord, this.size)
     })
   }
@@ -38,7 +38,7 @@ export default class Vector {
    * @see {@link Dimension}
    */
   get size(): number[] {
-    return this.dimensions.map(dimension => dimension.size)
+    return this.dimensions.map((dimension) => dimension.size)
   }
 
   /**
@@ -54,14 +54,14 @@ export default class Vector {
    * @see {@link Dimension}
    */
   get names(): string[] {
-    return this.dimensions.map(dimension => dimension.name)
+    return this.dimensions.map((dimension) => dimension.name)
   }
 
   /**
    * @returns Coordinate names for each {@link Dimension}.
    */
   get coordNames(): string[][] {
-    return this.dimensions.map(dimension => dimension.coordNames)
+    return this.dimensions.map((dimension) => dimension.coordNames)
   }
 
   /**
@@ -75,7 +75,7 @@ export default class Vector {
    * FIXME: Feels it should be a getter
    */
   normSquared(): number {
-    return this.entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b, 0)
+    return this.entries.map((entry) => entry.value.abs2()).reduce((a, b) => a + b, 0)
   }
 
   /**
@@ -105,7 +105,7 @@ export default class Vector {
    * @returns Complex conjugation for a vector.
    */
   conj(): Vector {
-    const entries = this.entries.map(entry => new VectorEntry([...entry.coord], entry.value.conj()))
+    const entries = this.entries.map((entry) => new VectorEntry([...entry.coord], entry.value.conj()))
     return new Vector(entries, this.dimensions)
   }
 
@@ -127,7 +127,7 @@ export default class Vector {
    * @returns c v
    */
   mulConstant(c: Complex): Vector {
-    const entries = this.entries.map(entry => new VectorEntry(entry.coord, entry.value.mul(c)))
+    const entries = this.entries.map((entry) => new VectorEntry(entry.coord, entry.value.mul(c)))
     return new Vector(entries, this.dimensions)
   }
 
@@ -148,7 +148,7 @@ export default class Vector {
       .values()
       .map((grouped: VectorEntry[]) => {
         const coord = [...grouped[0].coord]
-        const value = grouped.map(entry => entry.value).reduce((a, b) => a.add(b))
+        const value = grouped.map((entry) => entry.value).reduce((a, b) => a.add(b))
         return new VectorEntry(coord, value)
       })
       .value()
@@ -208,7 +208,7 @@ export default class Vector {
    * Map values
    */
   mapValues(func: (x: Complex) => Complex): Vector {
-    const entries = this.entries.map(entry => new VectorEntry(entry.coord, func(entry.value)))
+    const entries = this.entries.map((entry) => new VectorEntry(entry.coord, func(entry.value)))
     return new Vector(entries, this.dimensions)
   }
 
@@ -222,11 +222,11 @@ export default class Vector {
     const contractionDimensions = _.at(this.dimensions, coordIndices)
 
     return _(this.entries)
-      .groupBy(entry => _.at(entry.coord, complementIndices))
+      .groupBy((entry) => _.at(entry.coord, complementIndices))
       .values()
-      .map(entries => {
+      .map((entries) => {
         const coord = _.at(entries[0].coord, complementIndices)
-        const vecEntries = entries.map(entry => new VectorEntry(_.at(entry.coord, coordIndices), entry.value))
+        const vecEntries = entries.map((entry) => new VectorEntry(_.at(entry.coord, coordIndices), entry.value))
         const vector = new Vector(vecEntries, contractionDimensions)
         return { coord, vector }
       })
@@ -247,8 +247,8 @@ export default class Vector {
     Dimension.checkDimensions(this.dimensions, contractionDimensions)
 
     const vecEntries = groupedByCoords
-      .map(row => new VectorEntry(row.coord, this.dot(row.vector)))
-      .filter(entry => !entry.value.isAlmostZero())
+      .map((row) => new VectorEntry(row.coord, this.dot(row.vector)))
+      .filter((entry) => !entry.value.isAlmostZero())
     return new Vector(vecEntries, complementDimensions)
   }
 
@@ -292,7 +292,7 @@ export default class Vector {
       throw new Error(`${order} is not a valid permutation for ${this.dimensions.length} dimensions.`)
     }
     const dimensions = _.at(this.dimensions, order)
-    const entries = this.entries.map(entry => new VectorEntry(_.at(entry.coord, order), entry.value))
+    const entries = this.entries.map((entry) => new VectorEntry(_.at(entry.coord, order), entry.value))
     return new Vector(entries, dimensions)
   }
 
@@ -322,7 +322,7 @@ export default class Vector {
    */
   toString(complexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
     const valueStr = this.entries
-      .map(entry => {
+      .map((entry) => {
         const coordStr = entry.coord.map((i: number, dim: number) => this.coordNames[dim][i])
         return `${entry.value.toString(complexFormat, precision)} |${coordStr}⟩`
       })
@@ -366,7 +366,7 @@ export default class Vector {
    * @returns E.g. [{i: 2, v: Cx(2, 4)}, {i: 5, v: Cx(-1, 0)}, ...]
    */
   toIndexValues(): IEntryIndexValue[] {
-    return this.entries.map(entry => ({
+    return this.entries.map((entry) => ({
       i: coordsToIndex(entry.coord, this.size),
       v: entry.value,
     }))
@@ -385,7 +385,7 @@ export default class Vector {
    */
   static fromArray(denseArray: Complex[], dimensions: Dimension[], removeZeros = true): Vector {
     // Get size vector from dimensions
-    const sizes = dimensions.map(dimension => dimension.size)
+    const sizes = dimensions.map((dimension) => dimension.size)
     const totalSize = sizes.reduce((a, b) => a * b)
     if (denseArray.length !== totalSize) {
       throw new Error(`Dimension inconsistency: entry count ${denseArray.length} != total: ${totalSize}`)

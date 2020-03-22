@@ -69,7 +69,7 @@ export default class Circuit {
   }
 
   measureQubit(at: number): IMeasurementResult<Circuit>[] {
-    const newQubitIds = this.qubitIds.filter(i => i !== at)
+    const newQubitIds = this.qubitIds.filter((i) => i !== at)
     const vector0 = qubit0.innerPartial([at], this.vector)
     const vector1 = qubit1.innerPartial([at], this.vector)
     return [

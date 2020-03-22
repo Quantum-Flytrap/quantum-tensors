@@ -31,7 +31,7 @@ export default class Operator {
     this.dimensionsOut = dimensionsOut
     this.dimensionsIn = dimensionsIn
 
-    this.entries.forEach(entry => {
+    this.entries.forEach((entry) => {
       checkCoordsSizesCompability(entry.coordOut, this.sizeOut)
       checkCoordsSizesCompability(entry.coordIn, this.sizeIn)
     })
@@ -49,7 +49,7 @@ export default class Operator {
    * @see {@link Dimension}
    */
   get sizeOut(): number[] {
-    return this.dimensionsOut.map(dimension => dimension.size)
+    return this.dimensionsOut.map((dimension) => dimension.size)
   }
 
   /**
@@ -57,7 +57,7 @@ export default class Operator {
    * @see {@link Dimension}
    */
   get sizeIn(): number[] {
-    return this.dimensionsIn.map(dimension => dimension.size)
+    return this.dimensionsIn.map((dimension) => dimension.size)
   }
 
   /**
@@ -81,7 +81,7 @@ export default class Operator {
    * @see {@link Dimension}
    */
   get namesOut(): string[] {
-    return this.dimensionsOut.map(dimension => dimension.name)
+    return this.dimensionsOut.map((dimension) => dimension.name)
   }
 
   /**
@@ -89,7 +89,7 @@ export default class Operator {
    * @see {@link Dimension}
    */
   get namesIn(): string[] {
-    return this.dimensionsIn.map(dimension => dimension.name)
+    return this.dimensionsIn.map((dimension) => dimension.name)
   }
 
   /**
@@ -97,7 +97,7 @@ export default class Operator {
    * @see {@link Dimension}
    */
   get coordNamesOut(): string[][] {
-    return this.dimensionsOut.map(dimension => dimension.coordNames)
+    return this.dimensionsOut.map((dimension) => dimension.coordNames)
   }
 
   /**
@@ -105,7 +105,7 @@ export default class Operator {
    * @see {@link Dimension}
    */
   get coordNamesIn(): string[][] {
-    return this.dimensionsIn.map(dimension => dimension.coordNames)
+    return this.dimensionsIn.map((dimension) => dimension.coordNames)
   }
 
   /**
@@ -123,7 +123,7 @@ export default class Operator {
    */
   conj(): Operator {
     const entries = this.entries.map(
-      entry => new OperatorEntry([...entry.coordOut], [...entry.coordIn], entry.value.conj()),
+      (entry) => new OperatorEntry([...entry.coordOut], [...entry.coordIn], entry.value.conj()),
     )
     return new Operator(entries, this.dimensionsOut, this.dimensionsIn)
   }
@@ -134,7 +134,7 @@ export default class Operator {
    * @returns a^T Transpose of an operator.
    */
   transpose(): Operator {
-    const entries = this.entries.map(entry => new OperatorEntry([...entry.coordIn], [...entry.coordOut], entry.value))
+    const entries = this.entries.map((entry) => new OperatorEntry([...entry.coordIn], [...entry.coordOut], entry.value))
     return new Operator(entries, this.dimensionsIn, this.dimensionsOut)
   }
 
@@ -145,7 +145,7 @@ export default class Operator {
    */
   dag(): Operator {
     const entries = this.entries.map(
-      entry => new OperatorEntry([...entry.coordIn], [...entry.coordOut], entry.value.conj()),
+      (entry) => new OperatorEntry([...entry.coordIn], [...entry.coordOut], entry.value.conj()),
     )
     return new Operator(entries, this.dimensionsIn, this.dimensionsOut)
   }
@@ -191,10 +191,10 @@ export default class Operator {
       .map((grouped: OperatorEntry[]) => {
         const coordOut = [...grouped[0].coordOut]
         const coordIn = [...grouped[0].coordIn]
-        const value = grouped.map(entry => entry.value).reduce((a, b) => a.add(b))
+        const value = grouped.map((entry) => entry.value).reduce((a, b) => a.add(b))
         return new OperatorEntry(coordOut, coordIn, value)
       })
-      .filter(entry => !entry.value.isAlmostZero())
+      .filter((entry) => !entry.value.isAlmostZero())
       .value()
 
     return new Operator(entries, m1.dimensionsOut, m1.dimensionsIn)
@@ -206,7 +206,7 @@ export default class Operator {
    * @returns c M
    */
   mulConstant(c: Complex): Operator {
-    const entries = this.entries.map(entry => new OperatorEntry(entry.coordOut, entry.coordIn, entry.value.mul(c)))
+    const entries = this.entries.map((entry) => new OperatorEntry(entry.coordOut, entry.coordIn, entry.value.mul(c)))
     return new Operator(entries, this.dimensionsOut, this.dimensionsIn)
   }
 
@@ -224,7 +224,7 @@ export default class Operator {
    * Map values
    */
   mapValues(func: (x: Complex) => Complex): Operator {
-    const entries = this.entries.map(entry => new OperatorEntry(entry.coordOut, entry.coordIn, func(entry.value)))
+    const entries = this.entries.map((entry) => new OperatorEntry(entry.coordOut, entry.coordIn, func(entry.value)))
     return new Operator(entries, this.dimensionsOut, this.dimensionsIn)
   }
 
@@ -235,11 +235,11 @@ export default class Operator {
    */
   toVectorPerOutput(): IColumnOrRow[] {
     return _(this.entries)
-      .groupBy(entry => entry.coordOut.toString())
+      .groupBy((entry) => entry.coordOut.toString())
       .values()
-      .map(entries => {
+      .map((entries) => {
         const coord = entries[0].coordOut
-        const vecEntries = entries.map(opEntry => new VectorEntry(opEntry.coordIn, opEntry.value))
+        const vecEntries = entries.map((opEntry) => new VectorEntry(opEntry.coordIn, opEntry.value))
         const vector = new Vector(vecEntries, [...this.dimensionsIn])
         return { coord, vector }
       })
@@ -253,11 +253,11 @@ export default class Operator {
    */
   toVectorPerInput(): IColumnOrRow[] {
     return _(this.entries)
-      .groupBy(entry => entry.coordIn.toString())
+      .groupBy((entry) => entry.coordIn.toString())
       .values()
-      .map(entries => {
+      .map((entries) => {
         const coord = entries[0].coordIn
-        const vecEntries = entries.map(opEntry => new VectorEntry(opEntry.coordOut, opEntry.value))
+        const vecEntries = entries.map((opEntry) => new VectorEntry(opEntry.coordOut, opEntry.value))
         const vector = new Vector(vecEntries, [...this.dimensionsOut])
         return { coord, vector }
       })
@@ -273,8 +273,8 @@ export default class Operator {
   mulVec(v: Vector): Vector {
     Dimension.checkDimensions(this.dimensionsIn, v.dimensions)
     const vecEntries = this.toVectorPerOutput()
-      .map(row => new VectorEntry(row.coord, row.vector.dot(v)))
-      .filter(entry => !entry.value.isAlmostZero())
+      .map((row) => new VectorEntry(row.coord, row.vector.dot(v)))
+      .filter((entry) => !entry.value.isAlmostZero())
     return new Vector(vecEntries, [...this.dimensionsOut])
   }
 
@@ -291,10 +291,10 @@ export default class Operator {
     Dimension.checkDimensions(m1.dimensionsIn, m2.dimensionsOut)
     const entries = m1
       .toVectorPerOutput()
-      .flatMap(row =>
-        m2.toVectorPerInput().map(col => new OperatorEntry(row.coord, col.coord, row.vector.dot(col.vector))),
+      .flatMap((row) =>
+        m2.toVectorPerInput().map((col) => new OperatorEntry(row.coord, col.coord, row.vector.dot(col.vector))),
       )
-      .filter(entry => !entry.value.isAlmostZero())
+      .filter((entry) => !entry.value.isAlmostZero())
     return new Operator(entries, [...m1.dimensionsOut], [...m2.dimensionsIn])
   }
 
@@ -314,11 +314,13 @@ export default class Operator {
 
     const newEntries = v
       .toGroupedByCoords(coordIndices)
-      .map(row => ({
+      .map((row) => ({
         coord: row.coord,
         vector: this.mulVec(row.vector),
       }))
-      .flatMap(row => row.vector.entries.map(entry => new VectorEntry(joinCoords(row.coord, entry.coord), entry.value)))
+      .flatMap((row) =>
+        row.vector.entries.map((entry) => new VectorEntry(joinCoords(row.coord, entry.coord), entry.value)),
+      )
 
     return new Vector(newEntries, v.dimensions)
   }
@@ -333,11 +335,11 @@ export default class Operator {
     const complementIndices = indicesComplement(coordIndices, this.dimensionsOut.length)
 
     const newEntries = this.toVectorPerInput()
-      .map(col => ({
+      .map((col) => ({
         coord: col.coord,
         vector: v.dotPartial(coordIndices, col.vector),
       }))
-      .flatMap(col => col.vector.entries.map(entry => new OperatorEntry(entry.coord, col.coord, entry.value)))
+      .flatMap((col) => col.vector.entries.map((entry) => new OperatorEntry(entry.coord, col.coord, entry.value)))
 
     return new Operator(newEntries, _.at(this.dimensionsOut, complementIndices), [...this.dimensionsIn])
   }
@@ -352,11 +354,11 @@ export default class Operator {
     const complementIndices = indicesComplement(coordIndices, this.dimensionsIn.length)
 
     const newEntries = this.toVectorPerOutput()
-      .map(row => ({
+      .map((row) => ({
         coord: row.coord,
         vector: v.dotPartial(coordIndices, row.vector),
       }))
-      .flatMap(row => row.vector.entries.map(entry => new OperatorEntry(row.coord, entry.coord, entry.value)))
+      .flatMap((row) => row.vector.entries.map((entry) => new OperatorEntry(row.coord, entry.coord, entry.value)))
 
     return new Operator(newEntries, [...this.dimensionsOut], _.at(this.dimensionsIn, complementIndices))
   }
@@ -377,7 +379,7 @@ export default class Operator {
     const dimensionsIn = _.at(this.dimensionsIn, orderIn)
 
     const entries = this.entries.map(
-      entry => new OperatorEntry(_.at(entry.coordOut, orderOut), _.at(entry.coordIn, orderIn), entry.value),
+      (entry) => new OperatorEntry(_.at(entry.coordOut, orderOut), _.at(entry.coordIn, orderIn), entry.value),
     )
     return new Operator(entries, dimensionsOut, dimensionsIn)
   }
@@ -408,7 +410,7 @@ export default class Operator {
    */
   toString(complexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
     const valueStr = this.entries
-      .map(entry => {
+      .map((entry) => {
         const coordStrOut = entry.coordOut.map((i: number, dim: number) => this.coordNamesOut[dim][i])
         const coordStrIn = entry.coordIn.map((i: number, dim: number) => this.coordNamesIn[dim][i])
         return `${entry.value.toString(complexFormat, precision)} |${coordStrOut}⟩⟨${coordStrIn}|`
@@ -446,7 +448,7 @@ export default class Operator {
    * @returns E.g. [{i: 2, j: 0, v: Cx(2, 4)}, {i: 5, j: 3, v: Cx(-1, 0)}, ...]
    */
   toIndexIndexValues(): IEntryIndexIndexValue[] {
-    return this.entries.map(entry => ({
+    return this.entries.map((entry) => ({
       i: coordsToIndex(entry.coordOut, this.sizeOut),
       j: coordsToIndex(entry.coordIn, this.sizeIn),
       v: entry.value,
@@ -460,10 +462,10 @@ export default class Operator {
    * @returns I
    */
   static identity(dimensions: Dimension[]): Operator {
-    const sizes = dimensions.map(dimension => dimension.size)
+    const sizes = dimensions.map((dimension) => dimension.size)
     const totalSize = sizes.reduce((a, b) => a * b)
 
-    const entries = _.range(totalSize).map(index =>
+    const entries = _.range(totalSize).map((index) =>
       OperatorEntry.fromIndexIndexValue(index, index, sizes, sizes, Cx(1, 0)),
     )
     return new Operator(entries, dimensions, dimensions)
@@ -480,7 +482,7 @@ export default class Operator {
     const start = Math.max(0, -shift)
     const end = Math.min(dimension.size, dimension.size - shift)
 
-    const entries = _.range(start, end).map(index =>
+    const entries = _.range(start, end).map((index) =>
       OperatorEntry.fromIndexIndexValue(index + shift, index, [dimension.size], [dimension.size], Cx(1, 0)),
     )
     return new Operator(entries, [dimension], [dimension])
@@ -522,13 +524,13 @@ export default class Operator {
     removeZeros = true,
   ): Operator {
     // Get size vector from dimensions
-    const sizesOut = dimensionsOut.map(dimension => dimension.size)
+    const sizesOut = dimensionsOut.map((dimension) => dimension.size)
     const totalSizeOut = sizesOut.reduce((a, b) => a * b)
 
-    const sizesIn = dimensionsIn.map(dimension => dimension.size)
+    const sizesIn = dimensionsIn.map((dimension) => dimension.size)
     const totalSizeIn = sizesIn.reduce((a, b) => a * b)
 
-    const rowLengths = denseArray.map(row => row.length)
+    const rowLengths = denseArray.map((row) => row.length)
     if (_.min(rowLengths) !== _.max(rowLengths)) {
       throw new Error(`Is not a rectangular array. Row sizes ${_.min(rowLengths)} to ${_.max(rowLengths)}.`)
     }
@@ -618,7 +620,7 @@ export default class Operator {
    * https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm
    */
   normSquared(): number {
-    return this.entries.map(entry => entry.value.abs2()).reduce((a, b) => a + b, 0)
+    return this.entries.map((entry) => entry.value.abs2()).reduce((a, b) => a + b, 0)
   }
 
   /**
@@ -680,9 +682,7 @@ export default class Operator {
    * @return Checks M^dag M ~= Id
    */
   isCloseToUnitary(eps = 1e-6): boolean {
-    return this.dag()
-      .mulOp(this)
-      .isCloseToIdentity(eps)
+    return this.dag().mulOp(this).isCloseToIdentity(eps)
   }
 
   /**
