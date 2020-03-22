@@ -127,7 +127,7 @@ export default class Dimension {
    */
   static concatDimNames(dims: Dimension[]): string {
     let names = ''
-    dims.forEach(dim => {
+    dims.forEach((dim) => {
       names += dim.coordString
     })
     return names
@@ -150,7 +150,7 @@ export default class Dimension {
       throw new Error('Dimensions array size mismatch...')
     }
     // Check for order
-    _.range(dims1.length).forEach(i => {
+    _.range(dims1.length).forEach((i) => {
       if (!dims1[i].isEqual(dims2[i])) {
         console.error(
           `Dimensions have the same number of components, but the component ${i} is\n${dims1[i]}\nvs\n${dims2[i]}.\n
@@ -173,6 +173,6 @@ export default class Dimension {
     if (dimensions.length !== s.length) {
       throw `dimensions.length (${dimensions.length}) !== string.length (${s.length})`
     }
-    return _.range(dimensions.length).map(i => dimensions[i].coordNameToIndex(s[i]))
+    return _.range(dimensions.length).map((i) => dimensions[i].coordNameToIndex(s[i]))
   }
 }

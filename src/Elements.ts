@@ -201,7 +201,7 @@ export function quarterWavePlateNS(angle: number): Operator {
  * @return Operator with real values and dimenson [direction].
  */
 export function incoherentLightOperator(opDirPol: Operator): Operator {
-  const opIntensity = opDirPol.mapValues(z => z.mul(z.conj()))
+  const opIntensity = opDirPol.mapValues((z) => z.mul(z.conj()))
   const polInputs = Vector.fromArray([Cx(0.5), Cx(0.5)], [Dimension.polarization()])
   const polOutpus = Vector.fromArray([Cx(1), Cx(1)], [Dimension.polarization()])
   return opIntensity.contractLeft([1], polOutpus).contractRight([1], polInputs)

@@ -28,7 +28,7 @@ export default class Basis {
           ` - incorrect for a basis for ${computationalDimension.toString()}`,
       )
     }
-    this.namedVectors = namedVectorValues.map(d => ({
+    this.namedVectors = namedVectorValues.map((d) => ({
       name: d.name,
       vector: Vector.fromArray(d.values, [computationalDimension]).normalize(),
     }))
@@ -42,7 +42,7 @@ export default class Basis {
   }
 
   get basisCoordNames(): string[] {
-    return this.namedVectors.map(d => d.name)
+    return this.namedVectors.map((d) => d.name)
   }
 
   /**
@@ -61,7 +61,7 @@ export default class Basis {
    */
   toString(): string {
     const intro = `Basis ${this.basisStr} for dimension ${this.computationalDimension.name}`
-    const listStr = this.namedVectors.map(d => `|${d.name}⟩ = ${d.vector.toKetString('cartesian')}`)
+    const listStr = this.namedVectors.map((d) => `|${d.name}⟩ = ${d.vector.toKetString('cartesian')}`)
     return `${intro}\n${listStr.join('\n')}`
   }
 
@@ -196,7 +196,7 @@ export default class Basis {
   }
 
   static basisChangeU(basisTo: Basis, basisFrom: Basis): Operator {
-    const entries = basisTo.namedVectors.flatMap(to =>
+    const entries = basisTo.namedVectors.flatMap((to) =>
       basisFrom.namedVectors.map((from): [string[], string[], Complex] => {
         return [[to.name], [from.name], to.vector.inner(from.vector)]
       }),
@@ -223,7 +223,7 @@ export default class Basis {
   }
 
   changeAllBasesUnitary(dimensions: Dimension[]): Operator {
-    const ops = dimensions.map(dimension => {
+    const ops = dimensions.map((dimension) => {
       if (dimension.name !== this.basisDimension.name) {
         return Operator.identity([dimension])
       } else {

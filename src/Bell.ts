@@ -75,10 +75,7 @@ function linearPol(alpha: number): Vector {
  * @param vec Vector to be measured
  */
 function measurementOne(alpha: number, vec: Vector): [number, number] {
-  const res = linearPol(alpha)
-    .conj()
-    .dot(vec)
-    .abs2()
+  const res = linearPol(alpha).conj().dot(vec).abs2()
   return [res, 1 - res]
 }
 
@@ -93,7 +90,7 @@ function perc(p: number): string {
 // testing
 const ourState = linearPol(45)
 const angles: number[] = [-45, 0, 45, 90, 135]
-angles.forEach(alpha => {
+angles.forEach((alpha) => {
   const [res, opRes] = measurementOne(alpha, ourState)
   console.log(`At ${alpha} the result was: ${perc(res)} vs ${perc(opRes)}`)
 })
