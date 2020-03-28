@@ -72,7 +72,7 @@ describe('IncoherentLight', () => {
     space.propagateBeam().interact(operations)
     expect(space.ketString()).toBe('0.50 |2,0,>⟩ + 0.50 |2,0,v⟩')
     space.propagateBeam().interact(operations)
-    expect(space.ketString()).toBe('0.50 |3,0,>⟩ + 0.50 |2,1,>⟩')
+    expect(space.ketString()).toBe('0.50 |2,1,>⟩ + 0.50 |3,0,>⟩')
     space.propagateBeam().interact(operations)
     expect(space.ketString()).toBe('0.50 |3,1,>⟩ + 0.50 |4,0,>⟩')
     space.propagateBeam().interact(operations)

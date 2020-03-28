@@ -134,7 +134,7 @@ describe('Sparse Complex Vector', () => {
       [Dimension.spin(), Dimension.polarization()],
     )
 
-    expect(vec.mapValues(z => z.mul(z.conj()))).vectorCloseTo(vecAbs2)
+    expect(vec.mapValues((z) => z.mul(z.conj()))).vectorCloseTo(vecAbs2)
   })
 
   it('should substract a vector from another one', () => {
@@ -310,6 +310,35 @@ describe('Sparse Complex Vector', () => {
       { i: 1, v: Cx(2, -2) },
       { i: 2, v: Cx(3, -3) },
     ])
+  })
+
+  it('ket components output', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['dH0', Cx(1)],
+        ['dV1', Cx(-1)],
+        ['dV2', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    ).toBasisAll('spin', 'spin-x')
+    const ketComponents = vector.toKetComponents()
+    expect(ketComponents.length).toBe(6)
+    expect(ketComponents[0].amplitude.re).toBeCloseTo(Math.SQRT1_2)
+    expect(ketComponents[0].coordStrs).toEqual(['ux', 'H', '0'])
+  })
+
+  it('ket components output - keeping order', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['dV1', Cx(-1)],
+        ['dH0', Cx(1)],
+        ['dV2', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    ).toBasisAll('spin', 'spin-x')
+    const ketComponents = vector.toKetComponents()
+    expect(ketComponents[0].amplitude.re).toBeCloseTo(Math.SQRT1_2)
+    expect(ketComponents[0].coordStrs).toEqual(['ux', 'H', '0'])
   })
 
   it('creates vector with a single entry', () => {

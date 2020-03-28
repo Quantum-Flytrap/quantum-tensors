@@ -68,3 +68,11 @@ export interface IXYOperator {
   y: number
   op: Operator
 }
+
+/**
+ * And interface for visualizing kets. Serializes as amplitudes, and an array of coord strings.
+ */
+export interface IKetComponent {
+  amplitude: Complex
+  coordStrs: string[]
+}
