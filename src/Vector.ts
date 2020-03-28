@@ -5,7 +5,7 @@ import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
 import Basis from './Basis'
-import { IColumnOrRow, IEntryIndexValue } from './interfaces'
+import { IColumnOrRow, IEntryIndexValue, IKetComponent } from './interfaces'
 
 /**
  * Vector class.
@@ -97,6 +97,13 @@ export default class Vector {
    */
   copy(): Vector {
     return _.cloneDeep(this)
+  }
+
+  /**
+   * Sort entires in-place (internal, important for diplay formats)
+   */
+  sortedEntries(): VectorEntry[] {
+    return this.entries.sort((a, b) => coordsToIndex(a.coord, this.size) - coordsToIndex(b.coord, this.size))
   }
 
   /**
@@ -321,7 +328,7 @@ export default class Vector {
    * (0.00 +2.00i) |u,H⟩ + (-1.00 -1.00i) |d,H⟩ + (0.50 +2.50i) |d,V⟩
    */
   toString(complexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
-    const valueStr = this.entries
+    const valueStr = this.sortedEntries()
       .map((entry) => {
         const coordStr = entry.coord.map((i: number, dim: number) => this.coordNames[dim][i])
         return `${entry.value.toString(complexFormat, precision)} |${coordStr}⟩`
@@ -366,10 +373,26 @@ export default class Vector {
    * @returns E.g. [{i: 2, v: Cx(2, 4)}, {i: 5, v: Cx(-1, 0)}, ...]
    */
   toIndexValues(): IEntryIndexValue[] {
-    return this.entries.map((entry) => ({
+    return this.sortedEntries().map((entry) => ({
       i: coordsToIndex(entry.coord, this.size),
       v: entry.value,
     }))
+  }
+
+  /**
+   * Exports a form suitable for visualization, with fixed basis.
+   * @param probThreshold Minimal probability to emit an entry.
+   * @returns An array of elements like {amplitude: Cx(0.1, -0.5), coordStrings: ['3', 'H', 'V' '>', 'u']}
+   */
+  toKetComponents(probThreshold = 1e-4): IKetComponent[] {
+    return this.sortedEntries()
+      .map(
+        (entry: VectorEntry): IKetComponent => ({
+          amplitude: entry.value,
+          coordStrs: entry.coord.map((c: number, dim: number) => this.coordNames[dim][c]),
+        }),
+      )
+      .filter((d) => d.amplitude.r ** 2 > probThreshold)
   }
 
   /**

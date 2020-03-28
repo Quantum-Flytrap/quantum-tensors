@@ -122,7 +122,7 @@ describe('Photons', () => {
     photons.propagatePhotons().actOnSinglePhotons(operations)
     expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.00 +0.71i) |2,0,v,H⟩')
     photons.propagatePhotons().actOnSinglePhotons(operations)
-    expect(photons.ketString()).toBe('(0.71 +0.00i) |3,0,>,H⟩ + (0.00 +0.71i) |2,1,>,H⟩')
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,1,>,H⟩ + (0.71 +0.00i) |3,0,>,H⟩')
     photons.propagatePhotons().actOnSinglePhotons(operations)
     expect(photons.ketString()).toBe('(0.71 +0.00i) |3,1,>,H⟩ + (0.71 +0.00i) |4,0,>,H⟩')
     photons.propagatePhotons().actOnSinglePhotons(operations)
@@ -158,7 +158,7 @@ describe('Photons', () => {
     expect(photons.ketString()).toBe('(0.71 +0.00i) |4,0,>,H⟩ + (0.71 +0.00i) |4,0,v,V⟩')
     photons.propagatePhotons()
     photons.actOnSinglePhotons(operations)
-    expect(photons.ketString()).toBe('(0.71 +0.00i) |5,0,>,H⟩ + (0.71 +0.00i) |4,1,<,V⟩')
+    expect(photons.ketString()).toBe('(0.71 +0.00i) |4,1,<,V⟩ + (0.71 +0.00i) |5,0,>,H⟩')
   })
 
   it('Hong-Ou-Mandel', () => {
@@ -182,7 +182,7 @@ describe('Photons', () => {
     photons.propagatePhotons().actOnSinglePhotons(operations)
     expect(photons.ketString()).toBe('(0.00 +0.71i) |2,2,>,H,2,2,>,H⟩ + (0.00 +0.71i) |2,2,v,H,2,2,v,H⟩')
     photons.propagatePhotons().actOnSinglePhotons(operations)
-    expect(photons.ketString()).toBe('(0.00 +0.71i) |3,2,>,H,3,2,>,H⟩ + (0.00 +0.71i) |2,3,v,H,2,3,v,H⟩')
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,3,v,H,2,3,v,H⟩ + (0.00 +0.71i) |3,2,>,H,3,2,>,H⟩')
   })
 
   it('attenuation', () => {
