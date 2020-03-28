@@ -5,7 +5,7 @@
   "main": "dist/quantum-tensors.js",
   "module": "dist/quantum-tensors.esm.js",
   "unpkg": "dist/quantum-tensors.min.js",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "README.md",
