@@ -370,10 +370,10 @@ export default class Operator {
    */
   permute(orderOut: number[], orderIn = orderOut): Operator {
     if (!isPermutation(orderOut, this.dimensionsOut.length)) {
-      throw new Error(`${orderOut} is not a valid permutation for ${this.dimensionsOut.length} dimensions.`)
+      throw new Error(`${orderOut} is not a valid permutation for ${this.dimensionsOut.length} output dimensions.`)
     }
-    if (!isPermutation(orderIn, this.dimensionsOut.length)) {
-      throw new Error(`${orderIn} is not a valid permutation for ${this.dimensionsIn.length} dimensions.`)
+    if (!isPermutation(orderIn, this.dimensionsIn.length)) {
+      throw new Error(`${orderIn} is not a valid permutation for ${this.dimensionsIn.length} input dimensions.`)
     }
     const dimensionsOut = _.at(this.dimensionsOut, orderOut)
     const dimensionsIn = _.at(this.dimensionsIn, orderIn)

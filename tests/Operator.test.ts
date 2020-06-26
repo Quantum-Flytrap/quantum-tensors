@@ -187,9 +187,9 @@ describe('Sparse Complex Operator', () => {
     expect(permuted.namesOut).toEqual(['polarization', 'x', 'qubit'])
     expect(permuted.namesIn).toEqual(['polarization', 'x', 'spin'])
     expect(permuted).operatorCloseToNumbers(opPerm.toDense())
-    expect(() => op.permute([0, 1, 2, 3])).toThrowError('0,1,2,3 is not a valid permutation for 3 dimensions.')
-    expect(() => op.permute([0, 0, 0])).toThrowError('0,0,0 is not a valid permutation for 3 dimensions.')
-    expect(() => op.permute([2, 0, 0])).toThrowError('2,0,0 is not a valid permutation for 3 dimensions.')
+    expect(() => op.permute([0, 1, 2, 3])).toThrowError('0,1,2,3 is not a valid permutation for 3 output dimensions.')
+    expect(() => op.permute([0, 0, 0])).toThrowError('0,0,0 is not a valid permutation for 3 output dimensions.')
+    expect(() => op.permute([2, 0, 0])).toThrowError('2,0,0 is not a valid permutation for 3 output dimensions.')
   })
 
   it('op-vec multiplication', () => {
