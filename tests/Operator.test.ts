@@ -187,9 +187,53 @@ describe('Sparse Complex Operator', () => {
     expect(permuted.namesOut).toEqual(['polarization', 'x', 'qubit'])
     expect(permuted.namesIn).toEqual(['polarization', 'x', 'spin'])
     expect(permuted).operatorCloseToNumbers(opPerm.toDense())
-    expect(() => op.permute([0, 1, 2, 3])).toThrowError('0,1,2,3 is not a valid permutation for 3 dimensions.')
-    expect(() => op.permute([0, 0, 0])).toThrowError('0,0,0 is not a valid permutation for 3 dimensions.')
-    expect(() => op.permute([2, 0, 0])).toThrowError('2,0,0 is not a valid permutation for 3 dimensions.')
+    expect(() => op.permute([0, 1, 2, 3])).toThrowError('0,1,2,3 is not a valid permutation for 3 output dimensions.')
+    expect(() => op.permute([0, 0, 0])).toThrowError('0,0,0 is not a valid permutation for 3 output dimensions.')
+    expect(() => op.permute([2, 0, 0])).toThrowError('2,0,0 is not a valid permutation for 3 output dimensions.')
+  })
+
+  it('permute an operator: in and out', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['0H', 'dH1', Cx(0, 2)],
+        ['1H', 'uH1', Cx(-1, -1)],
+        ['0V', 'uH2', Cx(0.5, 2.5)],
+      ],
+      [Dimension.qubit(), Dimension.polarization()],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    )
+
+    const opPermOut = Operator.fromSparseCoordNames(
+      [
+        ['H0', 'dH1', Cx(0, 2)],
+        ['H1', 'uH1', Cx(-1, -1)],
+        ['V0', 'uH2', Cx(0.5, 2.5)],
+      ],
+      [Dimension.polarization(), Dimension.qubit()],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    )
+
+    const opPermIn = Operator.fromSparseCoordNames(
+      [
+        ['0H', 'H1d', Cx(0, 2)],
+        ['1H', 'H1u', Cx(-1, -1)],
+        ['0V', 'H2u', Cx(0.5, 2.5)],
+      ],
+      [Dimension.qubit(), Dimension.polarization()],
+      [Dimension.polarization(), Dimension.position(3), Dimension.spin()],
+    )
+    const permutedOut = op.permuteDimsOut([1, 0])
+    expect(permutedOut.namesOut).toEqual(['polarization', 'qubit'])
+    expect(permutedOut.namesIn).toEqual(['spin', 'polarization', 'x']) // unchanged
+    expect(permutedOut).operatorCloseToNumbers(opPermOut.toDense())
+
+    const permutedIn = op.permuteDimsIn([1, 2, 0])
+    expect(permutedIn.namesOut).toEqual(['qubit', 'polarization']) // unchanged
+    expect(permutedIn.namesIn).toEqual(['polarization', 'x', 'spin'])
+    expect(permutedIn).operatorCloseToNumbers(opPermIn.toDense())
+
+    expect(() => op.permuteDimsOut([1, 2, 0])).toThrowError('1,2,0 is not a valid permutation for 2 output dimensions.')
+    expect(() => op.permuteDimsIn([1, 0])).toThrowError('1,0 is not a valid permutation for 3 input dimensions.')
   })
 
   it('op-vec multiplication', () => {

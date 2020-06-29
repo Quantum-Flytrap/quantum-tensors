@@ -364,16 +364,16 @@ export default class Operator {
   }
 
   /**
-   * Changing order of dimensions for a vector, from [0, 1, 2, ...] to something else.
+   * Changing order of dimensions for an operator, from [0, 1, 2, ...] to something else.
    * @param orderOut  E.g. [2, 0, 1]
-   * @param orderIn  E.g. [2, 0, 1]
+   * @param orderIn  E.g. [2, 0, 1] (be default, same as orderOut)
    */
   permute(orderOut: number[], orderIn = orderOut): Operator {
     if (!isPermutation(orderOut, this.dimensionsOut.length)) {
-      throw new Error(`${orderOut} is not a valid permutation for ${this.dimensionsOut.length} dimensions.`)
+      throw new Error(`${orderOut} is not a valid permutation for ${this.dimensionsOut.length} output dimensions.`)
     }
-    if (!isPermutation(orderIn, this.dimensionsOut.length)) {
-      throw new Error(`${orderIn} is not a valid permutation for ${this.dimensionsIn.length} dimensions.`)
+    if (!isPermutation(orderIn, this.dimensionsIn.length)) {
+      throw new Error(`${orderIn} is not a valid permutation for ${this.dimensionsIn.length} input dimensions.`)
     }
     const dimensionsOut = _.at(this.dimensionsOut, orderOut)
     const dimensionsIn = _.at(this.dimensionsIn, orderIn)
@@ -382,6 +382,38 @@ export default class Operator {
       (entry) => new OperatorEntry(_.at(entry.coordOut, orderOut), _.at(entry.coordIn, orderIn), entry.value),
     )
     return new Operator(entries, dimensionsOut, dimensionsIn)
+  }
+
+  /**
+   * Changing order of output dimensions for an operator, from [0, 1, 2, ...] to something else.
+   * @param orderOut  E.g. [2, 0, 1]
+   */
+  permuteDimsOut(orderOut: number[]): Operator {
+    if (!isPermutation(orderOut, this.dimensionsOut.length)) {
+      throw new Error(`${orderOut} is not a valid permutation for ${this.dimensionsOut.length} output dimensions.`)
+    }
+    const dimensionsOut = _.at(this.dimensionsOut, orderOut)
+
+    const entries = this.entries.map(
+      (entry) => new OperatorEntry(_.at(entry.coordOut, orderOut), entry.coordIn, entry.value),
+    )
+    return new Operator(entries, dimensionsOut, this.dimensionsIn)
+  }
+
+  /**
+   * Changing order of input dimensions for an operator, from [0, 1, 2, ...] to something else.
+   * @param orderIn  E.g. [2, 0, 1]
+   */
+  permuteDimsIn(orderIn: number[]): Operator {
+    if (!isPermutation(orderIn, this.dimensionsIn.length)) {
+      throw new Error(`${orderIn} is not a valid permutation for ${this.dimensionsIn.length} input dimensions.`)
+    }
+    const dimensionsIn = _.at(this.dimensionsIn, orderIn)
+
+    const entries = this.entries.map(
+      (entry) => new OperatorEntry(entry.coordOut, _.at(entry.coordIn, orderIn), entry.value),
+    )
+    return new Operator(entries, this.dimensionsOut, dimensionsIn)
   }
 
   /**

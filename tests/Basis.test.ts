@@ -18,7 +18,7 @@ describe('Basis', () => {
     expect(Basis.polarization('LR').toString()).toBe(
       'Basis LR for dimension polarization\n' +
         '|L⟩ = (0.71 +0.00i) |H⟩ + (0.00 +0.71i) |V⟩\n' +
-        '|R⟩ = (0.71 +0.00i) |H⟩ + (0.00 -0.71i) |V⟩',
+        '|R⟩ = (0.00 +0.71i) |H⟩ + (0.71 +0.00i) |V⟩',
     )
 
     expect(() => Basis.polarization('VH')).toThrowError('')
@@ -36,7 +36,7 @@ describe('Basis', () => {
     expect(Basis.spin('spin-y').toString()).toBe(
       'Basis uydy for dimension spin\n' +
         '|uy⟩ = (0.71 +0.00i) |u⟩ + (0.00 +0.71i) |d⟩\n' +
-        '|dy⟩ = (0.71 +0.00i) |u⟩ + (0.00 -0.71i) |d⟩',
+        '|dy⟩ = (0.00 +0.71i) |u⟩ + (0.71 +0.00i) |d⟩',
     )
 
     expect(() => Basis.spin('du')).toThrowError('')
@@ -138,8 +138,8 @@ describe('Basis', () => {
         ' + (0.00 -0.25i) |2,d,1,D,A⟩ + (0.00 -0.25i) |2,d,1,A,D⟩ + (0.00 -0.25i) |2,d,1,A,A⟩',
     )
     expect(spinY.changeAllDimsOfVector(vector).toKetString('cartesian')).toEqual(
-      '(0.35 +0.00i) |0,uy,0,H,H⟩ + (0.35 +0.00i) |0,uy,0,H,V⟩ + (0.35 +0.00i) |0,dy,0,H,H⟩' +
-        ' + (0.35 +0.00i) |0,dy,0,H,V⟩ + (0.71 +0.00i) |2,dy,1,V,V⟩',
+      '(0.35 +0.00i) |0,uy,0,H,H⟩ + (0.35 +0.00i) |0,uy,0,H,V⟩ + (0.00 -0.35i) |0,dy,0,H,H⟩' +
+        ' + (0.00 -0.35i) |0,dy,0,H,V⟩ + (0.00 -0.71i) |2,dy,1,V,V⟩',
     )
   })
 
@@ -156,6 +156,40 @@ describe('Basis', () => {
     expect(rotatorRotated.toString('polarTau', 2, ' + ', false)).toEqual(
       '1.00 exp(0.88τi) |^,L⟩⟨^,L| + 1.00 exp(0.13τi) |^,R⟩⟨^,R|' +
         ' + 1.00 exp(0.13τi) |v,L⟩⟨v,L| + 1.00 exp(0.88τi) |v,R⟩⟨v,R|',
+    )
+  })
+
+  it('photon: singlet state same all bases', () => {
+    const singlet = Vector.fromSparseCoordNames(
+      [
+        ['HV', Cx(Math.SQRT1_2)],
+        ['VH', Cx(-Math.SQRT1_2)],
+      ],
+      [Dimension.polarization(), Dimension.polarization()],
+    )
+
+    expect(singlet.toBasisAll('polarization', 'DA').toKetString('cartesian')).toEqual(
+      '(0.71 +0.00i) |D,A⟩ + (-0.71 +0.00i) |A,D⟩',
+    )
+    expect(singlet.toBasisAll('polarization', 'LR').toKetString('cartesian')).toEqual(
+      '(0.71 +0.00i) |L,R⟩ + (-0.71 +0.00i) |R,L⟩',
+    )
+  })
+
+  it('spin singlet state same all bases', () => {
+    const singlet = Vector.fromSparseCoordNames(
+      [
+        ['ud', Cx(Math.SQRT1_2)],
+        ['du', Cx(-Math.SQRT1_2)],
+      ],
+      [Dimension.spin(), Dimension.spin()],
+    )
+
+    expect(singlet.toBasisAll('spin', 'spin-y').toKetString('cartesian')).toEqual(
+      '(0.71 +0.00i) |uy,dy⟩ + (-0.71 +0.00i) |dy,uy⟩',
+    )
+    expect(singlet.toBasisAll('spin', 'spin-x').toKetString('cartesian')).toEqual(
+      '(0.71 +0.00i) |ux,dx⟩ + (-0.71 +0.00i) |dx,ux⟩',
     )
   })
 })
