@@ -278,8 +278,8 @@ describe('Sparse Complex Vector', () => {
         ' + (0.00 -0.25i) |2,d,1,D,A⟩ + (0.00 -0.25i) |2,d,1,A,D⟩ + (0.00 -0.25i) |2,d,1,A,A⟩',
     )
     expect(vector.toBasisAll('spin', 'spin-y').toKetString('cartesian')).toEqual(
-      '(0.35 +0.00i) |0,uy,0,H,H⟩ + (0.35 +0.00i) |0,uy,0,H,V⟩ + (0.35 +0.00i) |0,dy,0,H,H⟩' +
-        ' + (0.35 +0.00i) |0,dy,0,H,V⟩ + (0.71 +0.00i) |2,dy,1,V,V⟩',
+      '(0.35 +0.00i) |0,uy,0,H,H⟩ + (0.35 +0.00i) |0,uy,0,H,V⟩ + (0.00 -0.35i) |0,dy,0,H,H⟩' +
+        ' + (0.00 -0.35i) |0,dy,0,H,V⟩ + (0.00 -0.71i) |2,dy,1,V,V⟩',
     )
   })
 

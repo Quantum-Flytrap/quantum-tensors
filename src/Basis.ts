@@ -91,7 +91,7 @@ export default class Basis {
         return new Basis(
           [
             { name: 'L', values: [Cx(1), Cx(0, 1)] },
-            { name: 'R', values: [Cx(1), Cx(0, -1)] },
+            { name: 'R', values: [Cx(0, 1), Cx(1)] },
           ],
           Dimension.polarization(),
         )
@@ -168,7 +168,7 @@ export default class Basis {
         return new Basis(
           [
             { name: 'uy', values: [Cx(1), Cx(0, 1)] },
-            { name: 'dy', values: [Cx(1), Cx(0, -1)] },
+            { name: 'dy', values: [Cx(0, 1), Cx(1)] },
           ],
           Dimension.spin(),
         )
