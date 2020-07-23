@@ -76,3 +76,21 @@ export interface IKetComponent {
   amplitude: Complex
   coordStrs: string[]
 }
+
+/**
+ * Interface for localized operators
+ */
+export interface ILocalOperator {
+  x: number
+  y: number
+  operator: Operator
+}
+
+/**
+ * Interface for localized operators
+ */
+export interface ITileIntensity {
+  x: number
+  y: number
+  probability: number
+}
