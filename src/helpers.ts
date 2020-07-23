@@ -1,5 +1,64 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
+import { Cx, Complex } from './Complex'
+
+/**
+ * Convert direction in degrees to string representation
+ * @param direction angle in degrees
+ * @returns angle in str
+ */
+export function angleToStr(direction: number): string {
+  const angle = direction % 360
+  switch (angle) {
+    case 0:
+      return '>'
+    case 90:
+      return '^'
+    case 180:
+      return '<'
+    case 270:
+      return 'v'
+    default:
+      throw new Error(`Direction ${direction} % 360 is not in the allowed values (0, 90, 180, 270).`)
+  }
+}
+
+/**
+ * Convert direction string to angle in degrees
+ * @param directionStr ascii representation of the direction angle
+ * @returns angle in degrees
+ */
+export function strToAngle(direction: string): number {
+  switch (direction) {
+    case '>':
+      return 0
+    case '^':
+      return 90
+    case '<':
+      return 180
+    case 'v':
+      return 270
+    default:
+      throw new Error(`DirectionStr ${direction} is not in the allowed values (>, ^, <, v).`)
+  }
+}
+
+/**
+ * Convert polarization described as complex numbers to string
+ * @param cx1
+ * @param cx2
+ * @returns string describing polarization
+ * @todo input the correct complex values
+ */
+export function complexToStr(h: Complex, v: Complex): string {
+  if (h.equal(Cx(0, 1)) && v.equal(Cx(0, 1))) {
+    return 'H'
+  } else if (h.equal(Cx(0, 1)) && v.equal(Cx(0, 1))) {
+    return 'V'
+  } else {
+    throw new Error(`Polarization is is not in the allowed values.`)
+  }
+}
 
 /**
  * Turns an index into a multi-index, according to dimension sizes.

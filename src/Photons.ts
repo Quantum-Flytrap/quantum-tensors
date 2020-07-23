@@ -1,6 +1,7 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { IParticle } from './interfaces'
+import { IParticle, ILocalOperator, ITileIntensity, IPolarization } from './interfaces'
+import { angleToStr } from './helpers'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
@@ -12,16 +13,15 @@ import Complex, { Cx } from './Complex'
  * x, y, direction, polarization
  * @see {@link @Dimension.position}, {@link @Dimension.direction}, {@link @Dimension.polarization}
  * Designed so that it will work with https://github.com/stared/quantum-game-2 board.
- * @todo Think deeply about which things should change in-plance, and which: modify this object.
- * @todo A lot of things with interfaces to make them consistent.
+ * @todo Think deeply about which things should change in-place, and which things modify this object.
+ * @todo Should compute with numerical values and convert to string for display/debug instead
+ * of using H/V in computation which forbids non 90 values
  */
 export default class Photons {
-  readonly sizeX: number
-  readonly sizeY: number
-  vector: Vector
-  nPhotons: number
   readonly dimX: Dimension
   readonly dimY: Dimension
+  vector: Vector
+  nPhotons: number
 
   /**
    * Create a board for photons.
@@ -29,46 +29,37 @@ export default class Photons {
    * @param sizeY An integer, size y (height) of the board.
    */
   constructor(sizeX: number, sizeY: number) {
-    this.sizeX = sizeX
-    this.sizeY = sizeY
-    this.vector = new Vector([], [])
-    this.nPhotons = 0
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
+    this.vector = new Vector([], [])
+    this.nPhotons = 0
   }
 
   /**
    * @returns A deep copy of the same object.
    */
   copy(): Photons {
-    const newPhotons = new Photons(this.sizeX, this.sizeY)
+    const newPhotons = new Photons(this.dimX.size, this.dimY.size)
     newPhotons.vector = this.vector.copy()
     newPhotons.nPhotons = this.nPhotons
     return newPhotons
   }
 
   /**
-   * Normalize in-place
+   * @returns a normalized deep copy
    */
-  normalizeInplace(): void {
-    this.vector = this.vector.normalize()
-  }
-
-  /**
-   * Normalize a copy
-   */
-  normalize(): Photons {
+  normalizedCopy(): Photons {
     const newPhotons = this.copy()
-    this.normalizeInplace()
+    newPhotons.vector.normalize()
     return newPhotons
   }
 
   /**
-   * Dimension indices for particle i, for [posX, posY, dir, pol].
+   * Dimension indices for photon i, for [posX, posY, dir, pol].
    * @param i Photon id, from [0, ..., nPhotons - 1]
    * @returns E.g. for 1: [4, 5, 6, 7]
    */
-  vectorIndicesForParticle(i: number): number[] {
+  vectorIndicesForPhoton(i: number): number[] {
     return [4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3]
   }
 
@@ -77,7 +68,7 @@ export default class Photons {
    * @param i Photon id, from [0, ..., nPhotons - 1]
    * @returns E.g. for 1: [4, 5, 6]
    */
-  vectorPosDirIndicesForParticle(i: number): number[] {
+  vectorPosDirIndicesForPhoton(i: number): number[] {
     return [4 * i, 4 * i + 1, 4 * i + 2]
   }
 
@@ -86,22 +77,26 @@ export default class Photons {
    * @param i Photon id, from [0, ..., nPhotons - 1]
    * @returns E.g. for 1: [4, 5]
    */
-  vectorPosIndicesForParticle(i: number): number[] {
+  vectorPosIndicesForPhoton(i: number): number[] {
     return [4 * i, 4 * i + 1]
   }
 
   /**
    * Create a single photon vector.
+   * @param IPolarization inteface containing:
    * @param posX Position of the photon, x.
    * @param posY Position of the photon, y.
-   * @param dirDirection Direction from ['>', '^', '<', 'v].
-   * @param pol Polarization from ['H', 'V'].
+   * @param direction Direction in degrees converted to ['>', '^', '<', 'v].
+   * @param polarization Polarization in complex values converted to ['H', 'V'].
    *
    * @returns A vector [dimX, DimY, dir, pol], does not modify the object.
+   * @todo Create converter helper functions for direction and polarization allowing more values.
    */
-  createPhoton(posX: number, posY: number, dir: string, pol: string): Vector {
+  createPhoton(photon: IPolarization): Vector {
     const dimensions = [this.dimX, this.dimY, Dimension.direction(), Dimension.polarization()]
-    const state = [posX.toString(), posY.toString(), dir, pol]
+    const directionStr = angleToStr(photon.direction)
+    const polarizationStr = convertPolarizationToStr(photon.polarization)
+    const state = [photon.x.toString(), photon.y.toString(), directionStr, polarizationStr]
 
     return Vector.indicator(dimensions, state)
   }
@@ -111,23 +106,23 @@ export default class Photons {
    *
    * @remark
    *
+   * @param IPolarization inteface containing:
    * @param posX Position of the photon, x.
    * @param posY Position of the photon, y.
-   * @param dir Direction from ['>', '^', '<', 'v].
-   * @param pol Polarization from ['H', 'V'].
+   * @param direction Direction in degrees converted to ['>', '^', '<', 'v].
+   * @param polarization Polarization in complex values converted to ['H', 'V'].
    *
    * @returns Nothings, acts in-place.
-   * TODO: could use an interface
    */
-  addPhotonIndicator(posX: number, posY: number, dir: string, pol: string): void {
-    const newPhoton = this.createPhoton(posX, posY, dir, pol)
+  addPhotonIndicator(photon: IPolarization): void {
+    const newPhoton = this.createPhoton(photon)
     const oldPhotons = this.vector
     this.nPhotons += 1
     if (this.nPhotons === 1) {
       this.vector = newPhoton
     } else if (this.nPhotons === 2) {
       if (!newPhoton.dot(this.vector).isZero) {
-        throw `Adding photons not yet implemented for non-ortogonal states.` +
+        throw `Adding photons not yet implemented for non-orthogonal states.` +
           `Old photon:\n${this.vector}\nand new photon:\n${newPhoton}`
       }
       this.vector = Vector.add([oldPhotons.outer(newPhoton), newPhoton.outer(oldPhotons)]).mulConstant(Cx(Math.SQRT1_2))
@@ -138,51 +133,54 @@ export default class Photons {
 
   /**
    * Create a propagator, given this object dimX and dimY.
+   * Propagator "moves" photons.
    * @param yDirMeansDown For true, direction 'v' increments dimY.
+   * @todo is yDirMeansDown really necessary? It is only present in this file.
    *
    * @return An operator, with dimensions [dimX, dimY, {@link Dimension.direction()}].
    */
   createPhotonPropagator(yDirMeansDown = true): Operator {
     const dir = Dimension.direction()
-    const dimX = this.dimX
-    const dimY = this.dimY
     const s = yDirMeansDown ? 1 : -1
 
     return Operator.add([
-      Operator.outer([Operator.shift(dimX, +1), Operator.identity([dimY]), Operator.indicator([dir], ['>'])]),
-      Operator.outer([Operator.shift(dimX, -1), Operator.identity([dimY]), Operator.indicator([dir], ['<'])]),
-      Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, +s), Operator.indicator([dir], ['v'])]),
-      Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, -s), Operator.indicator([dir], ['^'])]),
+      Operator.outer([Operator.shift(this.dimX, +1), Operator.identity([this.dimY]), Operator.indicator([dir], ['>'])]),
+      Operator.outer([Operator.shift(this.dimX, -1), Operator.identity([this.dimY]), Operator.indicator([dir], ['<'])]),
+      Operator.outer([Operator.identity([this.dimX]), Operator.shift(this.dimY, +s), Operator.indicator([dir], ['v'])]),
+      Operator.outer([Operator.identity([this.dimX]), Operator.shift(this.dimY, -s), Operator.indicator([dir], ['^'])]),
     ])
   }
 
   /**
    * Propagate all particles, using {@link createPhotonPropagator}.
    * @param yDirMeansDown or true, direction 'v' increments dimY.
+   * @todo is yDirMeansDown really necessary? It is only present in this file.
    *
    * @returns Nothing, acts in-place.
    */
   propagatePhotons(yDirMeansDown = true): void {
     const photonPropagator = this.createPhotonPropagator(yDirMeansDown)
     _.range(this.nPhotons).forEach(i => {
-      this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
+      this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForPhoton(i), this.vector)
     })
   }
 
   /**
    * Create an operator for a particular place, projecting only on the particular position.
-   * @param op Operator, assumed to be with dimensions [pol, dir].
+   * @param ILocalOperator a local operator interface containing:
    * @param posX Position x.
    * @param posY Posiiton y.
+   * @param op Operator, assumed to be with dimensions [pol, dir].
    *
    * @returns An operator [dimX, dimY, pol, dir].
    */
-  createLocalizedOperator(op: Operator, posX: number, posY: number): Operator {
-    return Operator.outer([Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`]), op])
+  createLocalizedOperator(op: ILocalOperator): Operator {
+    return Operator.outer([Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`]), op.operator])
   }
 
   /**
    * Measure the absolute absorbtion on a given tile.
+   * @param ILocalOperator a local operator interface containing:
    * @param posX Position x.
    * @param posY Position y.
    * @param op Operator, assumed to be with dimensions [pol, dir].
@@ -190,11 +188,11 @@ export default class Photons {
    * @returns Probability lost at tile (x, y) after applying the operator.
    * Does not change the photon object.
    */
-  measureAbsorptionAtOperator(posX: number, posY: number, op: Operator, photonId = 0): number {
-    const localizedOperator = this.createLocalizedOperator(op, posX, posY)
-    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`])
-    const newVector = localizedOperator.mulVecPartial(this.vectorIndicesForParticle(photonId), this.vector)
-    const oldVector = localizedId.mulVecPartial(this.vectorPosIndicesForParticle(photonId), this.vector)
+  measureAbsorptionAtOperator(op: ILocalOperator, photonId = 0): number {
+    const localizedOperator = this.createLocalizedOperator(op)
+    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`])
+    const newVector = localizedOperator.mulVecPartial(this.vectorIndicesForPhoton(photonId), this.vector)
+    const oldVector = localizedId.mulVecPartial(this.vectorPosIndicesForPhoton(photonId), this.vector)
     return oldVector.normSquared() - newVector.normSquared()
   }
 
@@ -203,19 +201,20 @@ export default class Photons {
    * So far the basis is FIXED, so it won't give corrent results with operators absorbing in a basis
    * that does not commute with this basis.
    * Vide {@link measureAbsorptionAtOperator} as the structure is
+   * @param ILocalOperator a local operator interface containing:
    * @param posX
    * @param posY
    * @param op
    * @param photonId
    *
-   * @return Only measurement (zeros excluded). Conditional state is NOT normalized (to avoid issues with division by )
+   * @return Only measurement (zeros excluded). Conditional state is NOT normalized (to avoid issues with division by 0)
    * FIXME: No return type
    */
   /* eslint-disable-next-line */
-  vectorValuedMeasurement(posX: number, posY: number, op: Operator, photonId = 0): any {
+  vectorValuedMeasurement(op: ILocalOperator, photonId = 0): any {
     // as I see later, localizedOperator can be discarded as
     // we use localizedId anyway
-    const localizedOperator = this.createLocalizedOperator(op, posX, posY)
+    const localizedOperator = this.createLocalizedOperator(op)
     // for decomposition of identity
     // this step is dirty, as it won't work, say, for polarizer at non H/V angle
     const basis = ['>H', '>V', '^H', '^V', '<H', '<V', 'vH', 'vV']
@@ -224,10 +223,10 @@ export default class Photons {
 
     // for sho
     // just in case [...posInd] if I modify it elsewere (better safe than sorry)
-    const posInd = this.vectorPosIndicesForParticle(photonId)
+    const posInd = this.vectorPosIndicesForPhoton(photonId)
     const dirPolInd = [4 * photonId + 2, 4 * photonId + 3]
 
-    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`])
+    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`])
     // we already project on pos, so it is consistent!
     // it may be goo to gather it, though
 
@@ -238,13 +237,13 @@ export default class Photons {
         const projection = Operator.indicator([dimDir, dimPol], coordStr)
         const vectorProjected = projection.mulVecPartial(dirPolInd, oldVectorHere)
         const inputProjectedProbabability = vectorProjected.normSquared()
-        const allId = this.vectorIndicesForParticle(photonId)
+        const allId = this.vectorIndicesForPhoton(photonId)
         const outputProjectedProbability = localizedOperator.mulVecPartial([...allId], vectorProjected).normSquared()
         const p = inputProjectedProbabability - outputProjectedProbability
 
         const proj = Vector.indicator(
           [this.dimX, this.dimY, dimDir, dimPol],
-          [`${posX}`, `${posY}`, coordStr[0], coordStr[1]],
+          [`${op.x}`, `${op.y}`, coordStr[0], coordStr[1]],
         )
 
         const newPhotons = this.copy()
@@ -253,8 +252,8 @@ export default class Photons {
         newPhotons.vector = proj.innerPartial([...allId], this.vector)
         return {
           photonId: photonId,
-          x: posX,
-          y: posY,
+          x: op.x,
+          y: op.y,
           dirStr: coordStr[0],
           polStr: coordStr[1],
           inputProb: inputProjectedProbabability,
@@ -271,12 +270,11 @@ export default class Photons {
    * vide {@link Operator.mulVecPartial}.
    * @param opsWithPos A list of [x, y, operator with [dir, pol]].
    */
-  createSinglePhotonInteraction(opsWithPos: [number, number, Operator][]): Operator {
+  createSinglePhotonInteraction(ops: ILocalOperator[]): Operator {
     //
-    const localizedOpsShifted = opsWithPos.map((x: [number, number, Operator]) => {
-      const [posX, posY, op] = x
-      const shiftedOp = op.sub(Operator.identity([Dimension.direction(), Dimension.polarization()]))
-      return this.createLocalizedOperator(shiftedOp, posX, posY)
+    const localizedOpsShifted = ops.map(op => {
+      const shiftedOp = op.operator.sub(Operator.identity([Dimension.direction(), Dimension.polarization()]))
+      return this.createLocalizedOperator({ x: op.x, y: op.y, operator: shiftedOp })
     })
 
     return Operator.add([
@@ -293,10 +291,10 @@ export default class Photons {
    *
    * @returns Nothing, as acts in-place.
    */
-  actOnSinglePhotons(opsWithPos: [number, number, Operator][]): void {
-    const singlePhotonInteraction = this.createSinglePhotonInteraction(opsWithPos)
+  actOnSinglePhotons(ops: ILocalOperator[]): void {
+    const singlePhotonInteraction = this.createSinglePhotonInteraction(ops)
     _.range(this.nPhotons).forEach(i => {
-      this.vector = singlePhotonInteraction.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
+      this.vector = singlePhotonInteraction.mulVecPartial(this.vectorIndicesForPhoton(i), this.vector)
     })
   }
 
@@ -343,7 +341,7 @@ export default class Photons {
    * Shows probability of photons.
    * @todo Create probability for any number of photons.
    */
-  totalIntensityPerTile(): { x: number; y: number; probability: number }[] {
+  totalIntensityPerTile(): ITileIntensity[] {
     if (this.nPhotons !== 1) {
       throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
     }

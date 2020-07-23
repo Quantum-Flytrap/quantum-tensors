@@ -1,5 +1,6 @@
 import Complex from './Complex'
 import Vector from './Vector'
+import Operator from './Operator'
 
 /**
  * PARTICLE INTERFACE
@@ -57,4 +58,22 @@ export interface IEntryIndexIndexValue {
 export interface INamedVector {
   name: string
   vector: Vector
+}
+
+/**
+ * Interface for localized operators
+ */
+export interface ILocalOperator {
+  x: number
+  y: number
+  operator: Operator
+}
+
+/**
+ * Interface for localized operators
+ */
+export interface ITileIntensity {
+  x: number
+  y: number
+  probability: number
 }
