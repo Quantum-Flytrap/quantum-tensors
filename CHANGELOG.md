@@ -9,10 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* This CHANGELOG!
-* `Operator.permuteDimsOut` and ``Operator.permuteDimsIn` methods.
+- This CHANGELOG!
+- `Operator.permuteDimsOut` and ``Operator.permuteDimsIn` methods.
 
 ### Fixed
 
-* Fixed a problem with a dimension check on permuting non-square tensors.
-* Set phase for LR basis (for polarization) and y-spin basis (for spin) so that the singlet state phase stays the same
+- Fixed a problem with a dimension check on permuting non-square tensors.
+- Set phase for LR basis (for polarization) and y-spin basis (for spin) so that the singlet state phase stays the same
