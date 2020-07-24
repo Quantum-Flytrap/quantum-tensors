@@ -1,6 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { IParticle, IXYOperator } from './interfaces'
+import { IParticle, IXYOperator, ITileIntensity } from './interfaces'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
@@ -216,10 +216,10 @@ export default class Photons {
    *
    * @returns An operator [dimX, dimY, pol, dir].
    */
-  static localizeOperator(sizeX: number, sizeY: number, posX: number, posY: number, op: Operator): Operator {
+  static localizeOperator(sizeX: number, sizeY: number, op: IXYOperator): Operator {
     const dimX = Dimension.position(sizeX, 'x')
     const dimY = Dimension.position(sizeY, 'y')
-    return Operator.outer([Operator.indicator([dimX, dimY], [`${posX}`, `${posY}`]), op])
+    return Operator.outer([Operator.indicator([dimX, dimY], [`${op.x}`, `${op.y}`]), op.op])
   }
 
   /**
@@ -231,9 +231,9 @@ export default class Photons {
    * @returns Probability lost at tile (x, y) after applying the operator.
    * Does not change the photon object.
    */
-  measureAbsorptionAtOperator(posX: number, posY: number, op: Operator, photonId = 0): number {
-    const localizedOperator = Photons.localizeOperator(this.sizeX, this.sizeY, posX, posY, op)
-    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`])
+  measureAbsorptionAtOperator(op: IXYOperator, photonId = 0): number {
+    const localizedOperator = Photons.localizeOperator(this.dimX.size, this.dimY.size, op)
+    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`])
     const newVector = localizedOperator.mulVecPartial(this.vectorIndicesForParticle(photonId), this.vector)
     const oldVector = localizedId.mulVecPartial(this.vectorPosIndicesForParticle(photonId), this.vector)
     return oldVector.normSquared() - newVector.normSquared()
@@ -253,10 +253,10 @@ export default class Photons {
    * FIXME: No return type
    */
   /* eslint-disable-next-line */
-  vectorValuedMeasurement(posX: number, posY: number, op: Operator, photonId = 0): any {
+  vectorValuedMeasurement(op: IXYOperator, photonId = 0): any {
     // as I see later, localizedOperator can be discarded as
     // we use localizedId anyway
-    const localizedOperator = Photons.localizeOperator(this.sizeX, this.sizeY, posX, posY, op)
+    const localizedOperator = Photons.localizeOperator(this.sizeX, this.sizeY, op)
     // for decomposition of identity
     // this step is dirty, as it won't work, say, for polarizer at non H/V angle
     const basis = ['>H', '>V', '^H', '^V', '<H', '<V', 'vH', 'vV']
@@ -268,7 +268,7 @@ export default class Photons {
     const posInd = this.vectorPosIndicesForParticle(photonId)
     const dirPolInd = [4 * photonId + 2, 4 * photonId + 3]
 
-    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${posX}`, `${posY}`])
+    const localizedId = Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`])
     // we already project on pos, so it is consistent!
     // it may be goo to gather it, though
 
@@ -285,7 +285,7 @@ export default class Photons {
 
         const proj = Vector.indicator(
           [this.dimX, this.dimY, dimDir, dimPol],
-          [`${posX}`, `${posY}`, coordStr[0], coordStr[1]],
+          [`${op.x}`, `${op.y}`, coordStr[0], coordStr[1]],
         )
 
         const newPhotons = this.copy()
@@ -293,8 +293,8 @@ export default class Photons {
         newPhotons.vector = proj.innerPartial([...allId], this.vector)
         return {
           photonId: photonId,
-          x: posX,
-          y: posY,
+          x: op.x,
+          y: op.y,
           dirStr: coordStr[0],
           polStr: coordStr[1],
           inputProb: inputProjectedProbabability,
@@ -318,7 +318,7 @@ export default class Photons {
       const { x, y, op } = d
       const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
       const shiftedOp = op.sub(idDirPol)
-      return Photons.localizeOperator(sizeX, sizeY, x, y, shiftedOp)
+      return Photons.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
     })
 
     const dimX = Dimension.position(sizeX, 'x')
@@ -404,7 +404,7 @@ export default class Photons {
    * Shows probability of photons.
    * @todo Create probability for any number of photons.
    */
-  totalIntensityPerTile(): { x: number; y: number; probability: number }[] {
+  totalIntensityPerTile(): ITileIntensity[] {
     if (this.nPhotons !== 1) {
       throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
     }
