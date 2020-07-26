@@ -18,6 +18,8 @@ import Complex, { Cx } from './Complex'
  */
 export default class Photons {
   vector: Vector
+  operators: IXYOperator[]
+  globalOperator: Operator
   readonly dimX: Dimension
   readonly dimY: Dimension
 
@@ -28,8 +30,10 @@ export default class Photons {
    * @param sizeY An integer, size y (height) of the board.
    * @param vector Vector with [x1, y1, dir1, pol1, ..., xn, yn, dirn, poln].
    */
-  constructor(sizeX: number, sizeY: number, vector: Vector) {
+  constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[]) {
     this.vector = vector
+    this.operators = operators
+    this.globalOperator = Photons.singlePhotonInteraction(sizeX, sizeY, operators)
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
   }
@@ -41,7 +45,7 @@ export default class Photons {
    */
   static emptySpace(sizeX: number, sizeY: number): Photons {
     const vector = new Vector([], [])
-    return new Photons(sizeX, sizeY, vector)
+    return new Photons(sizeX, sizeY, vector, [])
   }
 
   /**
@@ -69,7 +73,7 @@ export default class Photons {
    * @returns A deep copy of the same object.
    */
   copy(): Photons {
-    return new Photons(this.sizeX, this.sizeY, this.vector.copy())
+    return new Photons(this.sizeX, this.sizeY, this.vector.copy(), this.operators)
   }
 
   /**
@@ -338,10 +342,10 @@ export default class Photons {
    *
    * @returns Itself, for chaining.
    */
-  actOnSinglePhotons(opsWithPos: IXYOperator[]): Photons {
-    const singlePhotonInteraction = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, opsWithPos)
+  actOnSinglePhotons(): Photons {
+    // const singlePhotonInteraction = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, opsWithPos)
     _.range(this.nPhotons).forEach((i) => {
-      this.vector = singlePhotonInteraction.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
+      this.vector = this.globalOperator.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
     })
     return this
   }
