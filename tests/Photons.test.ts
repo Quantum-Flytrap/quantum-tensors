@@ -50,15 +50,16 @@ describe('Photons', () => {
       { x: 1, y: 2, op: Elements.mirror(135) },
       { x: 1, y: 4, op: Elements.attenuator() },
     ]
+    photons.updateOperators(operations)
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(-1.00 +0.00i) |1,2,v,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(-1.00 +0.00i) |1,3,v,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(-0.71 +0.00i) |1,4,v,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.50 +0.00i) |1,5,v,H⟩ + (-0.50 +0.00i) |1,5,v,V⟩')
   })
 
@@ -78,23 +79,24 @@ describe('Photons', () => {
       { x: 5, y: 2, op: Elements.mirror(45) },
       { x: 3, y: 2, op: Elements.mirror(135) },
     ]
+    photons.updateOperators(operations)
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,1,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |2,1,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |3,1,>,H⟩ + (0.71 +0.00i) |3,1,>,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |4,1,>,H⟩ + (0.71 +0.00i) |4,1,>,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |5,1,v,H⟩ + (-0.71 +0.00i) |5,1,v,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |5,2,<,H⟩ + (0.71 +0.00i) |5,2,<,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |4,2,<,H⟩ + (0.71 +0.00i) |4,2,<,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |3,2,^,H⟩ + (-0.71 +0.00i) |3,2,^,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |3,1,^,H⟩')
   })
 
@@ -115,19 +117,20 @@ describe('Photons', () => {
       { x: 4, y: 1, op: Elements.vacuumJar() },
       { x: 5, y: 1, op: Elements.beamSplitter(135) },
     ]
+    photons.updateOperators(operations)
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.00 +0.71i) |2,0,v,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 +0.71i) |2,1,>,H⟩ + (0.71 +0.00i) |3,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |3,1,>,H⟩ + (0.71 +0.00i) |4,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 -0.71i) |4,1,>,H⟩ + (0.71 +0.00i) |5,0,v,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |5,1,v,H⟩')
   })
 
@@ -146,18 +149,19 @@ describe('Photons', () => {
       { x: 4, y: 1, op: Elements.polarizingBeamsplitter(0) },
       { x: 5, y: 0, op: Elements.polarizingBeamsplitter(0) },
     ]
+    photons.updateOperators(operations)
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
     photons.propagatePhotons()
     photons.propagatePhotons()
-    photons.actOnSinglePhotons(operations)
+    photons.actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.71 +0.00i) |2,0,>,V⟩')
     photons.propagatePhotons()
     photons.propagatePhotons()
-    photons.actOnSinglePhotons(operations)
+    photons.actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |4,0,>,H⟩ + (0.71 +0.00i) |4,0,v,V⟩')
     photons.propagatePhotons()
-    photons.actOnSinglePhotons(operations)
+    photons.actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |4,1,<,V⟩ + (0.71 +0.00i) |5,0,>,H⟩')
   })
 
@@ -175,13 +179,14 @@ describe('Photons', () => {
     expect(photons.nPhotons).toBe(2)
 
     const operations: IXYOperator[] = [{ x: 2, y: 2, op: Elements.beamSplitter(135) }]
+    photons.updateOperators(operations)
 
     expect(photons.ketString()).toBe('(0.71 +0.00i) |0,2,>,H,2,0,v,H⟩ + (0.71 +0.00i) |2,0,v,H,0,2,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |1,2,>,H,2,1,v,H⟩ + (0.71 +0.00i) |2,1,v,H,1,2,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 +0.71i) |2,2,>,H,2,2,>,H⟩ + (0.00 +0.71i) |2,2,v,H,2,2,v,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 +0.71i) |2,3,v,H,2,3,v,H⟩ + (0.00 +0.71i) |3,2,>,H,3,2,>,H⟩')
   })
 
@@ -200,14 +205,16 @@ describe('Photons', () => {
       { x: 4, y: 0, op: Elements.attenuator() },
       { x: 2, y: 2, op: Elements.attenuator() },
     ]
+    photons.updateOperators(operations)
+
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.00 +0.71i) |2,0,v,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 +0.71i) |2,1,v,H⟩ + (0.50 +0.00i) |3,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 +0.50i) |2,2,v,H⟩ + (0.35 +0.00i) |4,0,>,H⟩')
   })
 
@@ -226,20 +233,22 @@ describe('Photons', () => {
       { x: 4, y: 0, op: Elements.attenuator() },
       { x: 2, y: 2, op: Elements.attenuator() },
     ]
+    photons.updateOperators(operations)
+
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,0,>,H⟩')
-    photons.propagatePhotons().actOnSinglePhotons(operations)
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.00 +0.71i) |2,0,v,H⟩')
     photons.propagatePhotons()
     expect(photons.measureAbsorptionAtOperator({ x: 3, y: 0, op: Elements.attenuator() })).toBeCloseTo(0.25)
-    photons.actOnSinglePhotons(operations)
+    photons.actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 +0.71i) |2,1,v,H⟩ + (0.50 +0.00i) |3,0,>,H⟩')
     photons.propagatePhotons()
     expect(photons.measureAbsorptionAtOperator({ x: 3, y: 0, op: Elements.attenuator() })).toBeCloseTo(0)
     expect(photons.measureAbsorptionAtOperator({ x: 4, y: 0, op: Elements.attenuator() })).toBeCloseTo(0.125)
     expect(photons.measureAbsorptionAtOperator({ x: 2, y: 2, op: Elements.attenuator() })).toBeCloseTo(0.25)
-    photons.actOnSinglePhotons(operations)
+    photons.actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 +0.50i) |2,2,v,H⟩ + (0.35 +0.00i) |4,0,>,H⟩')
   })
 })
