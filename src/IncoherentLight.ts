@@ -172,7 +172,7 @@ export default class IncoherentLight {
       const { x, y, op } = d
       const idDirPol = Operator.identity([Dimension.direction()])
       const shiftedOp = op.sub(idDirPol)
-      return Photons.localizeOperator(sizeX, sizeY, x, y, shiftedOp)
+      return Photons.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
     })
 
     const dimX = Dimension.position(sizeX, 'x')
