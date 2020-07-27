@@ -30,12 +30,21 @@ export default class Photons {
    * @param sizeY An integer, size y (height) of the board.
    * @param vector Vector with [x1, y1, dir1, pol1, ..., xn, yn, dirn, poln].
    */
-  constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[]) {
+  constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[] = []) {
     this.vector = vector
     this.operators = operators
     this.globalOperator = Photons.singlePhotonInteraction(sizeX, sizeY, operators)
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
+  }
+
+  /**
+   * Add operators to photons and compute static board operator
+   * @param operators An array of board operators in IXYOperator format
+   */
+  updateOperators(operators: IXYOperator[]): void {
+    this.operators = operators
+    this.globalOperator = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, operators)
   }
 
   /**
@@ -71,6 +80,7 @@ export default class Photons {
 
   /**
    * @returns A deep copy of the same object.
+   * @todo Check that the globalOperator doesn't hammer performance.
    */
   copy(): Photons {
     return new Photons(this.sizeX, this.sizeY, this.vector.copy(), this.operators)
