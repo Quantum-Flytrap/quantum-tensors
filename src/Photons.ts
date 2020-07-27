@@ -29,6 +29,7 @@ export default class Photons {
    * @param sizeX An integer, size x (width) of the board.
    * @param sizeY An integer, size y (height) of the board.
    * @param vector Vector with [x1, y1, dir1, pol1, ..., xn, yn, dirn, poln].
+   * @param operators A list of IXYOperator derived from elements from the board.
    */
   constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[] = []) {
     this.vector = vector
@@ -39,8 +40,8 @@ export default class Photons {
   }
 
   /**
-   * Add operators to photons and compute static board operator
-   * @param operators An array of board operators in IXYOperator format
+   * Add operators to photons and compute static globalOperator
+   * @param operators An array of board operators in IXYOperator format.
    */
   updateOperators(operators: IXYOperator[]): void {
     this.operators = operators
@@ -345,15 +346,13 @@ export default class Photons {
   }
 
   /**
-   * Act on single photons with a given set of operations.
+   * Act on single photons with the precomputed globalOperator.
    * @remark Absorption for states with n>1 photons is broken.
    * - it tracks only a fixed-number of photons subspace.
-   * @param opsWithPos A list of [x, y, operator with [dir, pol]].
    *
    * @returns Itself, for chaining.
    */
   actOnSinglePhotons(): Photons {
-    // const singlePhotonInteraction = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, opsWithPos)
     _.range(this.nPhotons).forEach((i) => {
       this.vector = this.globalOperator.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
     })
