@@ -1,6 +1,7 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { IParticle, IXYOperator, ITileIntensity } from './interfaces'
+import { IParticle, IXYOperator, ITileIntensity, IAbsorption, IKetComponentFrame, IParticleCoord } from './interfaces'
+import VectorEntry from './VectorEntry'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
@@ -17,11 +18,18 @@ import Complex, { Cx } from './Complex'
  * @todo A lot of things with interfaces to make them consistent.
  */
 export default class Photons {
-  vector: Vector
-  operators: IXYOperator[]
-  globalOperator: Operator
   readonly dimX: Dimension
   readonly dimY: Dimension
+  operators: IXYOperator[]
+  vector: Vector
+  globalOperator: Operator
+  absorptions: IAbsorption[]
+
+  // things below right now mostly for debugging purposes
+  public probBefore: number
+  public probPropagated?: number
+  public probAfter?: number
+  public probThreshold = 1e-6
 
   /**
    * Create a board for photons.
@@ -37,6 +45,8 @@ export default class Photons {
     this.globalOperator = Photons.singlePhotonInteraction(sizeX, sizeY, operators)
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
+    this.probBefore = this.probability
+    this.absorptions = []
   }
 
   /**
@@ -447,5 +457,99 @@ export default class Photons {
    */
   ketString(complexFormat = 'cartesian', precision = 2): string {
     return this.vector.toString(complexFormat, precision, ' + ', false)
+  }
+
+  /**
+   * Alias of vector
+   * @remark Moved from QuantumFrame
+   */
+  get ket(): Vector {
+    return this.vector
+  }
+
+  /**
+   * @returns Frame vector norm squared
+   * @remark Moved from QuantumFrame
+   * State vector norm.
+   */
+  get probability(): number {
+    return this.vector.normSquared()
+  }
+
+  /**
+   * @remark from QuantumFrame
+   * @todo Role of function unclear, see with Piotr
+   */
+  get ketComponents(): IKetComponentFrame[] {
+    const ns = _.range(this.nPhotons)
+    return this.vector.entries
+      .map(
+        (entry: VectorEntry): IKetComponentFrame => {
+          const particleCoords = ns.map(
+            (i: number): IParticleCoord => {
+              const [x, y, dir, pol] = entry.coord.slice(4 * i, 4 * i + 4)
+              return { kind: 'photon', x, y, dir, pol }
+            },
+          )
+          return {
+            amplitude: entry.value,
+            particleCoords,
+          }
+        },
+      )
+      .filter((ketComponent: IKetComponentFrame): boolean => ketComponent.amplitude.r ** 2 > this.probThreshold)
+  }
+
+  /**
+   * @remark Moved from QuantumFrame
+   * should be same as this.probAfter
+   */
+  public get totalProbabilityLoss(): number {
+    return this.absorptions.map((absorption): number => absorption.probability).reduce((a, b): number => a + b, 0)
+  }
+
+  /**
+   * @remark from QuantumFrame, non interesting gluecode
+   * @note Coord and Particle will need a serious rewrite
+   */
+  public get polarizationSuperpositions(): IParticle[] {
+    return this.aggregatePolarization().filter(
+      (p: IParticle): boolean => Cx(p.are, p.aim).abs2() + Cx(p.bre, p.bim).abs2() > this.probThreshold,
+    )
+  }
+
+  /**
+   * @remark moved from QuantumFrame
+   * @param operatorList list of IXYOperator
+   */
+  public propagateAndInteract(operatorList: IXYOperator[]): void {
+    this.updateOperators(operatorList)
+    if (this.probPropagated !== undefined) {
+      throw new Error('You cannot propagateAndInteract more times with the same frame!')
+    }
+
+    this.propagatePhotons()
+    this.probPropagated = this.probability
+
+    this.absorptions = operatorList
+      .map(
+        (operator: IXYOperator): IAbsorption => {
+          return {
+            x: operator.x,
+            y: operator.y,
+            probability: this.measureAbsorptionAtOperator(operator),
+          }
+        },
+      )
+      .filter((d): boolean => d.probability > this.probThreshold)
+    if (this.probBefore - this.probPropagated > this.probThreshold) {
+      this.absorptions.push({
+        x: -1,
+        y: -1,
+        probability: this.probBefore - this.probPropagated,
+      })
+    }
+    this.actOnSinglePhotons()
+    this.probAfter = this.probability
   }
 }

@@ -85,3 +85,29 @@ export interface ITileIntensity {
   y: number
   probability: number
 }
+
+/**
+ * Interface used for goals and absorptions
+ */
+export interface IAbsorption {
+  x: number
+  y: number
+  probability: number
+}
+
+/**
+ * @todo Duplicate naming is confusing
+ */
+export interface IKetComponentFrame {
+  amplitude: Complex
+  particleCoords: IParticleCoord[]
+}
+
+// TODO: Should come as enum in a nicer format
+export interface IParticleCoord {
+  kind: string // for now only 'photon'
+  x: number
+  y: number
+  dir: number // 0: > 1: ^, 2: <. 3: v
+  pol: number // 0: H, 1: V
+}
