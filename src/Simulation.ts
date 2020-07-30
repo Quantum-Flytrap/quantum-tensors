@@ -42,18 +42,18 @@ export default class Simulation {
   }
 
   /**
-   * Initialize simulation from indicator
-   * Using the polarization defined in laser json from the grid interface
+   * Initialize simulation from laser
+   * First generate the indicator for the laser from the grid
+   * Then initialize with the indicator.
    * @param pol Override of the starting polarization
    */
   public initializeFromLaser(polOverride?: PolEnum): void {
     // Select initial laser
-    const lasers = this.grid.cells.filter((cell: ICell) => cell.element === 'laser')
+    const lasers = this.grid.cells.filter((cell: ICell) => cell.element === 'Laser')
     if (lasers.length !== 1) {
       throw new Error(`Cannot initialize QuantumSimulation. ${lasers.length} != 1 lasers.`)
     }
     // Override laser cell polarization if an optional argument is provided
-    // const laserIndicator = lasers[0].indicator
     const laserIndicator: IIndicator = {
       x: lasers[0].coord.x,
       y: lasers[0].coord.y,
@@ -63,16 +63,7 @@ export default class Simulation {
     if (polOverride) {
       laserIndicator.polarization = polOverride
     }
-    // Create initial frame
-    this.frames = []
-    const initFrame = new Frame(this.sizeX, this.sizeY, this.operators)
-    initFrame.addPhotonFromIndicator(
-      laserIndicator.x,
-      laserIndicator.y,
-      laserIndicator.direction,
-      laserIndicator.polarization,
-    )
-    this.frames.push(initFrame)
+    this.initializeFromIndicator(laserIndicator)
   }
 
   /**
@@ -120,7 +111,7 @@ export default class Simulation {
     if (this.frames.length === 0) {
       throw new Error(`Cannot do nextFrame when there are no frames. initializeFromLaser or something else.`)
     }
-    const frame = new Frame(this.lastFrame.sizeX, this.lastFrame.sizeY, this.lastFrame.operators)
+    const frame = new Frame(this.lastFrame.sizeX, this.lastFrame.sizeY, this.lastFrame.operators, this.lastFrame.vector)
     frame.propagateAndInteract()
     return frame
   }
