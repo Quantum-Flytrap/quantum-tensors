@@ -7,6 +7,14 @@ import Operator from './Operator'
 import Dimension from './Dimension'
 import { polStates } from './Ops'
 import Complex, { Cx } from './Complex'
+import {
+  localizeOperator,
+  singlePhotonInteraction,
+  vectorIndicesForParticle,
+  vectorPosDirIndicesForParticle,
+  // eslint-disable-next-line comma-dangle
+  vectorPosIndicesForParticle,
+} from './helpers'
 
 /**
  * Photons class.
@@ -39,10 +47,10 @@ export default class Frame {
    * @param vector Vector with [x1, y1, dir1, pol1, ..., xn, yn, dirn, poln].
    * @param operators A list of IXYOperator derived from elements from the board.
    */
-  constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[] = []) {
+  constructor(sizeX: number, sizeY: number, operators: IXYOperator[] = [], vector: Vector = new Vector([], [])) {
     this.vector = vector
     this.operators = operators
-    this.globalOperator = Frame.singlePhotonInteraction(sizeX, sizeY, operators)
+    this.globalOperator = singlePhotonInteraction(sizeX, sizeY, operators)
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
     this.probBefore = this.probability
@@ -55,7 +63,7 @@ export default class Frame {
    */
   updateOperators(operators: IXYOperator[]): void {
     this.operators = operators
-    this.globalOperator = Frame.singlePhotonInteraction(this.sizeX, this.sizeY, operators)
+    this.globalOperator = singlePhotonInteraction(this.sizeX, this.sizeY, operators)
   }
 
   /**
@@ -64,8 +72,7 @@ export default class Frame {
    * @param sizeY An integer, size y (height) of the board.
    */
   static emptySpace(sizeX: number, sizeY: number): Frame {
-    const vector = new Vector([], [])
-    return new Frame(sizeX, sizeY, vector, [])
+    return new Frame(sizeX, sizeY, [])
   }
 
   /**
@@ -94,7 +101,7 @@ export default class Frame {
    * @todo Check that the globalOperator doesn't hammer performance.
    */
   copy(): Frame {
-    return new Frame(this.sizeX, this.sizeY, this.vector.copy(), this.operators)
+    return new Frame(this.sizeX, this.sizeY, this.operators, this.vector.copy())
   }
 
   /**
@@ -104,36 +111,6 @@ export default class Frame {
   normalize(): Frame {
     this.vector = this.vector.normalize()
     return this
-  }
-
-  /**
-   * Dimension indices for particle i, for [posX, posY, dir, pol].
-   * @note For internal use.
-   * @param i Photon id, from [0, ..., nPhotons - 1]
-   * @returns E.g. for 1: [4, 5, 6, 7]
-   */
-  vectorIndicesForParticle(i: number): number[] {
-    return [4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3]
-  }
-
-  /**
-   * Dimension indices for particle i, for [posX, posY, dir].
-   * @note For internal use.
-   * @param i Photon id, from [0, ..., nPhotons - 1]
-   * @returns E.g. for 1: [4, 5, 6]
-   */
-  vectorPosDirIndicesForParticle(i: number): number[] {
-    return [4 * i, 4 * i + 1, 4 * i + 2]
-  }
-
-  /**
-   * Dimension indices for particle i, for [posX, posY].
-   * @note For internal use.
-   * @param i Photon id, from [0, ..., nPhotons - 1]
-   * @returns E.g. for 1: [4, 5]
-   */
-  vectorPosIndicesForParticle(i: number): number[] {
-    return [4 * i, 4 * i + 1]
   }
 
   /**
@@ -226,25 +203,9 @@ export default class Frame {
   propagatePhotons(yDirMeansDown = true): Frame {
     const photonPropagator = Frame.propagator(this.sizeX, this.sizeY, yDirMeansDown)
     _.range(this.nPhotons).forEach((i) => {
-      this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
+      this.vector = photonPropagator.mulVecPartial(vectorPosDirIndicesForParticle(i), this.vector)
     })
     return this
-  }
-
-  /**
-   * Create an operator for a particular place, projecting only on the particular position.
-   * @param sizeX Board size, x.
-   * @param sizeY Board size, y.
-   * @param posX Position x.
-   * @param posY Posiiton y.
-   * @param op Operator, assumed to be with dimensions [pol, dir].
-   *
-   * @returns An operator [dimX, dimY, pol, dir].
-   */
-  static localizeOperator(sizeX: number, sizeY: number, op: IXYOperator): Operator {
-    const dimX = Dimension.position(sizeX, 'x')
-    const dimY = Dimension.position(sizeY, 'y')
-    return Operator.outer([Operator.indicator([dimX, dimY], [`${op.x}`, `${op.y}`]), op.op])
   }
 
   /**
@@ -257,10 +218,10 @@ export default class Frame {
    * Does not change the photon object.
    */
   measureAbsorptionAtOperator(op: IXYOperator, photonId = 0): number {
-    const localizedOperator = Frame.localizeOperator(this.dimX.size, this.dimY.size, op)
+    const localizedOperator = localizeOperator(this.dimX.size, this.dimY.size, op)
     const localizedId = Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`])
-    const newVector = localizedOperator.mulVecPartial(this.vectorIndicesForParticle(photonId), this.vector)
-    const oldVector = localizedId.mulVecPartial(this.vectorPosIndicesForParticle(photonId), this.vector)
+    const newVector = localizedOperator.mulVecPartial(vectorIndicesForParticle(photonId), this.vector)
+    const oldVector = localizedId.mulVecPartial(vectorPosIndicesForParticle(photonId), this.vector)
     return oldVector.normSquared() - newVector.normSquared()
   }
 
@@ -281,7 +242,7 @@ export default class Frame {
   vectorValuedMeasurement(op: IXYOperator, photonId = 0): any {
     // as I see later, localizedOperator can be discarded as
     // we use localizedId anyway
-    const localizedOperator = Frame.localizeOperator(this.sizeX, this.sizeY, op)
+    const localizedOperator = localizeOperator(this.sizeX, this.sizeY, op)
     // for decomposition of identity
     // this step is dirty, as it won't work, say, for polarizer at non H/V angle
     const basis = ['>H', '>V', '^H', '^V', '<H', '<V', 'vH', 'vV']
@@ -290,7 +251,7 @@ export default class Frame {
 
     // for sho
     // just in case [...posInd] if I modify it elsewere (better safe than sorry)
-    const posInd = this.vectorPosIndicesForParticle(photonId)
+    const posInd = vectorPosIndicesForParticle(photonId)
     const dirPolInd = [4 * photonId + 2, 4 * photonId + 3]
 
     const localizedId = Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`])
@@ -304,7 +265,7 @@ export default class Frame {
         const projection = Operator.indicator([dimDir, dimPol], coordStr)
         const vectorProjected = projection.mulVecPartial(dirPolInd, oldVectorHere)
         const inputProjectedProbabability = vectorProjected.normSquared()
-        const allId = this.vectorIndicesForParticle(photonId)
+        const allId = vectorIndicesForParticle(photonId)
         const outputProjectedProbability = localizedOperator.mulVecPartial([...allId], vectorProjected).normSquared()
         const p = inputProjectedProbabability - outputProjectedProbability
 
@@ -331,31 +292,6 @@ export default class Frame {
   }
 
   /**
-   * Turn an list of operators in a complete one-photon iteraction operator for the board.
-   * @remark Some space for improvement with avoiding identity (direct sum structure),
-   * vide {@link Operator.mulVecPartial}.
-   * @param sizeX Board size, x.
-   * @param sizeY Board size, y.
-   * @param opsWithPos A list of [x, y, operator with [dir, pol]].
-   */
-  static singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
-    const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
-      const { x, y, op } = d
-      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
-      const shiftedOp = op.sub(idDirPol)
-      return Frame.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
-    })
-
-    const dimX = Dimension.position(sizeX, 'x')
-    const dimY = Dimension.position(sizeY, 'y')
-
-    return Operator.add([
-      Operator.identity([dimX, dimY, Dimension.direction(), Dimension.polarization()]),
-      ...localizedOpsShifted,
-    ])
-  }
-
-  /**
    * Act on single photons with the precomputed globalOperator.
    * @remark Absorption for states with n>1 photons is broken.
    * - it tracks only a fixed-number of photons subspace.
@@ -364,25 +300,10 @@ export default class Frame {
    */
   actOnSinglePhotons(): Frame {
     _.range(this.nPhotons).forEach((i) => {
-      this.vector = this.globalOperator.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
+      this.vector = this.globalOperator.mulVecPartial(vectorIndicesForParticle(i), this.vector)
     })
     return this
   }
-
-  // propagateAndInteract(opsWithPos: IXYOperator[]): void {
-  //   this.propagatePhotons()
-  //   const absorptions = opsWithPos
-  //     .map(({ x, y, op }): any => {
-  //       return {
-  //         x,
-  //         y,
-  //         probability: this.measureAbsorptionAtOperator(x, y, op),
-  //       }
-  //      }
-  //     )
-  //     .filter((d): boolean => d.probability > this.probThreshold)
-  //   this.actOnSinglePhotons(opsWithPos)
-  // }
 
   /**
    * Combine H and V polarization, to
@@ -519,11 +440,19 @@ export default class Frame {
   }
 
   /**
+   * @remark from QuantumFrame, non interesting gluecode
+   * @note Coord and Particle will need a serious rewrite
+   */
+  public get particles(): IParticle[] {
+    return this.polarizationSuperpositions
+  }
+
+  /**
    * @remark moved from QuantumFrame
    * @param operatorList list of IXYOperator
    */
-  public propagateAndInteract(operatorList: IXYOperator[]): void {
-    this.updateOperators(operatorList)
+  public propagateAndInteract(): void {
+    // this.updateOperators(operatorList)
     if (this.probPropagated !== undefined) {
       throw new Error('You cannot propagateAndInteract more times with the same frame!')
     }
@@ -531,7 +460,7 @@ export default class Frame {
     this.propagatePhotons()
     this.probPropagated = this.probability
 
-    this.absorptions = operatorList
+    this.absorptions = this.operators
       .map(
         (operator: IXYOperator): IAbsorption => {
           return {

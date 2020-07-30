@@ -152,6 +152,15 @@ export interface IIndicator {
 }
 
 /**
+ * Temporary interface for localized operators and grid informations
+ */
+export interface IOperatorGrid {
+  sizeX: number
+  sizeY: number
+  operators: IXYOperator[]
+}
+
+/**
  * Laser starting polarization enum
  */
 export const enum PolEnum {

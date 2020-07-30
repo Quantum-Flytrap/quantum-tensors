@@ -1,9 +1,10 @@
 import _ from 'lodash'
 import Vector from './Vector'
+import Operator from './Operator'
 import Frame from './Frame'
 import { generateOperators } from './Elements'
-import { weightedRandomInt, startingPolarization, startingDirection } from './helpers'
-import { IAbsorption, IGrid, PolEnum, ICell, IIndicator, IXYOperator } from './interfaces'
+import { weightedRandomInt, startingPolarization, startingDirection, singlePhotonInteraction } from './helpers'
+import { IAbsorption, IGrid, PolEnum, ICell, IIndicator, IXYOperator, IOperatorGrid, IParticle } from './interfaces'
 
 /**
  * QUANTUM SIMULATION CLASS
@@ -12,12 +13,32 @@ import { IAbsorption, IGrid, PolEnum, ICell, IIndicator, IXYOperator } from './i
 export default class Simulation {
   private grid: IGrid
   private operators: IXYOperator[]
+  private globalOperator: Operator
   public frames: Frame[]
 
   public constructor(grid: IGrid) {
     this.grid = grid
     this.operators = generateOperators(grid)
+    this.globalOperator = singlePhotonInteraction(grid.cols, grid.rows, this.operators)
     this.frames = []
+  }
+
+  /**
+   * Generate an operator grid with size information
+   */
+  public get opGrid(): IOperatorGrid {
+    return {
+      sizeX: this.grid.cols,
+      sizeY: this.grid.rows,
+      operators: this.operators,
+    }
+  }
+
+  public get sizeX(): number {
+    return this.grid.cols
+  }
+  public get sizeY(): number {
+    return this.grid.rows
   }
 
   /**
@@ -44,7 +65,7 @@ export default class Simulation {
     }
     // Create initial frame
     this.frames = []
-    const initFrame = new Frame(this.grid.cols, this.grid.rows)
+    const initFrame = new Frame(this.sizeX, this.sizeY, this.operators)
     initFrame.addPhotonFromIndicator(
       laserIndicator.x,
       laserIndicator.y,
@@ -60,7 +81,7 @@ export default class Simulation {
    */
   public initializeFromIndicator(indicator: IIndicator): void {
     this.frames = []
-    const frame = new Frame(this.grid.cols, this.grid.rows)
+    const frame = new Frame(this.sizeX, this.sizeY, this.operators)
     frame.addPhotonFromIndicator(indicator.x, indicator.y, indicator.direction, indicator.polarization)
     this.frames.push(frame)
   }
@@ -71,7 +92,7 @@ export default class Simulation {
    */
   intializeFromXYState(posX: number, posY: number, vecDirPol: Vector): void {
     this.frames = []
-    const frame = new Frame(this.grid.cols, this.grid.rows)
+    const frame = new Frame(this.sizeX, this.sizeY, this.operators)
 
     const posInd = Vector.indicator([frame.dimX, frame.dimY], [posX.toString(), posY.toString()])
     if (vecDirPol.dimensions[0].name === 'direction') {
@@ -99,8 +120,8 @@ export default class Simulation {
     if (this.frames.length === 0) {
       throw new Error(`Cannot do nextFrame when there are no frames. initializeFromLaser or something else.`)
     }
-    const frame = Frame.fromPhotons(this.lastFrame)
-    frame.photons.propagateAndInteract(this.grid.operatorList)
+    const frame = new Frame(this.lastFrame.sizeX, this.lastFrame.sizeY, this.lastFrame.operators)
+    frame.propagateAndInteract()
     return frame
   }
 
@@ -121,7 +142,7 @@ export default class Simulation {
       console.debug('POST-SIMULATION LOG:')
       console.debug('probabilityPerFrame', this.probabilityPerFrame)
       console.debug('totalAbsorptionPerFrame', this.totalAbsorptionPerFrame)
-      console.debug('totalAbsorptionPerTile', this.absorptions)
+      console.debug('totalAbsorptionPerTile', this.totalIAbsorptionPerTile)
       console.debug('An example of realization:')
       // const randomSample = this.sampleRandomRealization();
       // randomSample.statePerFrame.forEach((state) => console.debug(state.ketString()));
@@ -156,11 +177,12 @@ export default class Simulation {
   public get totalIAbsorptionPerTile(): IAbsorption[] {
     return _(this.frames)
       .flatMap((frame): IAbsorption[] => frame.absorptions)
-      .groupBy((absorption: IAbsorption): string => `(${absorption.coord.x}.${absorption.coord.y})`)
+      .groupBy((absorption: IAbsorption): string => `(${absorption.x}.${absorption.y})`)
       .values()
       .map(
         (absorptions): IAbsorption => ({
-          coord: absorptions[0].coord,
+          x: absorptions[0].x,
+          y: absorptions[0].y,
           probability: _.sumBy(absorptions, 'probability'),
         }),
       )
@@ -168,43 +190,11 @@ export default class Simulation {
   }
 
   /**
-   * Convert IAbsorption to Absorption class instances
-   * Filter the escaping particle absorption events
-   * @param IAbsorption[]
-   * @returns absorption instance list (cell, probability)
-   */
-  public get absorptions(): Absorption[] {
-    const absorptions: Absorption[] = []
-    this.totalIAbsorptionPerTile.forEach((absorptionI: IAbsorption): void => {
-      const coord = Coord.importCoord(absorptionI.coord)
-      if (!coord.outOfGrid) {
-        const cell = this.grid.get(coord)
-        cell.energized = true
-        absorptions.push(new Absorption(cell, absorptionI.probability))
-      }
-    })
-    return absorptions
-  }
-
-  /**
-   * Check for a detection event with its coordinates
-   * @param coord coord to check for detection
-   */
-  public isDetectionEvent(coord: Coord): boolean {
-    const coords = this.absorptions.map(
-      (absorption): Coord => {
-        return Coord.importCoord(absorption.cell.coord)
-      },
-    )
-    return _.includes(coords, coord)
-  }
-
-  /**
    * Retrieve a list of all the particles for quantum path computation
    * @returns particle list
    */
-  public get allParticles(): Particle[] {
-    const result: Particle[] = []
+  public get allParticles(): IParticle[] {
+    const result: IParticle[] = []
     this.frames.forEach((frame): void => {
       frame.particles.forEach((particle): void => {
         result.push(particle)
@@ -218,12 +208,14 @@ export default class Simulation {
    * @remark So far for 1 particle.
    * @todo Make it work for more particles.
    * @todo Maybe make it another object? Or use QuantumFrame?
+   * @todo Kinda ugly return
    */
   public sampleRandomRealization(): {
     statePerFrame: Frame[]
     probability: number
     step: number
-    coord: Coord
+    x: number
+    y: number
   } {
     // first, which frame
     const lastId = weightedRandomInt(this.totalAbsorptionPerFrame, false)
@@ -236,14 +228,12 @@ export default class Simulation {
     const absorption = lastFrameAbs[absorptionId]
     const states = this.frames.slice(0, lastId).map((frame): Frame => frame.normalize())
 
-    // TO FIX: should NOT use Coord object, just absorption.coord
-    const coord = Coord.importCoord(absorption.coord)
-
     return {
       statePerFrame: states,
       probability: absorption.probability,
       step: lastId,
-      coord: coord,
+      x: absorption.x,
+      y: absorption.y,
     }
   }
 }
