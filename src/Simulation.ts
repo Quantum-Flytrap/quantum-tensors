@@ -12,8 +12,8 @@ import { IAbsorption, IGrid, PolEnum, ICell, IIndicator, IXYOperator, IOperatorG
  */
 export default class Simulation {
   private grid: IGrid
-  private operators: IXYOperator[]
-  private globalOperator: Operator
+  public operators: IXYOperator[]
+  public globalOperator: Operator
   public frames: Frame[]
 
   public constructor(grid: IGrid) {
