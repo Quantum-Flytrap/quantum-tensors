@@ -1,6 +1,7 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { IParticle, IXYOperator, ITileIntensity } from './interfaces'
+import { IParticle, IXYOperator, ITileIntensity, IAbsorption, IKetComponentFrame, IParticleCoord } from './interfaces'
+import VectorEntry from './VectorEntry'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
@@ -16,12 +17,19 @@ import Complex, { Cx } from './Complex'
  * @todo Think deeply about which things should change in-plance, and which: modify this object.
  * @todo A lot of things with interfaces to make them consistent.
  */
-export default class Photons {
-  vector: Vector
-  operators: IXYOperator[]
-  globalOperator: Operator
+export default class Frame {
   readonly dimX: Dimension
   readonly dimY: Dimension
+  operators: IXYOperator[]
+  vector: Vector
+  globalOperator: Operator
+  absorptions: IAbsorption[]
+
+  // things below right now mostly for debugging purposes
+  public probBefore: number
+  public probPropagated?: number
+  public probAfter?: number
+  public probThreshold = 1e-6
 
   /**
    * Create a board for photons.
@@ -34,9 +42,11 @@ export default class Photons {
   constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[] = []) {
     this.vector = vector
     this.operators = operators
-    this.globalOperator = Photons.singlePhotonInteraction(sizeX, sizeY, operators)
+    this.globalOperator = Frame.singlePhotonInteraction(sizeX, sizeY, operators)
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
+    this.probBefore = this.probability
+    this.absorptions = []
   }
 
   /**
@@ -45,7 +55,7 @@ export default class Photons {
    */
   updateOperators(operators: IXYOperator[]): void {
     this.operators = operators
-    this.globalOperator = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, operators)
+    this.globalOperator = Frame.singlePhotonInteraction(this.sizeX, this.sizeY, operators)
   }
 
   /**
@@ -53,9 +63,9 @@ export default class Photons {
    * @param sizeX An integer, size x (width) of the board.
    * @param sizeY An integer, size y (height) of the board.
    */
-  static emptySpace(sizeX: number, sizeY: number): Photons {
+  static emptySpace(sizeX: number, sizeY: number): Frame {
     const vector = new Vector([], [])
-    return new Photons(sizeX, sizeY, vector, [])
+    return new Frame(sizeX, sizeY, vector, [])
   }
 
   /**
@@ -83,15 +93,15 @@ export default class Photons {
    * @returns A deep copy of the same object.
    * @todo Check that the globalOperator doesn't hammer performance.
    */
-  copy(): Photons {
-    return new Photons(this.sizeX, this.sizeY, this.vector.copy(), this.operators)
+  copy(): Frame {
+    return new Frame(this.sizeX, this.sizeY, this.vector.copy(), this.operators)
   }
 
   /**
    * Normalize
    * @returns Itself, for chaining.
    */
-  normalize(): Photons {
+  normalize(): Frame {
     this.vector = this.vector.normalize()
     return this
   }
@@ -166,8 +176,8 @@ export default class Photons {
    *
    * @returns Itself, for chaining.
    */
-  addPhotonFromIndicator(posX: number, posY: number, dir: string, pol: string): Photons {
-    const newPhoton = Photons.vectorFromIndicator(this.sizeX, this.sizeY, posX, posY, dir, pol)
+  addPhotonFromIndicator(posX: number, posY: number, dir: string, pol: string): Frame {
+    const newPhoton = Frame.vectorFromIndicator(this.sizeX, this.sizeY, posX, posY, dir, pol)
     const oldPhotons = this.vector
     if (this.nPhotons === 0) {
       this.vector = newPhoton
@@ -213,8 +223,8 @@ export default class Photons {
    *
    * @returns Itself, for chaining.
    */
-  propagatePhotons(yDirMeansDown = true): Photons {
-    const photonPropagator = Photons.propagator(this.sizeX, this.sizeY, yDirMeansDown)
+  propagatePhotons(yDirMeansDown = true): Frame {
+    const photonPropagator = Frame.propagator(this.sizeX, this.sizeY, yDirMeansDown)
     _.range(this.nPhotons).forEach((i) => {
       this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
     })
@@ -247,7 +257,7 @@ export default class Photons {
    * Does not change the photon object.
    */
   measureAbsorptionAtOperator(op: IXYOperator, photonId = 0): number {
-    const localizedOperator = Photons.localizeOperator(this.dimX.size, this.dimY.size, op)
+    const localizedOperator = Frame.localizeOperator(this.dimX.size, this.dimY.size, op)
     const localizedId = Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`])
     const newVector = localizedOperator.mulVecPartial(this.vectorIndicesForParticle(photonId), this.vector)
     const oldVector = localizedId.mulVecPartial(this.vectorPosIndicesForParticle(photonId), this.vector)
@@ -271,7 +281,7 @@ export default class Photons {
   vectorValuedMeasurement(op: IXYOperator, photonId = 0): any {
     // as I see later, localizedOperator can be discarded as
     // we use localizedId anyway
-    const localizedOperator = Photons.localizeOperator(this.sizeX, this.sizeY, op)
+    const localizedOperator = Frame.localizeOperator(this.sizeX, this.sizeY, op)
     // for decomposition of identity
     // this step is dirty, as it won't work, say, for polarizer at non H/V angle
     const basis = ['>H', '>V', '^H', '^V', '<H', '<V', 'vH', 'vV']
@@ -333,7 +343,7 @@ export default class Photons {
       const { x, y, op } = d
       const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
       const shiftedOp = op.sub(idDirPol)
-      return Photons.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
+      return Frame.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
     })
 
     const dimX = Dimension.position(sizeX, 'x')
@@ -352,7 +362,7 @@ export default class Photons {
    *
    * @returns Itself, for chaining.
    */
-  actOnSinglePhotons(): Photons {
+  actOnSinglePhotons(): Frame {
     _.range(this.nPhotons).forEach((i) => {
       this.vector = this.globalOperator.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
     })
@@ -447,5 +457,99 @@ export default class Photons {
    */
   ketString(complexFormat = 'cartesian', precision = 2): string {
     return this.vector.toString(complexFormat, precision, ' + ', false)
+  }
+
+  /**
+   * Alias of vector
+   * @remark Moved from QuantumFrame
+   */
+  get ket(): Vector {
+    return this.vector
+  }
+
+  /**
+   * @returns Frame vector norm squared
+   * @remark Moved from QuantumFrame
+   * State vector norm.
+   */
+  get probability(): number {
+    return this.vector.normSquared()
+  }
+
+  /**
+   * @remark from QuantumFrame
+   * @todo Role of function unclear, see with Piotr
+   */
+  get ketComponents(): IKetComponentFrame[] {
+    const ns = _.range(this.nPhotons)
+    return this.vector.entries
+      .map(
+        (entry: VectorEntry): IKetComponentFrame => {
+          const particleCoords = ns.map(
+            (i: number): IParticleCoord => {
+              const [x, y, dir, pol] = entry.coord.slice(4 * i, 4 * i + 4)
+              return { kind: 'photon', x, y, dir, pol }
+            },
+          )
+          return {
+            amplitude: entry.value,
+            particleCoords,
+          }
+        },
+      )
+      .filter((ketComponent: IKetComponentFrame): boolean => ketComponent.amplitude.r ** 2 > this.probThreshold)
+  }
+
+  /**
+   * @remark Moved from QuantumFrame
+   * should be same as this.probAfter
+   */
+  public get totalProbabilityLoss(): number {
+    return this.absorptions.map((absorption): number => absorption.probability).reduce((a, b): number => a + b, 0)
+  }
+
+  /**
+   * @remark from QuantumFrame, non interesting gluecode
+   * @note Coord and Particle will need a serious rewrite
+   */
+  public get polarizationSuperpositions(): IParticle[] {
+    return this.aggregatePolarization().filter(
+      (p: IParticle): boolean => Cx(p.are, p.aim).abs2() + Cx(p.bre, p.bim).abs2() > this.probThreshold,
+    )
+  }
+
+  /**
+   * @remark moved from QuantumFrame
+   * @param operatorList list of IXYOperator
+   */
+  public propagateAndInteract(operatorList: IXYOperator[]): void {
+    this.updateOperators(operatorList)
+    if (this.probPropagated !== undefined) {
+      throw new Error('You cannot propagateAndInteract more times with the same frame!')
+    }
+
+    this.propagatePhotons()
+    this.probPropagated = this.probability
+
+    this.absorptions = operatorList
+      .map(
+        (operator: IXYOperator): IAbsorption => {
+          return {
+            x: operator.x,
+            y: operator.y,
+            probability: this.measureAbsorptionAtOperator(operator),
+          }
+        },
+      )
+      .filter((d): boolean => d.probability > this.probThreshold)
+    if (this.probBefore - this.probPropagated > this.probThreshold) {
+      this.absorptions.push({
+        x: -1,
+        y: -1,
+        probability: this.probBefore - this.probPropagated,
+      })
+    }
+    this.actOnSinglePhotons()
+    this.probAfter = this.probability
   }
 }

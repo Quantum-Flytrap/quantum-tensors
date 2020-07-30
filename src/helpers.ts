@@ -1,5 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
+import { PolEnum, DirEnum } from './interfaces'
 
 /**
  * Turns an index into a multi-index, according to dimension sizes.
@@ -154,4 +155,63 @@ export function hslToHex(hParam: number, sParam: number, lParam: number): string
     return hex.length === 1 ? `0${hex}` : hex
   }
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+}
+
+/**
+ * Pick a random index of an array according to weights.
+ * @param weights An array of weights. By default they should sum up to 1.
+ * @param normalize If to normalize array.
+ * @returns A number [0, ..., weights.length -1].
+ */
+export function weightedRandomInt(weights: number[], normalize = true): number {
+  let r = Math.random()
+  if (normalize) {
+    r *= weights.reduce((a, b): number => a + b, 0)
+  }
+  let cumSum = 0
+  for (let i = 0; i < weights.length; i += 1) {
+    cumSum += weights[i]
+    if (cumSum > r) {
+      return i
+    }
+  }
+  return -1
+}
+
+/**
+ * Output an enum describing laser starting polarization
+ * @remark Moved from QG2
+ * @returns a string enum
+ */
+export function startingPolarization(polarization: number): PolEnum {
+  switch (polarization) {
+    case 0:
+    case 180:
+      return PolEnum.H
+    case 90:
+    case 270:
+      return PolEnum.V
+    default:
+      throw new Error(`Wrong starting polarization: ${polarization}`)
+  }
+}
+
+/**
+ * Output an enum describing laser starting polarization
+ * @remark Moved from QG2
+ * @returns a string enum
+ */
+export function startingDirection(rotation: number): DirEnum {
+  switch (rotation) {
+    case 0:
+      return DirEnum['>']
+    case 90:
+      return DirEnum['^']
+    case 180:
+      return DirEnum['<']
+    case 270:
+      return DirEnum.v
+    default:
+      throw new Error(`Wrong starting direction: ${rotation}`)
+  }
 }
