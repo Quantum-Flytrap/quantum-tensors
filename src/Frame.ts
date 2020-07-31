@@ -56,15 +56,6 @@ export default class Frame {
     this.absorptions = []
   }
 
-  // /**
-  //  * Create an empty board for photons, with a given size.
-  //  * @param sizeX An integer, size x (width) of the board.
-  //  * @param sizeY An integer, size y (height) of the board.
-  //  */
-  // static emptySpace(sizeX: number, sizeY: number): Frame {
-  //   return new Frame(sizeX, sizeY, [])
-  // }
-
   /**
    * Size x ('width') of the board.
    */

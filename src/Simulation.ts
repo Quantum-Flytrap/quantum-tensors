@@ -1,10 +1,9 @@
 import _ from 'lodash'
-import Vector from './Vector'
 import Operator from './Operator'
 import Frame from './Frame'
 import { generateOperators } from './Elements'
 import { weightedRandomInt, startingPolarization, startingDirection, singlePhotonInteraction } from './helpers'
-import { IAbsorption, IGrid, PolEnum, ICell, IIndicator, IXYOperator, IOperatorGrid, IParticle } from './interfaces'
+import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator, IOperatorGrid } from './interfaces'
 
 /**
  * QUANTUM SIMULATION CLASS
@@ -50,7 +49,7 @@ export default class Simulation {
    * Creates an operator grid with a precomputed globalOperator
    * @returns IOperatorGrid
    */
-  public get opGrid(): IOperatorGrid {
+  public get operatorGrid(): IOperatorGrid {
     return {
       sizeX: this.grid.cols,
       sizeY: this.grid.rows,
@@ -60,47 +59,21 @@ export default class Simulation {
   }
 
   /**
-   * Initialize simulation from laser
-   * First generate the indicator for the laser from the grid
-   * Then initialize with the indicator.
-   * @param pol Override of the starting polarization
+   * Generate the laser indicator from the grid laser cell
+   * @returns laserIndicator
    */
-  public initializeFromLaser(polOverride?: PolEnum): IIndicator {
-    // Select initial laser
+  public generateLaserIndicator(): IIndicator {
     const lasers = this.grid.cells.filter((cell: ICell) => cell.element === 'Laser')
     if (lasers.length !== 1) {
       throw new Error(`Cannot initialize QuantumSimulation. ${lasers.length} != 1 lasers.`)
     }
-    // Override laser cell polarization if an optional argument is provided
     const laserIndicator: IIndicator = {
       x: lasers[0].coord.x,
       y: lasers[0].coord.y,
       direction: startingDirection(lasers[0].rotation),
       polarization: startingPolarization(lasers[0].polarization),
     }
-    if (polOverride) {
-      laserIndicator.polarization = polOverride
-    }
-    this.initializeFromIndicator(laserIndicator)
     return laserIndicator
-  }
-
-  /**
-   * Initialize simulation from XY State
-   * @param indicator IIndicator
-   */
-  intializeFromXYState(posX: number, posY: number, vecDirPol: Vector): void {
-    this.frames = []
-    const frame = new Frame(this)
-
-    const posInd = Vector.indicator([frame.dimX, frame.dimY], [posX.toString(), posY.toString()])
-    if (vecDirPol.dimensions[0].name === 'direction') {
-      frame.vector = posInd.outer(vecDirPol).toBasisAll('polarization', 'HV')
-    } else {
-      frame.vector = posInd.outer(vecDirPol.permute([1, 0])).toBasisAll('polarization', 'HV')
-    }
-
-    this.frames.push(frame)
   }
 
   /**
@@ -180,7 +153,7 @@ export default class Simulation {
   /**
    * Total (summed over all frames) absorption per tile.
    * {x: -1, y: -1, probability: ...} means falling of the board.
-   * @todo If needed, I we can add exact (off-board) cooardinates of all lost photons.
+   * @todo If needed, I we can add exact (off-board) coordinates of all lost photons.
    * @returns E.g.
    * [{x: 2, y: 1, probability: 0.25}, {x: 3, y: 5, probability: 0.25}, {x: -1, y: -1, probability: 0.25}]
    */
@@ -230,6 +203,23 @@ export default class Simulation {
       step: lastId,
       x: absorption.x,
       y: absorption.y,
+    }
+  }
+
+  /**
+   * Find element with coordinates
+   * @params x
+   * @params y
+   * @returns element name
+   */
+  public elementNameFromCoord(x: number, y: number): string {
+    const result = this.grid.cells.filter((cell) => {
+      cell.coord.x === x && cell.coord.y === y
+    })
+    if (result.length === 1) {
+      return result[0].element
+    } else {
+      return 'Void'
     }
   }
 }
