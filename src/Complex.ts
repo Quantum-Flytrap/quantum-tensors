@@ -169,6 +169,14 @@ export default class Complex {
   }
 
   /**
+   * Check if a complex number is one
+   * @return z1 === 1
+   */
+  isOne(): boolean {
+    return this.re === 1 && this.im === 0
+  }
+
+  /**
    * Check if a complex number is zero
    * @param eps tolerance for the Euclidean norm
    * @return z1 ~= 0

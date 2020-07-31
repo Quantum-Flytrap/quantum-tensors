@@ -43,6 +43,14 @@ export default class OperatorEntry {
   }
 
   /**
+   * Overrides toString() method.
+   * @returms E.g. "Sparse operator entry [[3,0,1], [2,1,1]] has value (1.00 - 0.5 i)"
+   */
+  isOne(): boolean {
+    return this.value.isOne()
+  }
+
+  /**
    * Creates OperatorEntry from two integer indices, coordinate sizes and a value.
    * @param indexOut an integer for output index
    * @param indexIn  an integer for output index

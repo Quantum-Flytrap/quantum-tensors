@@ -47,7 +47,7 @@ export default class Simulation {
    * Then initialize with the indicator.
    * @param pol Override of the starting polarization
    */
-  public initializeFromLaser(polOverride?: PolEnum): void {
+  public initializeFromLaser(polOverride?: PolEnum): IIndicator {
     // Select initial laser
     const lasers = this.grid.cells.filter((cell: ICell) => cell.element === 'Laser')
     if (lasers.length !== 1) {
@@ -64,17 +64,7 @@ export default class Simulation {
       laserIndicator.polarization = polOverride
     }
     this.initializeFromIndicator(laserIndicator)
-  }
-
-  /**
-   * Initialize simulation from indicator
-   * @param indicator IIndicator
-   */
-  public initializeFromIndicator(indicator: IIndicator): void {
-    this.frames = []
-    const frame = new Frame(this.sizeX, this.sizeY, this.operators)
-    frame.addPhotonFromIndicator(indicator.x, indicator.y, indicator.direction, indicator.polarization)
-    this.frames.push(frame)
+    return laserIndicator
   }
 
   /**
@@ -92,6 +82,17 @@ export default class Simulation {
       frame.vector = posInd.outer(vecDirPol.permute([1, 0])).toBasisAll('polarization', 'HV')
     }
 
+    this.frames.push(frame)
+  }
+
+  /**
+   * Initialize simulation from indicator
+   * @param indicator IIndicator
+   */
+  public initializeFromIndicator(indicator: IIndicator): void {
+    this.frames = []
+    const frame = new Frame(this.sizeX, this.sizeY, this.operators)
+    frame.addPhotonFromIndicator(indicator.x, indicator.y, indicator.direction, indicator.polarization)
     this.frames.push(frame)
   }
 
@@ -121,7 +122,7 @@ export default class Simulation {
    * @param n default number of frames
    * @param stopThreshold stop if probability below threshold
    */
-  public computeFrames(n = 20, stopThreshold = 1e-6): void {
+  public generateFrames(n = 20, stopThreshold = 1e-6): void {
     const logging = false
     for (let i = 0; i < n; i += 1) {
       this.frames.push(this.nextFrame())

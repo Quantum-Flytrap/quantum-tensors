@@ -71,7 +71,7 @@ describe('Simulation', () => {
   it('should generate frames', () => {
     const sim = new Simulation(grid1)
     sim.initializeFromLaser()
-    sim.computeFrames()
-    expect(sim.frames).toHaveLength(11)
+    sim.generateFrames()
+    expect(sim.frames).toHaveLength(7)
   })
 })
