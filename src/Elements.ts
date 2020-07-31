@@ -215,7 +215,7 @@ export function incoherentLightOperator(opDirPol: Operator): Operator {
  */
 export function generateOperator(cell: ICell): IXYOperator {
   const x = cell.coord.x
-  const y = cell.coord.x
+  const y = cell.coord.y
   switch (cell.element) {
     case Elem.Absorber: {
       return {
