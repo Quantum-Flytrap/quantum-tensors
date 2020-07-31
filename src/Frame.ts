@@ -158,31 +158,29 @@ export default class Frame {
    * @param sizeX Board size, x.
    * @param sizeY Board size, y.
    * @param yDirMeansDown For true, direction 'v' increments dimY.
-   *
+   * @remarks lets stick with Y means down conveniton and remove clutter
    * @return An operator, with dimensions [dimX, dimY, {@link Dimension.direction()}].
    */
-  static propagator(sizeX: number, sizeY: number, yDirMeansDown = true): Operator {
+  static propagator(sizeX: number, sizeY: number): Operator {
     const dir = Dimension.direction()
     const dimX = Dimension.position(sizeX, 'x')
     const dimY = Dimension.position(sizeY, 'y')
-    const s = yDirMeansDown ? 1 : -1
 
     return Operator.add([
       Operator.outer([Operator.shift(dimX, +1), Operator.identity([dimY]), Operator.indicator([dir], ['>'])]),
       Operator.outer([Operator.shift(dimX, -1), Operator.identity([dimY]), Operator.indicator([dir], ['<'])]),
-      Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, +s), Operator.indicator([dir], ['v'])]),
-      Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, -s), Operator.indicator([dir], ['^'])]),
+      Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, +1), Operator.indicator([dir], ['v'])]),
+      Operator.outer([Operator.identity([dimX]), Operator.shift(dimY, -1), Operator.indicator([dir], ['^'])]),
     ])
   }
 
   /**
    * Propagate all particles, using {@link createPhotonPropagator}.
-   * @param yDirMeansDown or true, direction 'v' increments dimY.
-   *
+   * @remarks lets stick with Y means down conveniton and remove clutter
    * @returns Itself, for chaining.
    */
-  propagatePhotons(yDirMeansDown = true): Frame {
-    const photonPropagator = Frame.propagator(this.sizeX, this.sizeY, yDirMeansDown)
+  propagatePhotons(): Frame {
+    const photonPropagator = Frame.propagator(this.sizeX, this.sizeY)
     _.range(this.nPhotons).forEach((i) => {
       this.vector = photonPropagator.mulVecPartial(vectorPosDirIndicesForParticle(i), this.vector)
     })
