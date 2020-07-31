@@ -5,11 +5,12 @@ import VectorEntry from './VectorEntry'
 import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
+import Simulation from './Simulation'
 import { polStates } from './Ops'
 import Complex, { Cx } from './Complex'
 import {
   localizeOperator,
-  singlePhotonInteraction,
+  // singlePhotonInteraction,
   vectorIndicesForParticle,
   vectorPosDirIndicesForParticle,
   // eslint-disable-next-line comma-dangle
@@ -28,9 +29,8 @@ import {
 export default class Frame {
   readonly dimX: Dimension
   readonly dimY: Dimension
-  operators: IXYOperator[]
+  sim: Simulation
   vector: Vector
-  globalOperator: Operator
   absorptions: IAbsorption[]
 
   // things below right now mostly for debugging purposes
@@ -47,33 +47,23 @@ export default class Frame {
    * @param vector Vector with [x1, y1, dir1, pol1, ..., xn, yn, dirn, poln].
    * @param operators A list of IXYOperator derived from elements from the board.
    */
-  constructor(sizeX: number, sizeY: number, operators: IXYOperator[] = [], vector: Vector = new Vector([], [])) {
+  constructor(sim: Simulation, vector: Vector = new Vector([], [])) {
     this.vector = vector
-    this.operators = operators
-    this.globalOperator = singlePhotonInteraction(sizeX, sizeY, operators)
-    this.dimX = Dimension.position(sizeX, 'x')
-    this.dimY = Dimension.position(sizeY, 'y')
+    this.sim = sim
+    this.dimX = Dimension.position(sim.sizeX, 'x')
+    this.dimY = Dimension.position(sim.sizeY, 'y')
     this.probBefore = this.probability
     this.absorptions = []
   }
 
-  /**
-   * Add operators to photons and compute static globalOperator
-   * @param operators An array of board operators in IXYOperator format.
-   */
-  updateOperators(operators: IXYOperator[]): void {
-    this.operators = operators
-    this.globalOperator = singlePhotonInteraction(this.sizeX, this.sizeY, operators)
-  }
-
-  /**
-   * Create an empty board for photons, with a given size.
-   * @param sizeX An integer, size x (width) of the board.
-   * @param sizeY An integer, size y (height) of the board.
-   */
-  static emptySpace(sizeX: number, sizeY: number): Frame {
-    return new Frame(sizeX, sizeY, [])
-  }
+  // /**
+  //  * Create an empty board for photons, with a given size.
+  //  * @param sizeX An integer, size x (width) of the board.
+  //  * @param sizeY An integer, size y (height) of the board.
+  //  */
+  // static emptySpace(sizeX: number, sizeY: number): Frame {
+  //   return new Frame(sizeX, sizeY, [])
+  // }
 
   /**
    * Size x ('width') of the board.
@@ -101,7 +91,7 @@ export default class Frame {
    * @todo Check that the globalOperator doesn't hammer performance.
    */
   copy(): Frame {
-    return new Frame(this.sizeX, this.sizeY, this.operators, this.vector.copy())
+    return new Frame(this.sim, this.vector.copy())
   }
 
   /**
@@ -300,7 +290,7 @@ export default class Frame {
    */
   actOnSinglePhotons(): Frame {
     _.range(this.nPhotons).forEach((i) => {
-      this.vector = this.globalOperator.mulVecPartial(vectorIndicesForParticle(i), this.vector)
+      this.vector = this.sim.globalOperator.mulVecPartial(vectorIndicesForParticle(i), this.vector)
     })
     return this
   }
@@ -460,7 +450,7 @@ export default class Frame {
     this.propagatePhotons()
     this.probPropagated = this.probability
 
-    this.absorptions = this.operators
+    this.absorptions = this.sim.operators
       .map(
         (operator: IXYOperator): IAbsorption => {
           return {

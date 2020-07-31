@@ -24,21 +24,39 @@ export default class Simulation {
   }
 
   /**
-   * Generate an operator grid with size information
+   * Add operators to photons and compute static globalOperator
+   * @param operators An array of board operators in IXYOperator format.
+   */
+  updateOperators(operators: IXYOperator[]): void {
+    this.operators = operators
+    this.globalOperator = singlePhotonInteraction(this.sizeX, this.sizeY, operators)
+  }
+
+  /**
+   * @returns number of columns of grid
+   */
+  public get sizeX(): number {
+    return this.grid.cols
+  }
+
+  /**
+   * @returns number of rows of grid
+   */
+  public get sizeY(): number {
+    return this.grid.rows
+  }
+
+  /**
+   * Creates an operator grid with a precomputed globalOperator
+   * @returns IOperatorGrid
    */
   public get opGrid(): IOperatorGrid {
     return {
       sizeX: this.grid.cols,
       sizeY: this.grid.rows,
       operators: this.operators,
+      globalOperator: this.globalOperator,
     }
-  }
-
-  public get sizeX(): number {
-    return this.grid.cols
-  }
-  public get sizeY(): number {
-    return this.grid.rows
   }
 
   /**
@@ -73,7 +91,7 @@ export default class Simulation {
    */
   intializeFromXYState(posX: number, posY: number, vecDirPol: Vector): void {
     this.frames = []
-    const frame = new Frame(this.sizeX, this.sizeY, this.operators)
+    const frame = new Frame(this)
 
     const posInd = Vector.indicator([frame.dimX, frame.dimY], [posX.toString(), posY.toString()])
     if (vecDirPol.dimensions[0].name === 'direction') {
@@ -91,7 +109,7 @@ export default class Simulation {
    */
   public initializeFromIndicator(indicator: IIndicator): void {
     this.frames = []
-    const frame = new Frame(this.sizeX, this.sizeY, this.operators)
+    const frame = new Frame(this)
     frame.addPhotonFromIndicator(indicator.x, indicator.y, indicator.direction, indicator.polarization)
     this.frames.push(frame)
   }
@@ -112,7 +130,7 @@ export default class Simulation {
     if (this.frames.length === 0) {
       throw new Error(`Cannot do nextFrame when there are no frames. initializeFromLaser or something else.`)
     }
-    const frame = new Frame(this.lastFrame.sizeX, this.lastFrame.sizeY, this.lastFrame.operators, this.lastFrame.vector)
+    const frame = new Frame(this, this.lastFrame.vector)
     frame.propagateAndInteract()
     return frame
   }
@@ -134,7 +152,7 @@ export default class Simulation {
       console.debug('POST-SIMULATION LOG:')
       console.debug('probabilityPerFrame', this.probabilityPerFrame)
       console.debug('totalAbsorptionPerFrame', this.totalAbsorptionPerFrame)
-      console.debug('totalAbsorptionPerTile', this.totalIAbsorptionPerTile)
+      console.debug('totalAbsorptionPerTile', this.totalAbsorptionPerTile)
       console.debug('An example of realization:')
       // const randomSample = this.sampleRandomRealization();
       // randomSample.statePerFrame.forEach((state) => console.debug(state.ketString()));
@@ -166,7 +184,7 @@ export default class Simulation {
    * @returns E.g.
    * [{x: 2, y: 1, probability: 0.25}, {x: 3, y: 5, probability: 0.25}, {x: -1, y: -1, probability: 0.25}]
    */
-  public get totalIAbsorptionPerTile(): IAbsorption[] {
+  public get totalAbsorptionPerTile(): IAbsorption[] {
     return _(this.frames)
       .flatMap((frame): IAbsorption[] => frame.absorptions)
       .groupBy((absorption: IAbsorption): string => `(${absorption.x}.${absorption.y})`)
@@ -179,20 +197,6 @@ export default class Simulation {
         }),
       )
       .value()
-  }
-
-  /**
-   * Retrieve a list of all the particles for quantum path computation
-   * @returns particle list
-   */
-  public get allParticles(): IParticle[] {
-    const result: IParticle[] = []
-    this.frames.forEach((frame): void => {
-      frame.particles.forEach((particle): void => {
-        result.push(particle)
-      })
-    })
-    return result
   }
 
   /**

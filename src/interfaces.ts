@@ -158,6 +158,7 @@ export interface IOperatorGrid {
   sizeX: number
   sizeY: number
   operators: IXYOperator[]
+  globalOperator: Operator
 }
 
 /**
