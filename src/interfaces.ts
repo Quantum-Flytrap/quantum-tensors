@@ -125,19 +125,12 @@ export interface IGrid {
  * Cell interface in primitives
  */
 export interface ICell {
-  coord: ICoord
+  x: number
+  y: number
   element: string
   rotation: number
   polarization: number
-  percentage?: number
-}
-
-/**
- * Coordinates interface in primitives
- */
-export interface ICoord {
-  x: number
-  y: number
+  strength?: number
 }
 
 /**

@@ -10,7 +10,6 @@ import { polStates } from './Ops'
 import Complex, { Cx } from './Complex'
 import {
   localizeOperator,
-  // singlePhotonInteraction,
   vectorIndicesForParticle,
   vectorPosDirIndicesForParticle,
   // eslint-disable-next-line comma-dangle
@@ -18,13 +17,9 @@ import {
 } from './helpers'
 
 /**
- * Photons class.
- * A state of many photons, each with with dimensions:
- * x, y, direction, polarization
- * @see {@link @Dimension.position}, {@link @Dimension.direction}, {@link @Dimension.polarization}
- * Designed so that it will work with https://github.com/stared/quantum-game-2 board.
- * @todo Think deeply about which things should change in-plance, and which: modify this object.
- * @todo A lot of things with interfaces to make them consistent.
+ * Frame class
+ * @remarks Merge between Photons and QuantumFrame from QG2
+ * @todo Think about how to pass the operators in a better way
  */
 export default class Frame {
   readonly dimX: Dimension

@@ -43,8 +43,8 @@ export default class OperatorEntry {
   }
 
   /**
-   * Overrides toString() method.
-   * @returms E.g. "Sparse operator entry [[3,0,1], [2,1,1]] has value (1.00 - 0.5 i)"
+   * Check if the entry value is 1.
+   * @returms true if value is 1.
    */
   isOne(): boolean {
     return this.value.isOne()

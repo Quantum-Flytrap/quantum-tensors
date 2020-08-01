@@ -68,8 +68,8 @@ export default class Simulation {
       throw new Error(`Cannot initialize QuantumSimulation. ${lasers.length} != 1 lasers.`)
     }
     const laserIndicator: IIndicator = {
-      x: lasers[0].coord.x,
-      y: lasers[0].coord.y,
+      x: lasers[0].x,
+      y: lasers[0].y,
       direction: startingDirection(lasers[0].rotation),
       polarization: startingPolarization(lasers[0].polarization),
     }
@@ -214,7 +214,7 @@ export default class Simulation {
    */
   public elementNameFromCoord(x: number, y: number): string {
     const result = this.grid.cells.filter((cell) => {
-      cell.coord.x === x && cell.coord.y === y
+      cell.x === x && cell.y === y
     })
     if (result.length === 1) {
       return result[0].element
