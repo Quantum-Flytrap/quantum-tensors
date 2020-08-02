@@ -50,7 +50,7 @@ describe('Sparse Complex Operator', () => {
       [Dimension.polarization()],
     )
     expect(opX.toString()).toBe(
-      'Operator with 2 entires of max size [[2], [2]] with dimensions [[polarization], [polarization]]\n' +
+      'Operator with 2 entries of max size [[2], [2]] with dimensions [[polarization], [polarization]]\n' +
         '(1.00 +0.00i) |V⟩⟨H| + (1.00 +0.00i) |H⟩⟨V|\n',
     )
 
@@ -159,7 +159,7 @@ describe('Sparse Complex Operator', () => {
       [Dimension.spin(), Dimension.polarization()],
     )
 
-    expect(op.mapValues(z => z.mul(z.conj()))).operatorCloseToNumbers(opAbs2.toDense())
+    expect(op.mapValues((z) => z.mul(z.conj()))).operatorCloseToNumbers(opAbs2.toDense())
   })
 
   it('permute an operator', () => {
@@ -463,20 +463,15 @@ describe('Sparse Complex Operator', () => {
       [Dimension.polarization()],
     )
     expect(op.contractLeft([1], vec).toString()).toBe(
-      'Operator with 3 entires of max size [[2], [2,2]] with dimensions [[spin], [spin,polarization]]\n' +
+      'Operator with 3 entries of max size [[2], [2,2]] with dimensions [[spin], [spin,polarization]]\n' +
         '(0.00 +4.00i) |d⟩⟨d,H| + (-2.00 -2.00i) |d⟩⟨u,V| + (0.50 +2.50i) |d⟩⟨u,H|\n',
     )
     expect(op.contractRight([1], vec).toString()).toBe(
-      'Operator with 3 entires of max size [[2,2], [2]] with dimensions [[spin,polarization], [spin]]\n' +
+      'Operator with 3 entries of max size [[2,2], [2]] with dimensions [[spin,polarization], [spin]]\n' +
         '(-1.00 -1.00i) |d,H⟩⟨u| + (0.00 +4.00i) |d,H⟩⟨d| + (1.00 +5.00i) |d,V⟩⟨u|\n',
     )
-    expect(
-      op
-        .contractLeft([1], vec)
-        .contractRight([1], vec)
-        .toString(),
-    ).toBe(
-      'Operator with 2 entires of max size [[2], [2]] with dimensions [[spin], [spin]]\n' +
+    expect(op.contractLeft([1], vec).contractRight([1], vec).toString()).toBe(
+      'Operator with 2 entries of max size [[2], [2]] with dimensions [[spin], [spin]]\n' +
         '(-1.00 +3.00i) |d⟩⟨u| + (0.00 +8.00i) |d⟩⟨d|\n',
     )
   })

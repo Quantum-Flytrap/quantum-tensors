@@ -6,19 +6,15 @@ const grid1 = {
   rows: 10,
   cells: [
     {
-      coord: {
-        y: 2,
-        x: 3,
-      },
+      x: 3,
+      y: 2,
       element: 'Laser',
       rotation: 0,
       polarization: 0,
     },
     {
-      coord: {
-        y: 2,
-        x: 9,
-      },
+      x: 9,
+      y: 2,
       element: 'Detector',
       rotation: 180,
       polarization: 0,
@@ -36,7 +32,8 @@ describe('Simulation', () => {
 
   it('Creates an initial frame by firing the laz0rs', () => {
     const sim = new Simulation(grid1)
-    sim.initializeFromLaser()
+    const laserIndicator = sim.generateLaserIndicator()
+    sim.initializeFromIndicator(laserIndicator)
     expect(sim.frames).toHaveLength(1)
     expect(sim.frames[0].particles).toHaveLength(1)
     const photon = sim.frames[0].particles[0]
@@ -53,7 +50,8 @@ describe('Simulation', () => {
 
   it('should propagate the photon', () => {
     const sim = new Simulation(grid1)
-    sim.initializeFromLaser()
+    const laserIndicator = sim.generateLaserIndicator()
+    sim.initializeFromIndicator(laserIndicator)
     sim.frames.push(sim.nextFrame())
     expect(sim.lastFrame.particles).toHaveLength(1)
     const photon = sim.lastFrame.particles[0]
@@ -70,7 +68,8 @@ describe('Simulation', () => {
 
   it('should generate frames', () => {
     const sim = new Simulation(grid1)
-    sim.initializeFromLaser()
+    const laserIndicator = sim.generateLaserIndicator()
+    sim.initializeFromIndicator(laserIndicator)
     sim.generateFrames()
     expect(sim.frames).toHaveLength(7)
   })
