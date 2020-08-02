@@ -3,11 +3,13 @@ import Operator from './Operator'
 import Frame from './Frame'
 import { generateOperators } from './Elements'
 import { weightedRandomInt, startingPolarization, startingDirection, singlePhotonInteraction } from './helpers'
-import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator, IOperatorGrid } from './interfaces'
+import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator } from './interfaces'
 
 /**
- * QUANTUM SIMULATION CLASS
- * Contains the frames of the simulation
+ * SIMULATION CLASS
+ * Loads a grid
+ * Convert its elements into operators and merge them into a global operator.
+ * Generate simulation frames and absorptions.
  */
 export default class Simulation {
   private grid: IGrid
@@ -23,15 +25,6 @@ export default class Simulation {
   }
 
   /**
-   * Add operators to photons and compute static globalOperator
-   * @param operators An array of board operators in IXYOperator format.
-   */
-  updateOperators(operators: IXYOperator[]): void {
-    this.operators = operators
-    this.globalOperator = singlePhotonInteraction(this.sizeX, this.sizeY, operators)
-  }
-
-  /**
    * @returns number of columns of grid
    */
   public get sizeX(): number {
@@ -43,19 +36,6 @@ export default class Simulation {
    */
   public get sizeY(): number {
     return this.grid.rows
-  }
-
-  /**
-   * Creates an operator grid with a precomputed globalOperator
-   * @returns IOperatorGrid
-   */
-  public get operatorGrid(): IOperatorGrid {
-    return {
-      sizeX: this.grid.cols,
-      sizeY: this.grid.rows,
-      operators: this.operators,
-      globalOperator: this.globalOperator,
-    }
   }
 
   /**
@@ -89,7 +69,7 @@ export default class Simulation {
 
   /**
    * Get last simulation frame
-   * @returns last QuantumFrame
+   * @returns last frame
    */
   public get lastFrame(): Frame {
     return this.frames[this.frames.length - 1]
@@ -97,7 +77,7 @@ export default class Simulation {
 
   /**
    * Compute the next simulation frame
-   * @returns QuantumFrame
+   * @returns computed frame
    */
   public nextFrame(): Frame {
     if (this.frames.length === 0) {
@@ -112,11 +92,12 @@ export default class Simulation {
    * Compute next frames until probability threshold
    * @param n default number of frames
    * @param stopThreshold stop if probability below threshold
+   * @param logging toggle console debug
    */
-  public generateFrames(n = 20, stopThreshold = 1e-6): void {
-    const logging = false
+  public generateFrames(n = 20, stopThreshold = 1e-6, logging = false): void {
     for (let i = 0; i < n; i += 1) {
-      this.frames.push(this.nextFrame())
+      const nextFrame = this.nextFrame()
+      this.frames.push(nextFrame)
       if (this.lastFrame.probability < stopThreshold) {
         break
       }
@@ -203,23 +184,6 @@ export default class Simulation {
       step: lastId,
       x: absorption.x,
       y: absorption.y,
-    }
-  }
-
-  /**
-   * Find element with coordinates
-   * @params x
-   * @params y
-   * @returns element name
-   */
-  public elementNameFromCoord(x: number, y: number): string {
-    const result = this.grid.cells.filter((cell) => {
-      cell.x === x && cell.y === y
-    })
-    if (result.length === 1) {
-      return result[0].element
-    } else {
-      return 'Void'
     }
   }
 }

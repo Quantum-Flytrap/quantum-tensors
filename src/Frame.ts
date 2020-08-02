@@ -28,7 +28,7 @@ export default class Frame {
   vector: Vector
   absorptions: IAbsorption[]
 
-  // things below right now mostly for debugging purposes
+  // probabilities below are mostly for debugging purposes
   public probBefore: number
   public probPropagated?: number
   public probAfter?: number
