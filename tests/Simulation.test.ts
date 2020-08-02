@@ -11,6 +11,7 @@ const grid1 = {
       element: 'Laser',
       rotation: 0,
       polarization: 0,
+      strength: 0,
     },
     {
       x: 9,
@@ -18,6 +19,7 @@ const grid1 = {
       element: 'Detector',
       rotation: 180,
       polarization: 0,
+      strength: 0,
     },
   ],
 }
