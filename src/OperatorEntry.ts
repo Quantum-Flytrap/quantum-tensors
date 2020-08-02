@@ -43,14 +43,6 @@ export default class OperatorEntry {
   }
 
   /**
-   * Check if the entry value is 1.
-   * @returms true if value is 1.
-   */
-  isOne(): boolean {
-    return this.value.isOne()
-  }
-
-  /**
    * Creates OperatorEntry from two integer indices, coordinate sizes and a value.
    * @param indexOut an integer for output index
    * @param indexIn  an integer for output index
