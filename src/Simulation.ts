@@ -166,6 +166,7 @@ export default class Simulation {
     step: number
     x: number
     y: number
+    // eslint-disable-next-line indent
   } {
     // first, which frame
     const lastId = weightedRandomInt(this.totalAbsorptionPerFrame, false)
