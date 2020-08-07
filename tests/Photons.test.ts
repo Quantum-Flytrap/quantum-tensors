@@ -100,7 +100,7 @@ describe('Photons', () => {
     expect(photons.ketString()).toBe('(1.00 +0.00i) |3,1,^,H⟩')
   })
 
-  it('interferference', () => {
+  it('interference', () => {
     // Sugar solutions and mirrors
     // Let's start horizontal
     // >.\..\.
@@ -250,5 +250,46 @@ describe('Photons', () => {
     expect(photons.measureAbsorptionAtOperator({ x: 2, y: 2, op: Elements.attenuator() })).toBeCloseTo(0.25)
     photons.actOnSinglePhotons()
     expect(photons.ketString()).toBe('(0.00 +0.50i) |2,2,v,H⟩ + (0.35 +0.00i) |4,0,>,H⟩')
+  })
+
+  it('performance propagation: size 100x100', () => {
+    const photons = Photons.emptySpace(100, 100)
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
+
+    const t0 = performance.now()
+    photons.propagatePhotons()
+    const dt = performance.now() - t0
+
+    expect(dt).toBeLessThanOrEqual(5000) // ms (741ms on i7-9750H CPU)
+  })
+
+  it('performance propagation: size 20x20', () => {
+    const photons = Photons.emptySpace(20, 20)
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
+
+    const t0 = performance.now()
+    photons.propagatePhotons()
+    const dt = performance.now() - t0
+
+    expect(dt).toBeLessThanOrEqual(500) // ms (22-34ms on i7-9750H CPU)
+  })
+
+  it('performance operation: size 20x20', () => {
+    const photons = Photons.emptySpace(20, 20)
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
+    const operations: IXYOperator[] = [
+      { x: 2, y: 0, op: Elements.beamSplitter(135) },
+      { x: 5, y: 0, op: Elements.mirror(135) },
+      { x: 2, y: 1, op: Elements.mirror(135) },
+      { x: 3, y: 1, op: Elements.vacuumJar() },
+      { x: 4, y: 1, op: Elements.vacuumJar() },
+      { x: 5, y: 1, op: Elements.beamSplitter(135) },
+    ]
+
+    const t0 = performance.now()
+    photons.actOnSinglePhotons(operations)
+    const dt = performance.now() - t0
+
+    expect(dt).toBeLessThanOrEqual(500) // ms (80ms on i7-9750H CPU)
   })
 })
