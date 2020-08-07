@@ -185,7 +185,7 @@ export default class Frame {
    * Does not change the photon object.
    */
   measureAbsorptionAtOperator(op: IXYOperator, photonId = 0): number {
-    const localizedOperator = this.localizeOperator(this.dimX.size, this.dimY.size, op)
+    const localizedOperator = Frame.localizeOperator(this.dimX.size, this.dimY.size, op)
     const localizedId = Operator.indicator([this.dimX, this.dimY], [`${op.x}`, `${op.y}`])
     const newVector = localizedOperator.mulVecPartial(this.vectorIndicesForParticle(photonId), this.vector)
     const oldVector = localizedId.mulVecPartial(this.vectorPosIndicesForParticle(photonId), this.vector)
@@ -209,7 +209,7 @@ export default class Frame {
   vectorValuedMeasurement(op: IXYOperator, photonId = 0): any {
     // as I see later, localizedOperator can be discarded as
     // we use localizedId anyway
-    const localizedOperator = this.localizeOperator(this.sizeX, this.sizeY, op)
+    const localizedOperator = Frame.localizeOperator(this.sizeX, this.sizeY, op)
     // for decomposition of identity
     // this step is dirty, as it won't work, say, for polarizer at non H/V angle
     const basis = ['>H', '>V', '^H', '^V', '<H', '<V', 'vH', 'vV']
@@ -489,7 +489,7 @@ export default class Frame {
    *
    * @returns An operator [dimX, dimY, pol, dir].
    */
-  localizeOperator(sizeX: number, sizeY: number, op: IXYOperator): Operator {
+  static localizeOperator(sizeX: number, sizeY: number, op: IXYOperator): Operator {
     const dimX = Dimension.position(sizeX, 'x')
     const dimY = Dimension.position(sizeY, 'y')
     return Operator.outer([Operator.indicator([dimX, dimY], [`${op.x}`, `${op.y}`]), op.op])
@@ -503,7 +503,7 @@ export default class Frame {
    * @param sizeY Board size, y.
    * @param opsWithPos A list of [x, y, operator with [dir, pol]].
    */
-  singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
+  static singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
     const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
       const { x, y, op } = d
       const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])

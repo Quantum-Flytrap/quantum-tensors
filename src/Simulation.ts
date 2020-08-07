@@ -2,7 +2,7 @@ import _ from 'lodash'
 import Operator from './Operator'
 import Frame from './Frame'
 import { generateOperators } from './Elements'
-import { weightedRandomInt, startingPolarization, startingDirection, singlePhotonInteraction } from './helpers'
+import { weightedRandomInt, startingPolarization, startingDirection } from './helpers'
 import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator } from './interfaces'
 
 /**
@@ -20,7 +20,7 @@ export default class Simulation {
   public constructor(grid: IGrid) {
     this.grid = grid
     this.operators = generateOperators(grid)
-    this.globalOperator = singlePhotonInteraction(grid.cols, grid.rows, this.operators)
+    this.globalOperator = Frame.singlePhotonInteraction(grid.cols, grid.rows, this.operators)
     this.frames = []
   }
 
