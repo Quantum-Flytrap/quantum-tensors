@@ -6,6 +6,7 @@ import Vector from './Vector'
 import Operator from './Operator'
 import { TAU } from './Constants'
 import * as ops from './Ops'
+import { IGrid, Elem, ICell, IXYOperator } from './interfaces'
 
 const dimPol = Dimension.polarization()
 const dimDir = Dimension.direction()
@@ -205,4 +206,195 @@ export function incoherentLightOperator(opDirPol: Operator): Operator {
   const polInputs = Vector.fromArray([Cx(0.5), Cx(0.5)], [Dimension.polarization()])
   const polOutpus = Vector.fromArray([Cx(1), Cx(1)], [Dimension.polarization()])
   return opIntensity.contractLeft([1], polOutpus).contractRight([1], polInputs)
+}
+
+/**
+ * Compute operators from the grid cells
+ * @param cell, an ICell interface
+ * @returns IXYOperator
+ */
+export function generateOperator(cell: ICell): IXYOperator {
+  const x = cell.x
+  const y = cell.y
+  switch (cell.element) {
+    case Elem.Absorber: {
+      return {
+        x,
+        y,
+        op: attenuator(Math.SQRT1_2),
+      }
+    }
+    case Elem.BeamSplitter: {
+      return {
+        x,
+        y,
+        op: beamSplitter(cell.rotation),
+      }
+    }
+    case Elem.CoatedBeamSplitter: {
+      return {
+        x,
+        y,
+        op: beamSplitter(cell.rotation),
+      }
+    }
+    case Elem.CornerCube: {
+      return {
+        x,
+        y,
+        op: cornerCube(),
+      }
+    }
+    case Elem.Detector: {
+      return {
+        x,
+        y,
+        op: attenuator(0),
+      }
+    }
+    case Elem.DetectorFour: {
+      return {
+        x,
+        y,
+        op: attenuator(0),
+      }
+    }
+    case Elem.FaradayRotator: {
+      return {
+        x,
+        y,
+        op: faradayRotator(cell.rotation),
+      }
+    }
+    case Elem.Gate: {
+      return {
+        x,
+        y,
+        op: attenuator(0),
+      }
+    }
+    case Elem.Glass: {
+      return {
+        x,
+        y,
+        op: glassSlab(),
+      }
+    }
+    case Elem.Glass: {
+      return {
+        x,
+        y,
+        op: glassSlab(),
+      }
+    }
+    case Elem.HalfWavePlate: {
+      return {
+        x,
+        y,
+        op: Operator.add([
+          phasePlate(0, cell.rotation / 360, 0.5), // qt.Elements.halfWavePlateWE(options.rotation)
+          phasePlate(90, (cell.rotation + 90) / 360, 0.5), // qt.Elements.quarterWavePlateNS(options.rotation + 90)
+        ]),
+      }
+    }
+    case Elem.Laser: {
+      return {
+        x,
+        y,
+        op: attenuator(0),
+      }
+    }
+    case Elem.Mine: {
+      return {
+        x,
+        y,
+        op: attenuator(0),
+      }
+    }
+    case Elem.Mirror: {
+      return {
+        x,
+        y,
+        op: mirror(cell.rotation),
+      }
+    }
+    case Elem.NonLinearCrystal: {
+      return {
+        x,
+        y,
+        op: attenuator(1),
+      }
+    }
+    case Elem.Polarizer: {
+      return {
+        x,
+        y,
+        op: Operator.add([polarizerWE(cell.rotation), polarizerNS(cell.rotation + 90)]),
+      }
+    }
+    case Elem.PolarizingBeamSplitter: {
+      return {
+        x,
+        y,
+        op: polarizingBeamsplitter(cell.rotation),
+      }
+    }
+    case Elem.QuarterWavePlate: {
+      return {
+        x,
+        y,
+        op: Operator.add([quarterWavePlateWE(cell.rotation), quarterWavePlateNS(cell.rotation + 90)]),
+      }
+    }
+    case Elem.Rock: {
+      return {
+        x,
+        y,
+        op: attenuator(0),
+      }
+    }
+    case Elem.SugarSolution: {
+      return {
+        x,
+        y,
+        op: sugarSolution(0.125),
+      }
+    }
+    case Elem.VacuumJar: {
+      return {
+        x,
+        y,
+        op: vacuumJar(),
+      }
+    }
+    case Elem.Void: {
+      return {
+        x,
+        y,
+        op: attenuator(1),
+      }
+    }
+    case Elem.Wall: {
+      return {
+        x,
+        y,
+        op: attenuator(0),
+      }
+    }
+
+    default: {
+      throw new Error(`Conversion from cell to operator failed: ${cell}.`)
+    }
+  }
+}
+
+/**
+ * Compute list of operators from the grid
+ * @param grid
+ * @returns IXYOperator[] list
+ */
+export function generateOperators(grid: IGrid): IXYOperator[] {
+  return grid.cells.map((cell) => {
+    return generateOperator(cell)
+  })
 }

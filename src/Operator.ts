@@ -442,6 +442,7 @@ export default class Operator {
    */
   toString(complexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
     const valueStr = this.entries
+      // .filter((entry: OperatorEntry): boolean => entry.isOne())
       .map((entry) => {
         const coordStrOut = entry.coordOut.map((i: number, dim: number) => this.coordNamesOut[dim][i])
         const coordStrIn = entry.coordIn.map((i: number, dim: number) => this.coordNamesIn[dim][i])
@@ -451,7 +452,7 @@ export default class Operator {
 
     if (intro) {
       const introStr =
-        `Operator with ${this.entries.length} entires ` +
+        `Operator with ${this.entries.length} entries ` +
         `of max size [[${this.sizeOut}], [${this.sizeIn}]] ` +
         `with dimensions [[${this.namesOut}], [${this.namesIn}]]`
       return `${introStr}\n${valueStr}\n`
