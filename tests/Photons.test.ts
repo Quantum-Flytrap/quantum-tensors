@@ -42,6 +42,18 @@ describe('Photons', () => {
     expect(photons.ketString()).toBe('')
   })
 
+  it('propagates a photon - faster', () => {
+    const photons = Photons.emptySpace(3, 5).addPhotonFromIndicator(0, 2, '>', 'V')
+
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
+    photons.propagatePhotonsFaster()
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |1,2,>,V⟩')
+    photons.propagatePhotonsFaster()
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |2,2,>,V⟩')
+    photons.propagatePhotonsFaster()
+    expect(photons.ketString()).toBe('')
+  })
+
   it('interacts a photon', () => {
     const photons = Photons.emptySpace(7, 6).addPhotonFromIndicator(0, 2, '>', 'V')
 

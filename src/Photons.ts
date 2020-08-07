@@ -222,6 +222,48 @@ export default class Photons {
   }
 
   /**
+   * Propagate all particles, hardcoded.
+   *
+   * @returns Itself, for chaining.
+   */
+  propagatePhotonsFaster(): Photons {
+    const dirToShiftX = (dir: number): number => {
+      if (dir === 0) {
+        return 1
+      } else if (dir === 2) {
+        return -1
+      } else {
+        return 0
+      }
+    }
+
+    const dirToShiftY = (dir: number): number => {
+      if (dir === 1) {
+        return -1
+      } else if (dir === 3) {
+        return 1
+      } else {
+        return 0
+      }
+    }
+
+    _.range(this.nPhotons).forEach((i) => {
+      const [iX, iY, iDir] = this.vectorPosDirIndicesForParticle(i)
+      this.vector.entries.forEach((entry) => {
+        const dir = entry.coord[iDir]
+        entry.coord[iX] += dirToShiftX(dir)
+        entry.coord[iY] += dirToShiftY(dir)
+      })
+      this.vector.entries = this.vector.entries.filter((entry) => {
+        const x = entry.coord[iX]
+        const y = entry.coord[iY]
+        return 0 <= x && x < this.sizeX && 0 <= y && y < this.sizeY
+      })
+    })
+    return this
+  }
+
+  /**
    * Create an operator for a particular place, projecting only on the particular position.
    * @param sizeX Board size, x.
    * @param sizeY Board size, y.
