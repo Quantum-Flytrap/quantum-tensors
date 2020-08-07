@@ -297,9 +297,10 @@ describe('Photons', () => {
       { x: 4, y: 1, op: Elements.vacuumJar() },
       { x: 5, y: 1, op: Elements.beamSplitter(135) },
     ]
+    photons.updateOperators(operations)
 
     const t0 = performance.now()
-    photons.actOnSinglePhotons(operations)
+    photons.actOnSinglePhotons()
     const dt = performance.now() - t0
 
     expect(dt).toBeLessThanOrEqual(500) // ms (80ms on i7-9750H CPU)
