@@ -1,8 +1,6 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { PolEnum, DirEnum, IXYOperator } from './interfaces'
-import Dimension from './Dimension'
-import Operator from './Operator'
+import { PolEnum, DirEnum } from './interfaces'
 
 /**
  * Turns an index into a multi-index, according to dimension sizes.
@@ -216,75 +214,4 @@ export function startingDirection(rotation: number): DirEnum {
     default:
       throw new Error(`Wrong starting direction: ${rotation}`)
   }
-}
-
-/**
- * Create an operator for a particular place, projecting only on the particular position.
- * @param sizeX Board size, x.
- * @param sizeY Board size, y.
- * @param posX Position x.
- * @param posY Posiiton y.
- * @param op Operator, assumed to be with dimensions [pol, dir].
- *
- * @returns An operator [dimX, dimY, pol, dir].
- */
-export function localizeOperator(sizeX: number, sizeY: number, op: IXYOperator): Operator {
-  const dimX = Dimension.position(sizeX, 'x')
-  const dimY = Dimension.position(sizeY, 'y')
-  return Operator.outer([Operator.indicator([dimX, dimY], [`${op.x}`, `${op.y}`]), op.op])
-}
-
-/**
- * Turn an list of operators in a complete one-photon iteraction operator for the board.
- * @remark Some space for improvement with avoiding identity (direct sum structure),
- * vide {@link Operator.mulVecPartial}.
- * @param sizeX Board size, x.
- * @param sizeY Board size, y.
- * @param opsWithPos A list of [x, y, operator with [dir, pol]].
- */
-export function singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
-  const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
-    const { x, y, op } = d
-    const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
-    const shiftedOp = op.sub(idDirPol)
-    return localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
-  })
-
-  const dimX = Dimension.position(sizeX, 'x')
-  const dimY = Dimension.position(sizeY, 'y')
-
-  return Operator.add([
-    Operator.identity([dimX, dimY, Dimension.direction(), Dimension.polarization()]),
-    ...localizedOpsShifted,
-  ])
-}
-
-/**
- * Dimension indices for particle i, for [posX, posY, dir, pol].
- * @note For internal use.
- * @param i Photon id, from [0, ..., nPhotons - 1]
- * @returns E.g. for 1: [4, 5, 6, 7]
- */
-export function vectorIndicesForParticle(i: number): number[] {
-  return [4 * i, 4 * i + 1, 4 * i + 2, 4 * i + 3]
-}
-
-/**
- * Dimension indices for particle i, for [posX, posY, dir].
- * @note For internal use.
- * @param i Photon id, from [0, ..., nPhotons - 1]
- * @returns E.g. for 1: [4, 5, 6]
- */
-export function vectorPosDirIndicesForParticle(i: number): number[] {
-  return [4 * i, 4 * i + 1, 4 * i + 2]
-}
-
-/**
- * Dimension indices for particle i, for [posX, posY].
- * @note For internal use.
- * @param i Photon id, from [0, ..., nPhotons - 1]
- * @returns E.g. for 1: [4, 5]
- */
-export function vectorPosIndicesForParticle(i: number): number[] {
-  return [4 * i, 4 * i + 1]
 }
