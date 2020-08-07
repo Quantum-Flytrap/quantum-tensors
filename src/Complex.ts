@@ -106,7 +106,7 @@ export default class Complex {
    * @param z2 complex number to be multiplied
    * @returns z = z1 * z2
    */
-  mulNaive(z2: Complex): Complex {
+  mul(z2: Complex): Complex {
     const z1 = this
     return new Complex(z1.re * z2.re - z1.im * z2.im, z1.re * z2.im + z1.im * z2.re)
   }
@@ -117,7 +117,7 @@ export default class Complex {
    * @param z2 complex number to be multiplied
    * @returns z = z1 * z2
    */
-  mul(z2: Complex): Complex {
+  mulGauss(z2: Complex): Complex {
     const z1 = this
     const k1 = z2.re * (z1.re + z1.im)
     const k2 = z1.re * (z2.im - z2.re)

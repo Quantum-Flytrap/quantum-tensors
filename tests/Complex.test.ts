@@ -73,6 +73,15 @@ describe('Complex', () => {
     expect(result2).toEqual({ re: -11, im: 23 })
   })
 
+  it('should multiply two complex numbers using Gauss algorithm', () => {
+    const complex1 = Cx(3, 2)
+    const complex2 = Cx(1, 7)
+    const result1 = complex1.mulGauss(complex2)
+    const result2 = complex2.mulGauss(complex1)
+    expect(result1).toEqual({ re: -11, im: 23 })
+    expect(result2).toEqual({ re: -11, im: 23 })
+  })
+
   it('should normalize if this.r is not 0', () => {
     const complex1 = Cx(0, 0)
     const complex2 = Cx(3, 4)
