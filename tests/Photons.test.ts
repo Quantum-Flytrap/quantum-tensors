@@ -42,15 +42,15 @@ describe('Photons', () => {
     expect(photons.ketString()).toBe('')
   })
 
-  it('propagates a photon - faster', () => {
+  it('propagates a photon - with operator', () => {
     const photons = Photons.emptySpace(3, 5).addPhotonFromIndicator(0, 2, '>', 'V')
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
-    photons.propagatePhotonsFaster()
+    photons.propagatePhotonsWithOperator()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,2,>,V⟩')
-    photons.propagatePhotonsFaster()
+    photons.propagatePhotonsWithOperator()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |2,2,>,V⟩')
-    photons.propagatePhotonsFaster()
+    photons.propagatePhotonsWithOperator()
     expect(photons.ketString()).toBe('')
   })
 
@@ -272,7 +272,7 @@ describe('Photons', () => {
     photons.propagatePhotons()
     const dt = performance.now() - t0
 
-    expect(dt).toBeLessThanOrEqual(5000) // ms (741ms on i7-9750H CPU)
+    expect(dt).toBeLessThanOrEqual(1) // ms (741ms->0.02ms on i7-9750H CPU)
   })
 
   it('performance propagation: size 20x20', () => {
@@ -283,7 +283,7 @@ describe('Photons', () => {
     photons.propagatePhotons()
     const dt = performance.now() - t0
 
-    expect(dt).toBeLessThanOrEqual(500) // ms (22-34ms on i7-9750H CPU)
+    expect(dt).toBeLessThanOrEqual(1) // ms (22-34ms->0.02ms on i7-9750H CPU)
   })
 
   it('performance operation: size 20x20', () => {
@@ -303,6 +303,6 @@ describe('Photons', () => {
     photons.actOnSinglePhotons()
     const dt = performance.now() - t0
 
-    expect(dt).toBeLessThanOrEqual(500) // ms (80ms on i7-9750H CPU)
+    expect(dt).toBeLessThanOrEqual(10) // ms (80ms->1.5ms on i7-9750H CPU)
   })
 })

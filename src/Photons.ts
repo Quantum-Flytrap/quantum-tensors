@@ -209,11 +209,12 @@ export default class Photons {
 
   /**
    * Propagate all particles, using {@link createPhotonPropagator}.
+   * Use it for a reference. All practical operations with {@link propagatePhotons}.
    * @param yDirMeansDown or true, direction 'v' increments dimY.
    *
    * @returns Itself, for chaining.
    */
-  propagatePhotons(yDirMeansDown = true): Photons {
+  propagatePhotonsWithOperator(yDirMeansDown = true): Photons {
     const photonPropagator = Photons.propagator(this.sizeX, this.sizeY, yDirMeansDown)
     _.range(this.nPhotons).forEach((i) => {
       this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
@@ -223,10 +224,11 @@ export default class Photons {
 
   /**
    * Propagate all particles, hardcoded.
+   * See {@link propagatePhotonsWithOperator} for a reference.
    *
    * @returns Itself, for chaining.
    */
-  propagatePhotonsFaster(): Photons {
+  propagatePhotons(): Photons {
     const dirToShiftX = (dir: number): number => {
       if (dir === 0) {
         return 1
