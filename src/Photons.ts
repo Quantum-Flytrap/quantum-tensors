@@ -363,6 +363,33 @@ export default class Photons {
   }
 
   /**
+   * Turn an list of operators in a complete one-photon iteraction operator for the board (U - Id).
+   * @param sizeX Board size, x.
+   * @param sizeY Board size, y.
+   * @param opsWithPos A list of [x, y, operator with [dir, pol]].
+   */
+  static singlePhotonInteractionDiff(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
+    const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
+      const { x, y, op } = d
+      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
+      const shiftedOp = op.sub(idDirPol)
+      return Photons.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
+    })
+
+    if (localizedOpsShifted.length === 0) {
+      localizedOpsShifted.push(
+        Operator.zeros([
+          Dimension.position(sizeX, 'x'),
+          Dimension.position(sizeY, 'y'),
+          Dimension.direction(),
+          Dimension.polarization(),
+        ]),
+      )
+    }
+    return Operator.add(localizedOpsShifted)
+  }
+
+  /**
    * Turn an list of operators in a complete one-photon iteraction operator for the board.
    * @remark Some space for improvement with avoiding identity (direct sum structure),
    * vide {@link Operator.mulVecPartial}.
@@ -371,20 +398,12 @@ export default class Photons {
    * @param opsWithPos A list of [x, y, operator with [dir, pol]].
    */
   static singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
-    const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
-      const { x, y, op } = d
-      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
-      const shiftedOp = op.sub(idDirPol)
-      return Photons.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
-    })
+    const localizedOpsShifted = Photons.singlePhotonInteractionDiff(sizeX, sizeY, opsWithPos)
 
     const dimX = Dimension.position(sizeX, 'x')
     const dimY = Dimension.position(sizeY, 'y')
 
-    return Operator.add([
-      Operator.identity([dimX, dimY, Dimension.direction(), Dimension.polarization()]),
-      ...localizedOpsShifted,
-    ])
+    return localizedOpsShifted.add(Operator.identity([dimX, dimY, Dimension.direction(), Dimension.polarization()]))
   }
 
   /**
