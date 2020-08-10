@@ -19,7 +19,7 @@ import Complex, { Cx } from './Complex'
 export default class Photons {
   vector: Vector
   operators: IXYOperator[]
-  globalOperator: Operator
+  cachedDiffU: Operator
   readonly dimX: Dimension
   readonly dimY: Dimension
 
@@ -34,18 +34,18 @@ export default class Photons {
   constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[] = []) {
     this.vector = vector
     this.operators = operators
-    this.globalOperator = Photons.singlePhotonInteraction(sizeX, sizeY, operators)
+    this.cachedDiffU = Photons.singlePhotonInteraction(sizeX, sizeY, operators)
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
   }
 
   /**
-   * Add operators to photons and compute static globalOperator
+   * Add operators to photons and compute static cachedDiffU
    * @param operators An array of board operators in IXYOperator format.
    */
   updateOperators(operators: IXYOperator[]): void {
     this.operators = operators
-    this.globalOperator = Photons.singlePhotonInteraction(this.sizeX, this.sizeY, operators)
+    this.cachedDiffU = Photons.singlePhotonInteractionDiff(this.sizeX, this.sizeY, operators)
   }
 
   /**
@@ -81,7 +81,7 @@ export default class Photons {
 
   /**
    * @returns A deep copy of the same object.
-   * @todo Check that the globalOperator doesn't hammer performance.
+   * @todo Check that the cachedDiffU doesn't hammer performance.
    */
   copy(): Photons {
     return new Photons(this.sizeX, this.sizeY, this.vector.copy(), this.operators)
@@ -209,14 +209,58 @@ export default class Photons {
 
   /**
    * Propagate all particles, using {@link createPhotonPropagator}.
+   * Use it for a reference. All practical operations with {@link propagatePhotons}.
    * @param yDirMeansDown or true, direction 'v' increments dimY.
    *
    * @returns Itself, for chaining.
    */
-  propagatePhotons(yDirMeansDown = true): Photons {
+  propagatePhotonsWithOperator(yDirMeansDown = true): Photons {
     const photonPropagator = Photons.propagator(this.sizeX, this.sizeY, yDirMeansDown)
     _.range(this.nPhotons).forEach((i) => {
       this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
+    })
+    return this
+  }
+
+  /**
+   * Propagate all particles, hardcoded.
+   * See {@link propagatePhotonsWithOperator} for a reference.
+   *
+   * @returns Itself, for chaining.
+   */
+  propagatePhotons(): Photons {
+    const dirToShiftX = (dir: number): number => {
+      if (dir === 0) {
+        return 1
+      } else if (dir === 2) {
+        return -1
+      } else {
+        return 0
+      }
+    }
+
+    const dirToShiftY = (dir: number): number => {
+      if (dir === 1) {
+        return -1
+      } else if (dir === 3) {
+        return 1
+      } else {
+        return 0
+      }
+    }
+
+    _.range(this.nPhotons).forEach((i) => {
+      const [iX, iY, iDir] = this.vectorPosDirIndicesForParticle(i)
+      this.vector.entries.forEach((entry) => {
+        const dir = entry.coord[iDir]
+        entry.coord[iX] += dirToShiftX(dir)
+        entry.coord[iY] += dirToShiftY(dir)
+      })
+      this.vector.entries = this.vector.entries.filter((entry) => {
+        const x = entry.coord[iX]
+        const y = entry.coord[iY]
+        return 0 <= x && x < this.sizeX && 0 <= y && y < this.sizeY
+      })
     })
     return this
   }
@@ -321,6 +365,33 @@ export default class Photons {
   }
 
   /**
+   * Turn an list of operators in a complete one-photon iteraction operator for the board (U - Id).
+   * @param sizeX Board size, x.
+   * @param sizeY Board size, y.
+   * @param opsWithPos A list of [x, y, operator with [dir, pol]].
+   */
+  static singlePhotonInteractionDiff(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
+    const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
+      const { x, y, op } = d
+      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
+      const shiftedOp = op.sub(idDirPol)
+      return Photons.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
+    })
+
+    if (localizedOpsShifted.length === 0) {
+      localizedOpsShifted.push(
+        Operator.zeros([
+          Dimension.position(sizeX, 'x'),
+          Dimension.position(sizeY, 'y'),
+          Dimension.direction(),
+          Dimension.polarization(),
+        ]),
+      )
+    }
+    return Operator.add(localizedOpsShifted)
+  }
+
+  /**
    * Turn an list of operators in a complete one-photon iteraction operator for the board.
    * @remark Some space for improvement with avoiding identity (direct sum structure),
    * vide {@link Operator.mulVecPartial}.
@@ -329,24 +400,16 @@ export default class Photons {
    * @param opsWithPos A list of [x, y, operator with [dir, pol]].
    */
   static singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
-    const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
-      const { x, y, op } = d
-      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
-      const shiftedOp = op.sub(idDirPol)
-      return Photons.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
-    })
+    const localizedOpsShifted = Photons.singlePhotonInteractionDiff(sizeX, sizeY, opsWithPos)
 
     const dimX = Dimension.position(sizeX, 'x')
     const dimY = Dimension.position(sizeY, 'y')
 
-    return Operator.add([
-      Operator.identity([dimX, dimY, Dimension.direction(), Dimension.polarization()]),
-      ...localizedOpsShifted,
-    ])
+    return localizedOpsShifted.add(Operator.identity([dimX, dimY, Dimension.direction(), Dimension.polarization()]))
   }
 
   /**
-   * Act on single photons with the precomputed globalOperator.
+   * Act on single photons with the precomputed cachedDiffU.
    * @remark Absorption for states with n>1 photons is broken.
    * - it tracks only a fixed-number of photons subspace.
    *
@@ -354,7 +417,7 @@ export default class Photons {
    */
   actOnSinglePhotons(): Photons {
     _.range(this.nPhotons).forEach((i) => {
-      this.vector = this.globalOperator.mulVecPartial(this.vectorIndicesForParticle(i), this.vector)
+      this.vector = this.cachedDiffU.mulVecPartial(this.vectorIndicesForParticle(i), this.vector).add(this.vector)
     })
     return this
   }

@@ -158,6 +158,7 @@ export default class Vector {
         const value = grouped.map((entry) => entry.value).reduce((a, b) => a.add(b))
         return new VectorEntry(coord, value)
       })
+      .filter((entry) => !entry.value.isAlmostZero())
       .value()
 
     return new Vector(entries, v1.dimensions)
