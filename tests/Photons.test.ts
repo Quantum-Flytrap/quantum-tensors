@@ -34,11 +34,11 @@ describe('Photons', () => {
     const photons = Photons.emptySpace(3, 5).addPhotonFromIndicator(0, 2, '>', 'V')
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
-    photons.propagatePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,2,>,V⟩')
-    photons.propagatePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |2,2,>,V⟩')
-    photons.propagatePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('')
   })
 
@@ -46,11 +46,11 @@ describe('Photons', () => {
     const photons = Photons.emptySpace(3, 5).addPhotonFromIndicator(0, 2, '>', 'V')
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
-    photons.propagatePhotonsWithOperator()
+    photons.propagatePhotonsWithOperator().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,2,>,V⟩')
-    photons.propagatePhotonsWithOperator()
+    photons.propagatePhotonsWithOperator().actOnSinglePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |2,2,>,V⟩')
-    photons.propagatePhotonsWithOperator()
+    photons.propagatePhotonsWithOperator().actOnSinglePhotons()
     expect(photons.ketString()).toBe('')
   })
 
