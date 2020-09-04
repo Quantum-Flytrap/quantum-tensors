@@ -34,11 +34,11 @@ describe('Photons', () => {
     const photons = Photons.emptySpace(3, 5).addPhotonFromIndicator(0, 2, '>', 'V')
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,2,>,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |2,2,>,V⟩')
-    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons()
     expect(photons.ketString()).toBe('')
   })
 
@@ -46,11 +46,23 @@ describe('Photons', () => {
     const photons = Photons.emptySpace(3, 5).addPhotonFromIndicator(0, 2, '>', 'V')
 
     expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
-    photons.propagatePhotonsWithOperator().actOnSinglePhotons()
+    photons.propagatePhotonsWithOperator()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |1,2,>,V⟩')
-    photons.propagatePhotonsWithOperator().actOnSinglePhotons()
+    photons.propagatePhotonsWithOperator()
     expect(photons.ketString()).toBe('(1.00 +0.00i) |2,2,>,V⟩')
-    photons.propagatePhotonsWithOperator().actOnSinglePhotons()
+    photons.propagatePhotonsWithOperator()
+    expect(photons.ketString()).toBe('')
+  })
+
+  it('interacts a photon with no effect on empty board', () => {
+    const photons = Photons.emptySpace(3, 5).addPhotonFromIndicator(0, 2, '>', 'V')
+
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |0,2,>,V⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |1,2,>,V⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |2,2,>,V⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
     expect(photons.ketString()).toBe('')
   })
 
