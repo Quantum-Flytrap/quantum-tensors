@@ -34,7 +34,7 @@ export default class Photons {
   constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[] = []) {
     this.vector = vector
     this.operators = operators
-    this.cachedDiffU = Photons.singlePhotonInteraction(sizeX, sizeY, operators)
+    this.cachedDiffU = Photons.singlePhotonInteractionDiff(sizeX, sizeY, operators)
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
   }
