@@ -41,7 +41,7 @@
     "typescript": "^3.6.3"
   },
   "scripts": {
-    "try-example": "tsc && node ./lib/demos/example.js",
+    "benchmark": "ts-node ./benchmarks/benchmark.ts",
     "build-old": "tsc --pretty",
     "build": "rollup -c && tsc",
     "test": "tsc --noEmit -p . && jest --coverage --no-cache",
