@@ -14,9 +14,9 @@ import { IColumnOrRow, IEntryIndexIndexValue } from './interfaces'
  * A complex number sparse matrix aware of dimensions and tensor structure.
  */
 export default class Operator {
-  entries: OperatorEntry[]
-  dimensionsOut: Dimension[]
-  dimensionsIn: Dimension[]
+  readonly entries: OperatorEntry[]
+  readonly dimensionsOut: Dimension[]
+  readonly dimensionsIn: Dimension[]
 
   /**
    * Creates an operator from sparse entires.
@@ -111,6 +111,7 @@ export default class Operator {
   /**
    * Create a copy of the vector.
    * @todo Make it more lightweight than using lodash.
+   * FIXME: Is this operation even necessary? Operator should never be mutated anyway.
    */
   copy(): Operator {
     return _.cloneDeep(this)
@@ -174,30 +175,12 @@ export default class Operator {
   /**
    * Add two operators.
    *
-   * Note: May be overengineered for adding 2 vectors with this map-reduce approach.
-   *
    * @param m2 Other operator with same dimensions.
    * @returns m1 + m2
+   * @see {@link Operator.add} for the actual implementation.
    */
   add(m2: Operator): Operator {
-    const m1 = this
-
-    Dimension.checkDimensions(m1.dimensionsIn, m2.dimensionsIn)
-    Dimension.checkDimensions(m1.dimensionsOut, m2.dimensionsOut)
-
-    const entries = _.chain(m1.entries.concat(m2.entries))
-      .groupBy((entry: OperatorEntry) => `${entry.coordOut.toString()}-${entry.coordIn.toString()} `)
-      .values()
-      .map((grouped: OperatorEntry[]) => {
-        const coordOut = [...grouped[0].coordOut]
-        const coordIn = [...grouped[0].coordIn]
-        const value = grouped.map((entry) => entry.value).reduce((a, b) => a.add(b))
-        return new OperatorEntry(coordOut, coordIn, value)
-      })
-      .filter((entry) => !entry.value.isAlmostZero())
-      .value()
-
-    return new Operator(entries, m1.dimensionsOut, m1.dimensionsIn)
+    return Operator.add([this, m2])
   }
 
   /**
@@ -236,7 +219,6 @@ export default class Operator {
   toVectorPerOutput(): IColumnOrRow[] {
     return _(this.entries)
       .groupBy((entry) => entry.coordOut.toString())
-      .values()
       .map((entries) => {
         const coord = entries[0].coordOut
         const vecEntries = entries.map((opEntry) => new VectorEntry(opEntry.coordIn, opEntry.value))
@@ -759,15 +741,46 @@ export default class Operator {
 
   /**
    * As sum of many operators with compatible dimensions.
-   * @see {@link Operator.add} for the actual implementation.
    *
    * @param ops [m1, m2, ...]
    *
    * @returns m1 + m2 + ...
    *
-   * @todo Can be optimized if needed.
    */
   static add(ops: Operator[]): Operator {
-    return ops.reduce((acc, x) => acc.add(x))
+    if (ops.length === 0) {
+      throw new Error('addMany requires at least one operator')
+    }
+    if (ops.length === 1) {
+      return ops[0]
+    }
+
+    const [m1, ...rest] = ops
+    for (const m2 of rest) {
+      Dimension.checkDimensions(m1.dimensionsIn, m2.dimensionsIn)
+      Dimension.checkDimensions(m1.dimensionsOut, m2.dimensionsOut)
+    }
+
+    // this function is very hot, so loops are hand-rolled for performance
+    const entriesByCoord: Record<string, OperatorEntry> = {}
+    for (const entry of m1.entries) {
+      entriesByCoord[entry.coordKey()] = entry
+    }
+    for (const m2 of rest) {
+      for (const entry of m2.entries) {
+        const key = entry.coordKey()
+        if (entriesByCoord.hasOwnProperty(key)) {
+          const value = entriesByCoord[key].value.add(entry.value)
+          if (value.isAlmostZero()) {
+            delete entriesByCoord[key]
+          } else {
+            entriesByCoord[key] = new OperatorEntry(entry.coordOut, entry.coordIn, value)
+          }
+        } else {
+          entriesByCoord[key] = entry
+        }
+      }
+    }
+    return new Operator(Object.values(entriesByCoord), m1.dimensionsOut, m1.dimensionsIn)
   }
 }

@@ -50,7 +50,7 @@ export default class Complex {
    * @returns number
    */
   abs2(): number {
-    return Math.pow(this.re, 2) + Math.pow(this.im, 2)
+    return this.re * this.re + this.im * this.im
   }
 
   /**
@@ -58,7 +58,7 @@ export default class Complex {
    * @returns absolute value
    */
   abs(): number {
-    return Math.sqrt(Math.pow(this.re, 2) + Math.pow(this.im, 2))
+    return Math.sqrt(this.re * this.re + this.im * this.im)
   }
 
   /**
@@ -148,8 +148,9 @@ export default class Complex {
    * @returns z
    */
   normalize(): Complex {
-    if (this.r !== 0) {
-      return new Complex(this.re / this.r, this.im / this.r)
+    const norm = this.r
+    if (norm !== 0) {
+      return new Complex(this.re / norm, this.im / norm)
     } else {
       throw new Error('Cannot normalize a 0 length vector...')
     }
@@ -191,12 +192,11 @@ export default class Complex {
   }
 
   /**
-   * Check if a complex number is zero
-   * @param eps tolerance for the Euclidean norm
+   * Check if a complex number is very close zero (norm at most 1e-6 from zero)
    * @return z1 ~= 0
    */
-  isAlmostZero(eps = 1e-6): boolean {
-    return this.r < eps
+  isAlmostZero(): boolean {
+    return this.abs2() < 1e-12
   }
 
   /**
@@ -204,7 +204,7 @@ export default class Complex {
    * @return z1.r === 1
    */
   isNormal(): boolean {
-    return this.r === 1
+    return this.abs2() === 1
   }
 
   /**

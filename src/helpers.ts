@@ -58,11 +58,13 @@ export function checkCoordsSizesCompability(coords: number[], sizes: number[]): 
   if (coords.length !== sizes.length) {
     throw new Error(`Coordinates [${coords}] incompatible with sizes [${sizes}].`)
   }
-  coords.forEach((c, i) => {
+
+  for (let i = 0; i < coords.length; i++) {
+    const c = coords[i]
     if (c < 0 || c >= sizes[i]) {
       throw new Error(`Coordinates [${coords}] incompatible with sizes [${sizes}].`)
     }
-  })
+  }
 }
 
 /**
