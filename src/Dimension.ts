@@ -1,6 +1,8 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
 
+const identityMap = new Map<string, symbol>()
+
 /**
  * Dimension class, e.g.
  * - "polarization" with coordinates ["H", "V"]
@@ -8,6 +10,8 @@ import _ from 'lodash'
  * Vide: http://nlp.seas.harvard.edu/NamedTensor and http://nlp.seas.harvard.edu/NamedTensor2
  */
 export default class Dimension {
+  /** A symbol used for Dimension comparison */
+  private readonly identity: symbol
   name: string
   size: number
   coordNames: string[]
@@ -25,6 +29,24 @@ export default class Dimension {
     this.name = name
     this.coordNames = coordNames // later, we may make it optional
     this.size = size
+
+    const identityKey = this.identityKey()
+    let identity = identityMap.get(identityKey)
+    if (identity == null) {
+      identity = Symbol(name)
+      identityMap.set(identityKey, identity)
+    }
+    this.identity = identity
+  }
+
+  /**
+   * A string used for dimension identification during comparison.
+   * Mapped into symbol on creation to avoid costly string compares.
+   */
+  private identityKey(): string {
+    return `${this.name}-${this.size}-${this.coordNames.length}-${this.coordNames
+      .map((n, i) => `#${i}-${n}`)
+      .join('-')}`
   }
 
   /**
@@ -103,8 +125,7 @@ export default class Dimension {
    * @returns dim1 === dim 2
    */
   isEqual(dim2: Dimension): boolean {
-    const dim1 = this
-    return dim1.name === dim2.name && dim1.size === dim2.size && _.isEqual(dim1.coordNames, dim2.coordNames)
+    return this.identity === dim2.identity
   }
 
   /**
@@ -150,7 +171,7 @@ export default class Dimension {
       throw new Error('Dimensions array size mismatch...')
     }
     // Check for order
-    _.range(dims1.length).forEach((i) => {
+    for (let i = 0; i < dims1.length; i++) {
       if (!dims1[i].isEqual(dims2[i])) {
         console.error(
           `Dimensions have the same number of components, but the component ${i} is\n${dims1[i]}\nvs\n${dims2[i]}.\n
@@ -159,7 +180,7 @@ export default class Dimension {
         )
         throw new Error('Dimensions array order mismatch...')
       }
-    })
+    }
   }
 
   /**
