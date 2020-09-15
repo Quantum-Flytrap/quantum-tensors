@@ -740,7 +740,7 @@ export default class Operator {
    */
   static add(ops: Operator[]): Operator {
     if (ops.length === 0) {
-      throw new Error('addMany requires at least one operator')
+      throw new Error('add requires at least one operator')
     }
     if (ops.length === 1) {
       return ops[0]
@@ -754,13 +754,18 @@ export default class Operator {
 
     // this function is very hot, so loops are hand-rolled for performance
     const entriesByCoord: Record<string, OperatorEntry> = {}
+
+    // hash entries from first operator by their coordinates
     for (const entry of m1.entries) {
       entriesByCoord[entry.coordKey()] = entry
     }
+    // for every next operator in the sum
     for (const m2 of rest) {
       for (const entry of m2.entries) {
         const key = entry.coordKey()
         if (entriesByCoord.hasOwnProperty(key)) {
+          // if this entry's coordinates are already in the hashmap,
+          // calculate the sum and store back, rejecting near-zero results.
           const value = entriesByCoord[key].value.add(entry.value)
           if (value.isAlmostZero()) {
             delete entriesByCoord[key]
@@ -768,6 +773,7 @@ export default class Operator {
             entriesByCoord[key] = new OperatorEntry(entry.coordOut, entry.coordIn, value)
           }
         } else {
+          // this is the first entry under given coordinates, so store it directly
           entriesByCoord[key] = entry
         }
       }

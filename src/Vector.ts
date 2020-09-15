@@ -153,20 +153,27 @@ export default class Vector {
 
     // this function is very hot, so loops are hand-rolled
     const entriesByCoord: Record<string, VectorEntry> = {}
+
+    // hash entries from v1 by coordinates
     for (const entry of v1.entries) {
       const key = entry.coord.toString()
       entriesByCoord[key] = entry
     }
+
     for (const entry of v2.entries) {
+      // look up entries by coordiantes from second vector
       const key = entry.coord.toString()
       if (entriesByCoord.hasOwnProperty(key)) {
+        // add values under the same coordinates
         const value = entriesByCoord[key].value.add(entry.value)
         if (value.isAlmostZero()) {
+          // remove near-zero sum results
           delete entriesByCoord[key]
         } else {
           entriesByCoord[key] = new VectorEntry(entry.coord, value)
         }
       } else {
+        // entry didn't exist in v1, sum is just a value from v2
         entriesByCoord[key] = entry
       }
     }
@@ -198,13 +205,17 @@ export default class Vector {
     // this function is very hot, so loops are hand-rolled for performance
     let dotSum = Cx(0, 0)
     const entriesByCoord: Record<string, VectorEntry> = {}
+    // hash entries from v1 by coordinates
     for (const entry of v1.entries) {
       const key = entry.coord.toString()
       entriesByCoord[key] = entry
     }
+
+    // lookup entries based on coordinates from v2
     for (const entry of v2.entries) {
       const key = entry.coord.toString()
       if (entriesByCoord.hasOwnProperty(key)) {
+        // for every entry existing on both v1 and v2, add their product to the dot
         dotSum = dotSum.add(entriesByCoord[key].value.mul(entry.value))
       }
     }
