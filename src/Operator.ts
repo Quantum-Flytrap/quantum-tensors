@@ -109,15 +109,6 @@ export default class Operator {
   }
 
   /**
-   * Create a copy of the vector.
-   * @todo Make it more lightweight than using lodash.
-   * FIXME: Is this operation even necessary? Operator should never be mutated anyway.
-   */
-  copy(): Operator {
-    return _.cloneDeep(this)
-  }
-
-  /**
    * Elementwise complex conjugation (no transpose!).
    * https://en.wikipedia.org/wiki/Complex_conjugate
    * @returns A^* - simple conjugate of an operator.
