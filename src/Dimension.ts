@@ -30,20 +30,24 @@ export default class Dimension {
     this.coordNames = coordNames // later, we may make it optional
     this.size = size
 
-    const identityKey = this.identityKey()
-    let identity = identityMap.get(identityKey)
+    const hashKey = this.hashKey()
+    let identity = identityMap.get(hashKey)
     if (identity == null) {
       identity = Symbol(name)
-      identityMap.set(identityKey, identity)
+      identityMap.set(hashKey, identity)
     }
     this.identity = identity
   }
 
   /**
-   * A string used for dimension identification during comparison.
-   * Mapped into symbol on creation to avoid costly string compares.
+   * A string used for dimension equality test.
+   *
+   * @remark do not assume any particular format. The only important quality of this
+   * value is that it fully encodes all relevant dimension data and can be used as a hash key
+   *
+   * @returns identification string
    */
-  private identityKey(): string {
+  private hashKey(): string {
     return `${this.name}-${this.size}-${this.coordNames.length}-${this.coordNames
       .map((n, i) => `#${i}-${n}`)
       .join('-')}`
