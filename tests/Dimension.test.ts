@@ -15,9 +15,21 @@ describe('Dimension', () => {
     const polarization = Dimension.polarization()
     const direction = Dimension.direction()
     const spin = Dimension.spin()
-    expect(polarization).toEqual({ coordNames: ['H', 'V'], name: 'polarization', size: 2 })
-    expect(direction).toEqual({ coordNames: ['>', '^', '<', 'v'], name: 'direction', size: 4 })
-    expect(spin).toEqual({ coordNames: ['u', 'd'], name: 'spin', size: 2 })
+    expect(polarization).toMatchObject({ coordNames: ['H', 'V'], name: 'polarization', size: 2 })
+    expect(direction).toMatchObject({ coordNames: ['>', '^', '<', 'v'], name: 'direction', size: 4 })
+    expect(spin).toMatchObject({ coordNames: ['u', 'd'], name: 'spin', size: 2 })
+  })
+
+  it('should equate identical dimensions', () => {
+    const polarization1 = Dimension.polarization()
+    const polarization2 = Dimension.polarization()
+    expect(polarization1.isEqual(polarization2)).toBeTruthy()
+  })
+
+  it('should not equate different dimensions', () => {
+    const polarization = Dimension.polarization()
+    const direction = Dimension.direction()
+    expect(polarization.isEqual(direction)).toBeFalsy()
   })
 
   it('should forbid creating dimensions with a mismatched length of element and size', () => {

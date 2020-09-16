@@ -28,9 +28,10 @@ export default class Vector {
     this.entries = entries
     this.dimensions = dimensions
 
-    this.entries.forEach((entry) => {
-      checkCoordsSizesCompability(entry.coord, this.size)
-    })
+    const size = this.size
+    for (const entry of entries) {
+      checkCoordsSizesCompability(entry.coord, size)
+    }
   }
 
   /**
@@ -46,7 +47,7 @@ export default class Vector {
    * FIXME: size and totalSize is confusing, rename to length or size, sizes?
    */
   get totalSize(): number {
-    return this.size.reduce((a, b) => a * b)
+    return this.dimensions.reduce((a, dim) => a * dim.size, 1)
   }
 
   /**
@@ -150,18 +151,34 @@ export default class Vector {
 
     Dimension.checkDimensions(v1.dimensions, v2.dimensions)
 
-    const entries = _.chain(v1.entries.concat(v2.entries))
-      .groupBy((entry: VectorEntry) => entry.coord.toString())
-      .values()
-      .map((grouped: VectorEntry[]) => {
-        const coord = [...grouped[0].coord]
-        const value = grouped.map((entry) => entry.value).reduce((a, b) => a.add(b))
-        return new VectorEntry(coord, value)
-      })
-      .filter((entry) => !entry.value.isAlmostZero())
-      .value()
+    // this function is very hot, so loops are hand-rolled
+    const entriesByCoord: Record<string, VectorEntry> = {}
 
-    return new Vector(entries, v1.dimensions)
+    // hash entries from v1 by coordinates
+    for (const entry of v1.entries) {
+      const key = entry.coord.toString()
+      entriesByCoord[key] = entry
+    }
+
+    for (const entry of v2.entries) {
+      // look up entries by coordiantes from second vector
+      const key = entry.coord.toString()
+      if (entriesByCoord.hasOwnProperty(key)) {
+        // add values under the same coordinates
+        const value = entriesByCoord[key].value.add(entry.value)
+        if (value.isAlmostZero()) {
+          // remove near-zero sum results
+          delete entriesByCoord[key]
+        } else {
+          entriesByCoord[key] = new VectorEntry(entry.coord, value)
+        }
+      } else {
+        // entry didn't exist in v1, sum is just a value from v2
+        entriesByCoord[key] = entry
+      }
+    }
+
+    return new Vector(Object.values(entriesByCoord), v1.dimensions)
   }
 
   /**
@@ -185,20 +202,24 @@ export default class Vector {
 
     Dimension.checkDimensions(v1.dimensions, v2.dimensions)
 
-    const result = _.chain(v1.entries.concat(v2.entries))
-      .groupBy((entry: VectorEntry) => entry.coord.toString())
-      .values()
-      .map((grouped: VectorEntry[]) => {
-        if (grouped.length === 2) {
-          return grouped[0].value.mul(grouped[1].value)
-        } else {
-          return Cx(0, 0)
-        }
-      })
-      .reduce((a, b) => a.add(b), Cx(0))
-      .value()
+    // this function is very hot, so loops are hand-rolled for performance
+    let dotSum = Cx(0, 0)
+    const entriesByCoord: Record<string, VectorEntry> = {}
+    // hash entries from v1 by coordinates
+    for (const entry of v1.entries) {
+      const key = entry.coord.toString()
+      entriesByCoord[key] = entry
+    }
 
-    return result
+    // lookup entries based on coordinates from v2
+    for (const entry of v2.entries) {
+      const key = entry.coord.toString()
+      if (entriesByCoord.hasOwnProperty(key)) {
+        // for every entry existing on both v1 and v2, add their product to the dot
+        dotSum = dotSum.add(entriesByCoord[key].value.mul(entry.value))
+      }
+    }
+    return dotSum
   }
 
   /**
@@ -410,7 +431,7 @@ export default class Vector {
   static fromArray(denseArray: Complex[], dimensions: Dimension[], removeZeros = true): Vector {
     // Get size vector from dimensions
     const sizes = dimensions.map((dimension) => dimension.size)
-    const totalSize = sizes.reduce((a, b) => a * b)
+    const totalSize = dimensions.reduce((a, dim) => a * dim.size, 1)
     if (denseArray.length !== totalSize) {
       throw new Error(`Dimension inconsistency: entry count ${denseArray.length} != total: ${totalSize}`)
     }

@@ -6,9 +6,9 @@ import { coordsFromIndex } from './helpers'
  * To be used only within a Operator object, or to create such.
  */
 export default class OperatorEntry {
-  coordOut: number[]
-  coordIn: number[]
-  value: Complex
+  readonly coordOut: number[]
+  readonly coordIn: number[]
+  readonly value: Complex
 
   /**
    * Creates a VectorEntry from output and input coordinates, and value.
@@ -40,6 +40,13 @@ export default class OperatorEntry {
       `Sparse operator entry [${this.coordOut.toString()}, ${this.coordIn.toString()}] ` +
       `has value ${this.value.toString()}`
     )
+  }
+
+  /**
+   * Entry coordinates in string representation. Can be used for hashing.
+   */
+  coordKey(): string {
+    return `${this.coordOut.toString()}-${this.coordIn.toString()}`
   }
 
   /**
