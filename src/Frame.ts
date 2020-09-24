@@ -167,10 +167,53 @@ export default class Frame {
    * @remarks lets stick with Y means down conveniton and remove clutter
    * @returns Itself, for chaining.
    */
-  propagatePhotons(): Frame {
+  propagatePhotonsWithOperator(): Frame {
     const photonPropagator = Frame.propagator(this.sizeX, this.sizeY)
     _.range(this.nPhotons).forEach((i) => {
       this.vector = photonPropagator.mulVecPartial(this.vectorPosDirIndicesForParticle(i), this.vector)
+    })
+    return this
+  }
+
+  /**
+   * Propagate all particles, hardcoded.
+   * See {@link propagatePhotonsWithOperator} for a reference.
+   *
+   * @returns Itself, for chaining.
+   */
+  propagatePhotons(): Frame {
+    const dirToShiftX = (dir: number): number => {
+      if (dir === 0) {
+        return 1
+      } else if (dir === 2) {
+        return -1
+      } else {
+        return 0
+      }
+    }
+
+    const dirToShiftY = (dir: number): number => {
+      if (dir === 1) {
+        return -1
+      } else if (dir === 3) {
+        return 1
+      } else {
+        return 0
+      }
+    }
+
+    _.range(this.nPhotons).forEach((i) => {
+      const [iX, iY, iDir] = this.vectorPosDirIndicesForParticle(i)
+      this.vector.entries.forEach((entry) => {
+        const dir = entry.coord[iDir]
+        entry.coord[iX] += dirToShiftX(dir)
+        entry.coord[iY] += dirToShiftY(dir)
+      })
+      this.vector.entries = this.vector.entries.filter((entry) => {
+        const x = entry.coord[iX]
+        const y = entry.coord[iY]
+        return 0 <= x && x < this.sizeX && 0 <= y && y < this.sizeY
+      })
     })
     return this
   }
@@ -496,6 +539,33 @@ export default class Frame {
   }
 
   /**
+   * Turn an list of operators in a complete one-photon iteraction operator for the board (U - Id).
+   * @param sizeX Board size, x.
+   * @param sizeY Board size, y.
+   * @param opsWithPos A list of [x, y, operator with [dir, pol]].
+   */
+  static singlePhotonInteractionDiff(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
+    const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
+      const { x, y, op } = d
+      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
+      const shiftedOp = op.sub(idDirPol)
+      return Frame.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
+    })
+
+    if (localizedOpsShifted.length === 0) {
+      localizedOpsShifted.push(
+        Operator.zeros([
+          Dimension.position(sizeX, 'x'),
+          Dimension.position(sizeY, 'y'),
+          Dimension.direction(),
+          Dimension.polarization(),
+        ]),
+      )
+    }
+    return Operator.add(localizedOpsShifted)
+  }
+
+  /**
    * Turn an list of operators in a complete one-photon iteraction operator for the board.
    * @remark Some space for improvement with avoiding identity (direct sum structure),
    * vide {@link Operator.mulVecPartial}.
@@ -504,19 +574,11 @@ export default class Frame {
    * @param opsWithPos A list of [x, y, operator with [dir, pol]].
    */
   static singlePhotonInteraction(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
-    const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
-      const { x, y, op } = d
-      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
-      const shiftedOp = op.sub(idDirPol)
-      return this.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
-    })
+    const localizedOpsShifted = Frame.singlePhotonInteractionDiff(sizeX, sizeY, opsWithPos)
 
     const dimX = Dimension.position(sizeX, 'x')
     const dimY = Dimension.position(sizeY, 'y')
 
-    return Operator.add([
-      Operator.identity([dimX, dimY, Dimension.direction(), Dimension.polarization()]),
-      ...localizedOpsShifted,
-    ])
+    return localizedOpsShifted.add(Operator.identity([dimX, dimY, Dimension.direction(), Dimension.polarization()]))
   }
 }

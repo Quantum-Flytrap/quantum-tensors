@@ -3,7 +3,7 @@ import Operator from './Operator'
 import Frame from './Frame'
 import { generateOperators } from './Elements'
 import { weightedRandomInt, startingPolarization, startingDirection } from './helpers'
-import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator } from './interfaces'
+import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator, IParticle } from './interfaces'
 
 /**
  * SIMULATION CLASS
@@ -129,6 +129,20 @@ export default class Simulation {
    */
   public get totalAbsorptionPerFrame(): number[] {
     return this.frames.map((frame): number => frame.totalProbabilityLoss)
+  }
+
+  /**
+   * Retrieve a list of all the particles for quantum path computation
+   * @returns particle list
+   */
+  public get allParticles(): IParticle[] {
+    const result: IParticle[] = []
+    this.frames.forEach((frame): void => {
+      frame.particles.forEach((particle): void => {
+        result.push(particle)
+      })
+    })
+    return result
   }
 
   /**
