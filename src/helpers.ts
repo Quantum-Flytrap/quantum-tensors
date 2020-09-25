@@ -92,7 +92,7 @@ export function indicesComplement(indices: number[], n: number): number[] {
   if (!isPermutation(indices.concat(res))) {
     throw new Error(`In [${indices}] are not unique integer, between 0 and ${n - 1}.`)
   }
-  return _.range(n).filter((i) => !_.includes(indices, i))
+  return res
 }
 
 /**

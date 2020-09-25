@@ -414,7 +414,7 @@ export default class Vector {
           coordStrs: entry.coord.map((c: number, dim: number) => this.coordNames[dim][c]),
         }),
       )
-      .filter((d) => d.amplitude.r ** 2 > probThreshold)
+      .filter((d) => d.amplitude.abs2() > probThreshold)
   }
 
   /**
