@@ -254,19 +254,17 @@ export default class Operator {
   /**
    * Multiply an operator by another operator.
    * Order as in the syntax (M1 this operator, M2 - the argument).
-   * @param m Operator M2 with dimensions compatible with operators input dimensions of M1.
+   * @param m2 Operator M2 with dimensions compatible with operators input dimensions of M1 (`this`).
    *
    * @returns M = M1 M2
    */
-  mulOp(m: Operator): Operator {
+  mulOp(m2: Operator): Operator {
     const m1 = this
-    const m2 = m
     Dimension.checkDimensions(m1.dimensionsIn, m2.dimensionsOut)
+    const vecPerInput = m2.toVectorPerInput()
     const entries = m1
       .toVectorPerOutput()
-      .flatMap((row) =>
-        m2.toVectorPerInput().map((col) => new OperatorEntry(row.coord, col.coord, row.vector.dot(col.vector))),
-      )
+      .flatMap((row) => vecPerInput.map((col) => new OperatorEntry(row.coord, col.coord, row.vector.dot(col.vector))))
       .filter((entry) => !entry.value.isAlmostZero())
     return new Operator(entries, [...m1.dimensionsOut], [...m2.dimensionsIn])
   }
