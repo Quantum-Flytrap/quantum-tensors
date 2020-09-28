@@ -18,6 +18,9 @@ export default class Operator {
   readonly dimensionsOut: Dimension[]
   readonly dimensionsIn: Dimension[]
 
+  private cachedPerOutput: IColumnOrRow[] | null = null
+  private cachedPerInput: IColumnOrRow[] | null = null
+
   /**
    * Creates an operator from sparse entires.
    * This is a low-level method (due to the explicit use of {@link OperatorEntry}).
@@ -208,15 +211,16 @@ export default class Operator {
    * @returns a sparse array of vector per output.
    */
   toVectorPerOutput(): IColumnOrRow[] {
-    return _(this.entries)
-      .groupBy((entry) => entry.coordOut.toString())
-      .map((entries) => {
-        const coord = entries[0].coordOut
-        const vecEntries = entries.map((opEntry) => new VectorEntry(opEntry.coordIn, opEntry.value))
-        const vector = new Vector(vecEntries, [...this.dimensionsIn])
-        return { coord, vector }
-      })
-      .value()
+    if (this.cachedPerOutput == null) {
+      this.cachedPerOutput = _(this.entries)
+        .groupBy((entry) => entry.coordOut.join('|'))
+        .map((entries) => {
+          const vecEntries = entries.map((opEntry) => new VectorEntry(opEntry.coordIn, opEntry.value))
+          return { coord: entries[0].coordOut, vector: new Vector(vecEntries, this.dimensionsIn) }
+        })
+        .value()
+    }
+    return this.cachedPerOutput
   }
 
   /**
@@ -225,16 +229,17 @@ export default class Operator {
    * @returns a sparse array of vector per input
    */
   toVectorPerInput(): IColumnOrRow[] {
-    return _(this.entries)
-      .groupBy((entry) => entry.coordIn.toString())
-      .values()
-      .map((entries) => {
-        const coord = entries[0].coordIn
-        const vecEntries = entries.map((opEntry) => new VectorEntry(opEntry.coordOut, opEntry.value))
-        const vector = new Vector(vecEntries, [...this.dimensionsOut])
-        return { coord, vector }
-      })
-      .value()
+    if (this.cachedPerInput == null) {
+      this.cachedPerInput = _(this.entries)
+        .groupBy((entry) => entry.coordIn.join('|'))
+        .values()
+        .map((entries) => {
+          const vecEntries = entries.map((opEntry) => new VectorEntry(opEntry.coordOut, opEntry.value))
+          return { coord: entries[0].coordIn, vector: new Vector(vecEntries, this.dimensionsOut) }
+        })
+        .value()
+    }
+    return this.cachedPerInput
   }
 
   /**

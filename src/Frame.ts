@@ -9,6 +9,9 @@ import Simulation from './Simulation'
 import { polStates } from './Ops'
 import Complex, { Cx } from './Complex'
 
+// Cached identity operator. Can be reused between frames as it is immutable.
+const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
+
 /**
  * Frame class
  * @remarks Merge between Photons and QuantumFrame from QG2
@@ -557,7 +560,6 @@ export default class Frame {
   static singlePhotonInteractionDiff(sizeX: number, sizeY: number, opsWithPos: IXYOperator[]): Operator {
     const localizedOpsShifted = opsWithPos.map((d: IXYOperator) => {
       const { x, y, op } = d
-      const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
       const shiftedOp = op.sub(idDirPol)
       return Frame.localizeOperator(sizeX, sizeY, { x, y, op: shiftedOp })
     })
