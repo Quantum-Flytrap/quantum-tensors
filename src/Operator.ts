@@ -279,7 +279,7 @@ export default class Operator {
    *
    * @returns M_(coord_indices) ⊗ I_(everywhere_else) v
    */
-  mulVecPartial(coordIndices: number[], v: Vector): Vector {
+  mulVecPartial(coordIndices: readonly number[], v: Vector): Vector {
     const complementIndices = indicesComplement(coordIndices, v.dimensions.length)
     const joinCoords = joinCoordsFunc(coordIndices, complementIndices)
 

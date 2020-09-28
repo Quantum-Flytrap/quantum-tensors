@@ -14,8 +14,8 @@ import { IColumnOrRow, IEntryIndexValue, IKetComponent } from './interfaces'
  * @see {@link Complex} and {@link Dimension}
  */
 export default class Vector {
-  entries: VectorEntry[]
-  dimensions: Dimension[]
+  readonly entries: VectorEntry[]
+  readonly dimensions: Dimension[]
 
   /**
    * Creates a vector entry.
@@ -246,7 +246,7 @@ export default class Vector {
    * Mostly for intrnal use, e.g. partial inner product, Schmidt decomposition, etc.
    * @param coordIndices Sorted indices of dimensions for vectors. Complementary ones are used for grouping.
    */
-  toGroupedByCoords(coordIndices: number[]): IColumnOrRow[] {
+  toGroupedByCoords(coordIndices: readonly number[]): IColumnOrRow[] {
     const complementIndices = indicesComplement(coordIndices, this.dimensions.length)
     const contractionDimensions = _.at(this.dimensions, coordIndices)
 

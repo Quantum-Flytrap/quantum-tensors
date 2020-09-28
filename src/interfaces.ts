@@ -31,7 +31,7 @@ export interface IPolarization {
  * For turning Operator in a sparse array of rows of columns
  */
 export interface IColumnOrRow {
-  coord: number[]
+  coord: readonly number[]
   vector: Vector
 }
 

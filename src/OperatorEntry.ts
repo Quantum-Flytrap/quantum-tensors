@@ -6,8 +6,8 @@ import { coordsFromIndex } from './helpers'
  * To be used only within a Operator object, or to create such.
  */
 export default class OperatorEntry {
-  readonly coordOut: number[]
-  readonly coordIn: number[]
+  readonly coordOut: readonly number[]
+  readonly coordIn: readonly number[]
   readonly value: Complex
 
   /**
@@ -16,7 +16,7 @@ export default class OperatorEntry {
    * @param coordIn
    * @param value
    */
-  constructor(coordOut: number[], coordIn: number[], value: Complex) {
+  constructor(coordOut: readonly number[], coordIn: readonly number[], value: Complex) {
     this.coordOut = coordOut
     this.coordIn = coordIn
     this.value = value

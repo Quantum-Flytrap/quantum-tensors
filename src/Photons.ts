@@ -6,6 +6,7 @@ import Operator from './Operator'
 import Dimension from './Dimension'
 import { polStates } from './Ops'
 import Complex, { Cx } from './Complex'
+import VectorEntry from './VectorEntry'
 
 /**
  * Photons class.
@@ -249,19 +250,29 @@ export default class Photons {
       }
     }
 
-    _.range(this.nPhotons).forEach((i) => {
+    const { sizeX, sizeY, nPhotons } = this
+    let newEntries = [...this.vector.entries]
+
+    for (let i = 0; i < nPhotons; i++) {
       const [iX, iY, iDir] = this.vectorPosDirIndicesForParticle(i)
-      this.vector.entries.forEach((entry) => {
-        const dir = entry.coord[iDir]
-        entry.coord[iX] += dirToShiftX(dir)
-        entry.coord[iY] += dirToShiftY(dir)
-      })
-      this.vector.entries = this.vector.entries.filter((entry) => {
-        const x = entry.coord[iX]
-        const y = entry.coord[iY]
-        return 0 <= x && x < this.sizeX && 0 <= y && y < this.sizeY
-      })
-    })
+      newEntries = newEntries
+        .map((entry) => {
+          const dir = entry.coord[iDir]
+          const x = entry.coord[iX] + dirToShiftX(dir)
+          const y = entry.coord[iY] + dirToShiftY(dir)
+          const newCoords = entry.coord.slice()
+          newCoords[iX] = x
+          newCoords[iY] = y
+          return new VectorEntry(newCoords, entry.value)
+        })
+        .filter((entry) => {
+          const x = entry.coord[iX]
+          const y = entry.coord[iY]
+          return 0 <= x && x < sizeX && 0 <= y && y < sizeY
+        })
+    }
+
+    this.vector = new Vector(newEntries, this.vector.dimensions)
     return this
   }
 
@@ -312,7 +323,7 @@ export default class Photons {
    * FIXME: No return type
    */
   /* eslint-disable-next-line */
-  vectorValuedMeasurement(op: IXYOperator, photonId = 0): any {
+  vectorValuedMeasurement(op: IXYOperator, photonId = 0) {
     // as I see later, localizedOperator can be discarded as
     // we use localizedId anyway
     const localizedOperator = Photons.localizeOperator(this.sizeX, this.sizeY, op)
