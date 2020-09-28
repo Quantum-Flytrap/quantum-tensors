@@ -6,15 +6,15 @@ import { coordsFromIndex } from './helpers'
  * To be used only within a Vector object, or to create such.
  */
 export default class VectorEntry {
-  coord: number[]
-  value: Complex
+  readonly coord: readonly number[]
+  readonly value: Complex
 
   /**
    * Creates a VectorEntry from coord and value.
    * @param coord
    * @param value
    */
-  constructor(coord: number[], value: Complex) {
+  constructor(coord: readonly number[], value: Complex) {
     this.coord = coord
     this.value = value
   }

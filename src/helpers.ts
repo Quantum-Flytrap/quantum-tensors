@@ -32,7 +32,7 @@ export function coordsFromIndex(index: number, sizes: number[]): number[] {
  *
  * @return Index
  */
-export function coordsToIndex(coords: number[], sizes: number[]): number {
+export function coordsToIndex(coords: readonly number[], sizes: readonly number[]): number {
   if (coords.length !== sizes.length) {
     throw new Error(`Coordinates ${coords} and sizes ${sizes} are of different lengths}.`)
   }
@@ -54,7 +54,7 @@ export function coordsToIndex(coords: number[], sizes: number[]): number {
  * @param sizes  [s1, s2, ...] Dimensions sizes
  * @returns Error when not [0 <= c1 < s1, 0 <= c2 < s2, ...]
  */
-export function checkCoordsSizesCompability(coords: number[], sizes: number[]): void {
+export function checkCoordsSizesCompability(coords: readonly number[], sizes: readonly number[]): void {
   if (coords.length !== sizes.length) {
     throw new Error(`Coordinates [${coords}] incompatible with sizes [${sizes}].`)
   }
@@ -87,7 +87,7 @@ export function isPermutation(array: number[], n = array.length): boolean {
  * @param n E.g. 5
  * @return E.g. [0, 2, 4]
  */
-export function indicesComplement(indices: number[], n: number): number[] {
+export function indicesComplement(indices: readonly number[], n: number): number[] {
   const res = _.range(n).filter((i) => !_.includes(indices, i))
   if (!isPermutation(indices.concat(res))) {
     throw new Error(`In [${indices}] are not unique integer, between 0 and ${n - 1}.`)
@@ -101,8 +101,8 @@ export function indicesComplement(indices: number[], n: number): number[] {
  * @param complementIndices E.g. [0, 2, 4]
  * @returns A function that for [2, 3, 5], [7, 11] -> [2, 11, 3, 7, 5]
  */
-export function joinCoordsFunc(coordIndices: number[], complementIndices: number[]) {
-  return (coordGroup: number[], coordContraction: number[]): number[] => {
+export function joinCoordsFunc(coordIndices: readonly number[], complementIndices: readonly number[]) {
+  return (coordGroup: readonly number[], coordContraction: readonly number[]): number[] => {
     const coord = new Array(coordIndices.length + complementIndices.length)
     coordGroup.forEach((c, i) => {
       coord[complementIndices[i]] = c
