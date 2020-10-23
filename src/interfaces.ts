@@ -120,6 +120,7 @@ export interface IGrid {
   rows: number
   cells: ICell[]
 }
+/* eslint-disable */
 
 /**
  * Cell interface in primitives

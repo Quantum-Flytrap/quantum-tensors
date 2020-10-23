@@ -128,27 +128,17 @@ describe('Optical elements', () => {
     expect(Elements.faradayRotator(270).isCloseToHermitian()).toBe(false)
   })
 
-  it('Polarizers WE and NS', () => {
-    expect(Elements.polarizerWE(0).isCloseToProjection()).toBe(true)
-    expect(Elements.polarizerWE(45).isCloseToProjection()).toBe(true)
-    expect(Elements.polarizerWE(90).isCloseToProjection()).toBe(true)
-    expect(Elements.polarizerWE(135).isCloseToProjection()).toBe(true)
-
-    expect(Elements.polarizerNS(0).isCloseToProjection()).toBe(true)
-    expect(Elements.polarizerNS(45).isCloseToProjection()).toBe(true)
-    expect(Elements.polarizerNS(90).isCloseToProjection()).toBe(true)
-    expect(Elements.polarizerNS(135).isCloseToProjection()).toBe(true)
+  it('Polarizers', () => {
+    expect(Elements.polarizer(0).isCloseToProjection()).toBe(true)
+    expect(Elements.polarizer(45).isCloseToProjection()).toBe(true)
+    expect(Elements.polarizer(90).isCloseToProjection()).toBe(true)
+    expect(Elements.polarizer(135).isCloseToProjection()).toBe(true)
   })
 
-  it('Quarter wave plates WE and NS', () => {
-    expect(Elements.quarterWavePlateWE(0).isCloseToUnitaryOnSubspace()).toBe(true)
-    expect(Elements.quarterWavePlateWE(45).isCloseToUnitaryOnSubspace()).toBe(true)
-    expect(Elements.quarterWavePlateWE(90).isCloseToUnitaryOnSubspace()).toBe(true)
-    expect(Elements.quarterWavePlateWE(135).isCloseToUnitaryOnSubspace()).toBe(true)
-
-    expect(Elements.quarterWavePlateNS(0).isCloseToUnitaryOnSubspace()).toBe(true)
-    expect(Elements.quarterWavePlateNS(45).isCloseToUnitaryOnSubspace()).toBe(true)
-    expect(Elements.quarterWavePlateNS(90).isCloseToUnitaryOnSubspace()).toBe(true)
-    expect(Elements.quarterWavePlateNS(135).isCloseToUnitaryOnSubspace()).toBe(true)
+  it('Quarter wave plates', () => {
+    expect(Elements.phasePlate(0, 0.25).isCloseToUnitaryOnSubspace()).toBe(true)
+    expect(Elements.phasePlate(45, 0.25).isCloseToUnitaryOnSubspace()).toBe(true)
+    expect(Elements.phasePlate(90, 0.25).isCloseToUnitaryOnSubspace()).toBe(true)
+    expect(Elements.phasePlate(135, 0.25).isCloseToUnitaryOnSubspace()).toBe(true)
   })
 })

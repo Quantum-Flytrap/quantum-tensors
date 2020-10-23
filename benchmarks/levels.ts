@@ -1,4 +1,6 @@
-export const grid1 = {
+import { IGrid } from '../src/interfaces'
+
+export const grid1: IGrid = {
   cols: 13,
   rows: 10,
   cells: [
@@ -8,7 +10,6 @@ export const grid1 = {
       element: 'Mirror',
       rotation: 45,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 0,
@@ -16,7 +17,6 @@ export const grid1 = {
       element: 'Mirror',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 2,
@@ -24,7 +24,6 @@ export const grid1 = {
       element: 'Mirror',
       rotation: 45,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 2,
@@ -32,7 +31,6 @@ export const grid1 = {
       element: 'Mirror',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -40,7 +38,6 @@ export const grid1 = {
       element: 'Laser',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -48,7 +45,6 @@ export const grid1 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -56,7 +52,6 @@ export const grid1 = {
       element: 'Mirror',
       rotation: 45,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 2,
@@ -64,7 +59,6 @@ export const grid1 = {
       element: 'Detector',
       rotation: 90,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 9,
@@ -72,7 +66,6 @@ export const grid1 = {
       element: 'Mirror',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 9,
@@ -80,12 +73,11 @@ export const grid1 = {
       element: 'Mirror',
       rotation: 45,
       polarization: 0,
-      percentage: 0,
     },
   ],
 }
 
-export const grid2 = {
+export const grid2: IGrid = {
   cols: 13,
   rows: 10,
   cells: [
@@ -95,7 +87,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 2,
@@ -103,7 +94,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 2,
@@ -111,7 +101,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -119,7 +108,6 @@ export const grid2 = {
       element: 'Laser',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 4,
@@ -127,7 +115,6 @@ export const grid2 = {
       element: 'SugarSolution',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 4,
@@ -135,7 +122,6 @@ export const grid2 = {
       element: 'SugarSolution',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -143,7 +129,6 @@ export const grid2 = {
       element: 'PolarizingBeamSplitter',
       rotation: 180,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -151,7 +136,6 @@ export const grid2 = {
       element: 'FaradayRotator',
       rotation: 180,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -159,7 +143,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -167,7 +150,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -175,7 +157,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 3,
@@ -183,7 +164,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 90,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 4,
@@ -191,7 +171,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 90,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 4,
@@ -199,7 +178,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 4,
@@ -207,7 +185,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 4,
@@ -215,7 +192,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 4,
@@ -223,7 +199,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 90,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 5,
@@ -231,7 +206,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 90,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 5,
@@ -239,7 +213,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 5,
@@ -247,7 +220,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 5,
@@ -255,7 +227,6 @@ export const grid2 = {
       element: 'BeamSplitter',
       rotation: 135,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 5,
@@ -263,7 +234,6 @@ export const grid2 = {
       element: 'Detector',
       rotation: 90,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 6,
@@ -271,7 +241,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 6,
@@ -279,7 +248,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 6,
@@ -287,7 +255,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 0,
       polarization: 0,
-      percentage: 0,
     },
     {
       y: 5,
@@ -295,7 +262,6 @@ export const grid2 = {
       element: 'Mirror',
       rotation: 90,
       polarization: 0,
-      percentage: 0,
     },
   ],
 }
