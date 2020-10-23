@@ -3,7 +3,25 @@ import Operator from './Operator'
 import Frame from './Frame'
 import { generateOperators } from './Elements'
 import { weightedRandomInt, startingPolarization, startingDirection } from './helpers'
-import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator, IParticle } from './interfaces'
+import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator, IParticle, Elem } from './interfaces'
+
+/**
+ * Generate the laser indicator from the grid laser cell
+ * @returns laserIndicator
+ */
+export function generateLaserIndicator(cells: ICell[]): IIndicator {
+  const lasers = cells.filter((cell: ICell) => cell.element === Elem.Laser)
+  if (lasers.length !== 1) {
+    throw new Error(`Cannot initialize QuantumSimulation. ${lasers.length} != 1 lasers.`)
+  }
+  const laserIndicator: IIndicator = {
+    x: lasers[0].x,
+    y: lasers[0].y,
+    direction: startingDirection(lasers[0].rotation),
+    polarization: startingPolarization(lasers[0].polarization),
+  }
+  return laserIndicator
+}
 
 /**
  * SIMULATION CLASS
@@ -12,48 +30,22 @@ import { IAbsorption, IGrid, ICell, IIndicator, IXYOperator, IParticle } from '.
  * Generate simulation frames and absorptions.
  */
 export default class Simulation {
-  private grid: IGrid
+  readonly sizeX: number
+  readonly sizeY: number
   public operators: IXYOperator[]
   public globalOperator: Operator
   public frames: Frame[]
 
-  public constructor(grid: IGrid) {
-    this.grid = grid
-    this.operators = generateOperators(grid)
-    this.globalOperator = Frame.singlePhotonInteraction(grid.cols, grid.rows, this.operators)
+  public constructor(sizeX: number, sizeY: number, operators: IXYOperator[]) {
+    this.sizeX = sizeX
+    this.sizeY = sizeY
+    this.operators = operators
+    this.globalOperator = Frame.singlePhotonInteraction(this.sizeX, this.sizeY, this.operators)
     this.frames = []
   }
 
-  /**
-   * @returns number of columns of grid
-   */
-  public get sizeX(): number {
-    return this.grid.cols
-  }
-
-  /**
-   * @returns number of rows of grid
-   */
-  public get sizeY(): number {
-    return this.grid.rows
-  }
-
-  /**
-   * Generate the laser indicator from the grid laser cell
-   * @returns laserIndicator
-   */
-  public generateLaserIndicator(): IIndicator {
-    const lasers = this.grid.cells.filter((cell: ICell) => cell.element === 'Laser')
-    if (lasers.length !== 1) {
-      throw new Error(`Cannot initialize QuantumSimulation. ${lasers.length} != 1 lasers.`)
-    }
-    const laserIndicator: IIndicator = {
-      x: lasers[0].x,
-      y: lasers[0].y,
-      direction: startingDirection(lasers[0].rotation),
-      polarization: startingPolarization(lasers[0].polarization),
-    }
-    return laserIndicator
+  public static fromGrid(grid: IGrid): Simulation {
+    return new Simulation(grid.cols, grid.rows, generateOperators(grid.cells))
   }
 
   /**

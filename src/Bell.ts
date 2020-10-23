@@ -2,6 +2,7 @@ import { Cx } from './Complex'
 import Dimension from './Dimension'
 import Vector from './Vector'
 import Operator from './Operator'
+import { DEG_TO_RAD } from './Constants'
 
 // takem from Quantum Boxing
 // https://github.com/sneakyweasel/quantum-boxing
@@ -62,8 +63,8 @@ export const opZ = Operator.fromSparseCoordNames(
 function linearPol(alpha: number): Vector {
   return Vector.fromSparseCoordNames(
     [
-      ['H', Cx(Math.cos((2 * Math.PI * alpha) / 360))],
-      ['V', Cx(Math.sin((2 * Math.PI * alpha) / 360))],
+      ['H', Cx(Math.cos(alpha * DEG_TO_RAD))],
+      ['V', Cx(Math.sin(alpha * DEG_TO_RAD))],
     ],
     [dimPol],
   )

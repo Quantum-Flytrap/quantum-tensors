@@ -4,9 +4,9 @@ import { Cx } from './Complex'
 import Dimension from './Dimension'
 import Vector from './Vector'
 import Operator from './Operator'
-import { TAU } from './Constants'
+import { DEG_TO_RAD, TAU } from './Constants'
 import * as ops from './Ops'
-import { IGrid, Elem, ICell, IXYOperator } from './interfaces'
+import { Elem, ICell, IXYOperator } from './interfaces'
 
 const dimPol = Dimension.polarization()
 const dimDir = Dimension.direction()
@@ -130,70 +130,40 @@ export function faradayRotator(angle: number, polarizationRotation = 0.125): Ope
  * @param polarizationOrientation A number, in tau, i.e. [0, 1]. 0 transmits hotizontal polarization, 0.25 - vertical.
  * @todo Check angle conventions.
  */
-export function polarizer(angle: number, polarizationOrientation: number): Operator {
+export function polarizer(angle: number): Operator {
   return Operator.add([
-    Operator.outer([ops.diodeForDirections(angle), ops.projectionMatrix(polarizationOrientation * TAU, dimPol)]),
-    Operator.outer([ops.diodeForDirections(angle + 180), ops.projectionMatrix(-polarizationOrientation * TAU, dimPol)]),
+    Operator.outer([ops.diodeForDirections(0), ops.projectionMatrix(angle * DEG_TO_RAD, dimPol)]),
+    Operator.outer([ops.diodeForDirections(90), ops.projectionMatrix((angle + 90) * DEG_TO_RAD, dimPol)]),
+    Operator.outer([ops.diodeForDirections(180), ops.projectionMatrix((angle + 180) * DEG_TO_RAD, dimPol)]),
+    Operator.outer([ops.diodeForDirections(270), ops.projectionMatrix((angle + 270) * DEG_TO_RAD, dimPol)]),
   ])
-}
-
-/**
- * As from Quantum Game 1, for compatibility.
- * Don't use in other.
- * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
- * @todo Check convention, etc
- */
-export function polarizerWE(angle: number): Operator {
-  return polarizer(0, angle / 360)
-}
-
-/**
- * As from Quantum Game 1, for compatibility.
- * Don't use in other.
- * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
- * @todo Check convention, etc
- */
-export function polarizerNS(angle: number): Operator {
-  return polarizer(90, angle / 360)
 }
 
 /**
  * A phase plate for linear polarization.
- * @param angle In plane rotation, in degrees [0, 90, 180, 270], i.e  | - | -.
- * @param polarizationOrientation A number, in tau, i.e. [0, 1]. 0 transmits hotizontal polarization, 0.25 - vertical.
- * @param phase Phase shift. 1/4 (default) for quater-wave-plate, 1/2 for half-wave-plate.
+ * @param rotation Element rotation in degrees
+ * @param phase Phase shift in TAU. 1/4 for quater-wave-plate, 1/2 for half-wave-plate.
  * @todo Convention: modify this polarization, ortonogal, or some other way?
  */
-export function phasePlate(angle: number, polarizationOrientation: number, phase = 1 / 4): Operator {
+export function phasePlate(rotation: number, phaseShift: number): Operator {
   return Operator.add([
     Operator.outer([
-      ops.diodeForDirections(angle),
-      ops.phaseShiftForRealEigenvectors(polarizationOrientation * TAU, 0, phase, dimPol),
+      ops.diodeForDirections(0),
+      ops.phaseShiftForRealEigenvectors(rotation * DEG_TO_RAD, 0, phaseShift, dimPol),
     ]),
     Operator.outer([
-      ops.diodeForDirections(angle + 180),
-      ops.phaseShiftForRealEigenvectors(-polarizationOrientation * TAU, 0, phase, dimPol),
+      ops.diodeForDirections(90),
+      ops.phaseShiftForRealEigenvectors((rotation + 90) * DEG_TO_RAD, 0, phaseShift, dimPol),
+    ]),
+    Operator.outer([
+      ops.diodeForDirections(180),
+      ops.phaseShiftForRealEigenvectors((rotation + 180) * DEG_TO_RAD, 0, phaseShift, dimPol),
+    ]),
+    Operator.outer([
+      ops.diodeForDirections(270),
+      ops.phaseShiftForRealEigenvectors((rotation + 270) * DEG_TO_RAD, 0, phaseShift, dimPol),
     ]),
   ])
-}
-
-/**
- * As from Quantum Game 1, for compatibility.
- * Don't use in other.
- * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
- * @todo Check convention, etc
- */
-export function quarterWavePlateWE(angle: number): Operator {
-  return phasePlate(0, angle / 360)
-}
-
-/**
- * As from Quantum Game 1, for compatibility.
- * @param angle In deg. Can be any, but we use [0, 45, 90, ...].
- * @todo Check convention, etc
- */
-export function quarterWavePlateNS(angle: number): Operator {
-  return phasePlate(90, angle / 360)
 }
 
 /**
@@ -209,6 +179,61 @@ export function incoherentLightOperator(opDirPol: Operator): Operator {
 }
 
 /**
+ * Compute local operator for given cell
+ */
+function cellLocalOperator(cell: ICell): Operator {
+  switch (cell.element) {
+    case Elem.Absorber:
+      return attenuator(Math.sqrt(cell.strength ?? 0.5))
+    case Elem.BeamSplitter:
+      return beamSplitter(cell.rotation)
+    case Elem.CoatedBeamSplitter:
+      return beamSplitter(cell.rotation)
+    case Elem.CornerCube:
+      return cornerCube()
+    case Elem.Detector:
+      return attenuator(0)
+    case Elem.DetectorFour:
+      return attenuator(0)
+    case Elem.FaradayRotator:
+      return faradayRotator(cell.rotation)
+    case Elem.Gate:
+      return attenuator(0)
+    case Elem.Glass:
+      return glassSlab()
+    case Elem.Laser:
+      return attenuator(0)
+    case Elem.Mine:
+      return attenuator(0)
+    case Elem.Mirror:
+      return mirror(cell.rotation)
+    case Elem.NonLinearCrystal:
+      return attenuator(1)
+    case Elem.Polarizer:
+      return polarizer(cell.rotation)
+    case Elem.PolarizingBeamSplitter:
+      return polarizingBeamsplitter(cell.rotation)
+    case Elem.HalfWavePlate:
+      return phasePlate(cell.rotation, 0.5)
+    case Elem.QuarterWavePlate:
+      return phasePlate(cell.rotation, 0.25)
+    case Elem.Rock:
+      return attenuator(0)
+    case Elem.SugarSolution:
+      return sugarSolution(0.25)
+    case Elem.VacuumJar:
+      return vacuumJar()
+    case Elem.Void:
+      return attenuator(1)
+    case Elem.Wall:
+      return attenuator(0)
+    default: {
+      throw new Error(`Conversion from cell to operator failed: ${cell}.`)
+    }
+  }
+}
+
+/**
  * Compute operators from the grid cells
  * @param cell, an ICell interface
  * @returns IXYOperator
@@ -216,175 +241,10 @@ export function incoherentLightOperator(opDirPol: Operator): Operator {
 export function generateOperator(cell: ICell): IXYOperator {
   const x = cell.x
   const y = cell.y
-  switch (cell.element) {
-    case Elem.Absorber: {
-      return {
-        x,
-        y,
-        op: attenuator(Math.SQRT1_2),
-      }
-    }
-    case Elem.BeamSplitter: {
-      return {
-        x,
-        y,
-        op: beamSplitter(cell.rotation),
-      }
-    }
-    case Elem.CoatedBeamSplitter: {
-      return {
-        x,
-        y,
-        op: beamSplitter(cell.rotation),
-      }
-    }
-    case Elem.CornerCube: {
-      return {
-        x,
-        y,
-        op: cornerCube(),
-      }
-    }
-    case Elem.Detector: {
-      return {
-        x,
-        y,
-        op: attenuator(0),
-      }
-    }
-    case Elem.DetectorFour: {
-      return {
-        x,
-        y,
-        op: attenuator(0),
-      }
-    }
-    case Elem.FaradayRotator: {
-      return {
-        x,
-        y,
-        op: faradayRotator(cell.rotation),
-      }
-    }
-    case Elem.Gate: {
-      return {
-        x,
-        y,
-        op: attenuator(0),
-      }
-    }
-    case Elem.Glass: {
-      return {
-        x,
-        y,
-        op: glassSlab(),
-      }
-    }
-    case Elem.Glass: {
-      return {
-        x,
-        y,
-        op: glassSlab(),
-      }
-    }
-    case Elem.HalfWavePlate: {
-      return {
-        x,
-        y,
-        op: Operator.add([
-          phasePlate(0, cell.rotation / 360, 0.5), // qt.Elements.halfWavePlateWE(options.rotation)
-          phasePlate(90, (cell.rotation + 90) / 360, 0.5), // qt.Elements.quarterWavePlateNS(options.rotation + 90)
-        ]),
-      }
-    }
-    case Elem.Laser: {
-      return {
-        x,
-        y,
-        op: attenuator(0),
-      }
-    }
-    case Elem.Mine: {
-      return {
-        x,
-        y,
-        op: attenuator(0),
-      }
-    }
-    case Elem.Mirror: {
-      return {
-        x,
-        y,
-        op: mirror(cell.rotation),
-      }
-    }
-    case Elem.NonLinearCrystal: {
-      return {
-        x,
-        y,
-        op: attenuator(1),
-      }
-    }
-    case Elem.Polarizer: {
-      return {
-        x,
-        y,
-        op: Operator.add([polarizerWE(cell.rotation), polarizerNS(cell.rotation + 90)]),
-      }
-    }
-    case Elem.PolarizingBeamSplitter: {
-      return {
-        x,
-        y,
-        op: polarizingBeamsplitter(cell.rotation),
-      }
-    }
-    case Elem.QuarterWavePlate: {
-      return {
-        x,
-        y,
-        op: Operator.add([quarterWavePlateWE(cell.rotation), quarterWavePlateNS(cell.rotation + 90)]),
-      }
-    }
-    case Elem.Rock: {
-      return {
-        x,
-        y,
-        op: attenuator(0),
-      }
-    }
-    case Elem.SugarSolution: {
-      return {
-        x,
-        y,
-        op: sugarSolution(0.125),
-      }
-    }
-    case Elem.VacuumJar: {
-      return {
-        x,
-        y,
-        op: vacuumJar(),
-      }
-    }
-    case Elem.Void: {
-      return {
-        x,
-        y,
-        op: attenuator(1),
-      }
-    }
-    case Elem.Wall: {
-      return {
-        x,
-        y,
-        op: attenuator(0),
-      }
-    }
-
-    default: {
-      throw new Error(`Conversion from cell to operator failed: ${cell}.`)
-    }
+  return {
+    x,
+    y,
+    op: cellLocalOperator(cell),
   }
 }
 
@@ -393,8 +253,8 @@ export function generateOperator(cell: ICell): IXYOperator {
  * @param grid
  * @returns IXYOperator[] list
  */
-export function generateOperators(grid: IGrid): IXYOperator[] {
-  return grid.cells.map((cell) => {
+export function generateOperators(cells: ICell[]): IXYOperator[] {
+  return cells.map((cell) => {
     return generateOperator(cell)
   })
 }
