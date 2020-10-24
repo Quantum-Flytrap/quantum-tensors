@@ -1,5 +1,5 @@
 /* eslint-disable-next-line */
-import _ from 'lodash'
+import _, { entries } from 'lodash'
 import { coordsToIndex, checkCoordsSizesCompability, isPermutation, indicesComplement, joinCoordsFunc } from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
@@ -622,6 +622,21 @@ export default class Operator {
         ),
     )
     return new Operator(entries, dimensionsOut, dimensionsIn)
+  }
+
+  /**
+   * Turn vector into a (non-normalized) projection on it:
+   * |v⟩ -> |v⟩⟨v|
+   * @param v |v⟩
+   * @returns |v⟩⟨v|
+   */
+  static projectionOn(v: Vector): Operator {
+    const opEntries = v.entries.flatMap((entryOut) =>
+      v.entries.map(
+        (entryIn) => new OperatorEntry(entryOut.coord, entryIn.coord, entryOut.value.mul(entryIn.value.conj())),
+      ),
+    )
+    return new Operator(opEntries, [...v.dimensions])
   }
 
   /**

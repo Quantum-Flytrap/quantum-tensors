@@ -326,6 +326,15 @@ export default class Vector {
   }
 
   /**
+   * Is it close to zero?
+   * @param eps Euclidean distance tolerance.
+   * @return Checks v ~= 0
+   */
+  isCloseToZero(eps = 1e-6): boolean {
+    return Math.sqrt(this.normSquared()) < eps
+  }
+
+  /**
    * Change all dimensions with a given dimName to the desired basis.
    * @see {@link Basis.fromString} and {@link changeAllDimsOfVector}
    * @param dimName 'polarization', 'spin' or 'qubit'

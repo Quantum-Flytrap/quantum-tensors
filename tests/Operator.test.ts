@@ -458,4 +458,22 @@ describe('Sparse Complex Operator', () => {
         '(-1.00 +3.00i) |d⟩⟨u| + (0.00 +8.00i) |d⟩⟨d|\n',
     )
   })
+
+  it('creating projections', () => {
+    const vec = Vector.fromSparseCoordNames(
+      [
+        ['u', Cx(1, 0)],
+        ['d', Cx(0, 1)],
+      ],
+      [Dimension.spin()],
+    ).normalize()
+    const proj = Operator.projectionOn(vec)
+    expect(proj.isCloseToProjection()).toBe(true)
+    expect(proj.toString()).toEqual(
+      [
+        'Operator with 4 entries of max size [[2], [2]] with dimensions [[spin], [spin]]',
+        '(0.50 +0.00i) |u⟩⟨u| + (0.00 -0.50i) |u⟩⟨d| + (0.00 +0.50i) |d⟩⟨u| + (0.50 +0.00i) |d⟩⟨d|\n',
+      ].join('\n'),
+    )
+  })
 })
