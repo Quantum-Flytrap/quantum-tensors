@@ -179,7 +179,7 @@ export default class Photons {
           `Old photon:\n${this.vector}\nand new photon:\n${newPhoton}`
         )
       }
-      this.vector = Vector.add([oldPhotons.outer(newPhoton), newPhoton.outer(oldPhotons)]).mulConstant(Cx(Math.SQRT1_2))
+      this.vector = Vector.add([oldPhotons.outer(newPhoton), newPhoton.outer(oldPhotons)]).mulByReal(Math.SQRT1_2)
     } else {
       throw `Adding 3 or more particles not yet implemented. We already have: ${this.nPhotons} photons.`
     }

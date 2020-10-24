@@ -83,7 +83,7 @@ export default class IncoherentLight {
    * @returns Itself, for chaining.
    */
   normalize(): IncoherentLight {
-    this.vector = this.vector.mulConstant(Cx(1 / this.totalIntensity))
+    this.vector = this.vector.mulByReal(1 / this.totalIntensity)
     return this
   }
 

@@ -140,6 +140,15 @@ export default class Vector {
   }
 
   /**
+   * Multiplies vector by a real number.
+   * @param x A factor.
+   * @returns x v
+   */
+  mulByReal(x: number): Vector {
+    return this.mulConstant(Cx(x))
+  }
+
+  /**
    * Adds to vectors.
    * @param v2 The other vector.
    *
