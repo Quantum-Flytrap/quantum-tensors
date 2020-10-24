@@ -13,15 +13,15 @@ describe('Measurement', () => {
       ],
       [Dimension.qubit()],
     ).normalize()
-    const m = new Measurement<string>([{ name: [], vector }])
+    const m = new Measurement([{ name: [], vector }])
     expect(m.states.length).toBe(1)
-    expect(m.toString()).toBe('100.0%   0.71 exp(0.00τi) |0⟩ + 0.71 exp(0.00τi) |1⟩')
+    expect(m.toString()).toBe('100.0% [] 0.71 exp(0.00τi) |0⟩ + 0.71 exp(0.00τi) |1⟩')
     const projections = [
       { name: ['zero'], vector: Vector.indicator([Dimension.qubit()], '0') },
       { name: ['one'], vector: Vector.indicator([Dimension.qubit()], '1') },
     ]
     const newM = m.projectiveMeasurement([0], projections)
-    expect(newM.toString()).toBe(['50.0%   1.00 exp(0.00τi) |⟩', '50.0%   1.00 exp(0.00τi) |⟩'].join('\n'))
+    expect(newM.toString()).toBe(['50.0% [zero] 1.00 exp(0.00τi) |⟩', '50.0% [one] 1.00 exp(0.00τi) |⟩'].join('\n'))
   })
 
   it('two particles', () => {
@@ -32,16 +32,20 @@ describe('Measurement', () => {
       ],
       [Dimension.qubit(), Dimension.qubit()],
     ).normalize()
-    const m = new Measurement<string>([{ name: [], vector }])
+    const m = new Measurement([{ name: [], vector }])
     const projections = [
       { name: ['zero'], vector: Vector.indicator([Dimension.qubit()], '0') },
       { name: ['one'], vector: Vector.indicator([Dimension.qubit()], '1') },
     ]
     const measFirst = m.projectiveMeasurement([0], projections)
-    expect(measFirst.toString()).toBe(['50.0%   1.00 exp(0.00τi) |1⟩', '50.0%   1.00 exp(0.50τi) |0⟩'].join('\n'))
+    expect(measFirst.toString()).toBe(
+      ['50.0% [zero] 1.00 exp(0.00τi) |1⟩', '50.0% [one] 1.00 exp(0.50τi) |0⟩'].join('\n'),
+    )
 
     const measLast = m.projectiveMeasurement([1], projections)
-    expect(measLast.toString()).toBe(['50.0%   1.00 exp(0.50τi) |1⟩', '50.0%   1.00 exp(0.00τi) |0⟩'].join('\n'))
+    expect(measLast.toString()).toBe(
+      ['50.0% [zero] 1.00 exp(0.50τi) |1⟩', '50.0% [one] 1.00 exp(0.00τi) |0⟩'].join('\n'),
+    )
   })
 
   it('non-complete projection', () => {
@@ -52,14 +56,14 @@ describe('Measurement', () => {
       ],
       [Dimension.qubit(), Dimension.qubit(), Dimension.polarization()],
     ).normalize()
-    const m = new Measurement<string>([{ name: [], vector }])
+    const m = new Measurement([{ name: [], vector }])
     const projections = [
       { name: ['0', '0'], vector: Vector.indicator([Dimension.qubit(), Dimension.qubit()], ['0', '0']) },
       { name: ['0', '1'], vector: Vector.indicator([Dimension.qubit(), Dimension.qubit()], ['0', '1']) },
     ]
     const measured = m.projectiveMeasurement([0, 1], projections)
     expect(measured.toString()).toBe(
-      ['50.0%   0.71 exp(0.00τi) |0,1,H⟩ + 0.71 exp(0.50τi) |1,0,V⟩', '50.0%   1.00 exp(0.00τi) |H⟩'].join('\n'),
+      ['50.0% [] 0.71 exp(0.00τi) |0,1,H⟩ + 0.71 exp(0.50τi) |1,0,V⟩', '50.0% [0&1] 1.00 exp(0.00τi) |H⟩'].join('\n'),
     )
   })
 
@@ -73,11 +77,11 @@ describe('Measurement', () => {
       ],
       [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
     )
-    const m = new Measurement<string>([{ name: [], vector }])
+    const m = new Measurement([{ name: [], vector }])
     expect(m.states.length).toBe(1)
     expect(m.toString()).toBe(
       // eslint-disable-next-line max-len
-      '100.0%   0.50 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.00τi) |d,H,0⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.50 exp(0.25τi) |d,V,2⟩',
+      '100.0% [] 0.50 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.00τi) |d,H,0⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.50 exp(0.25τi) |d,V,2⟩',
     )
     const projections = [
       { name: ['H'], vector: Vector.indicator([Dimension.polarization()], 'H') },
@@ -93,8 +97,8 @@ describe('Measurement', () => {
     )
     expect(newM.toString()).toBe(
       [
-        '25.0%   1.00 exp(0.00τi) |d,0⟩',
-        '75.0%   0.58 exp(0.75τi) |u,2⟩ + 0.58 exp(0.50τi) |d,1⟩ + 0.58 exp(0.25τi) |d,2⟩',
+        '25.0% [H] 1.00 exp(0.00τi) |d,0⟩',
+        '75.0% [V] 0.58 exp(0.75τi) |u,2⟩ + 0.58 exp(0.50τi) |d,1⟩ + 0.58 exp(0.25τi) |d,2⟩',
       ].join('\n'),
     )
   })
@@ -109,7 +113,7 @@ describe('Measurement', () => {
       ],
       [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
     )
-    const m = new Measurement<string>([{ name: [], vector }])
+    const m = new Measurement([{ name: [], vector }])
     const projectionsOne = [
       { name: ['0'], vector: Vector.indicator([Dimension.position(3)], '0') },
       { name: ['2'], vector: Vector.indicator([Dimension.position(3)], '2') },
@@ -122,9 +126,9 @@ describe('Measurement', () => {
     expect(stepOne.toString()).toBe(
       [
         // eslint-disable-next-line max-len
-        '25.0%   0.50 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.00τi) |d,H,0⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.50 exp(0.25τi) |d,V,2⟩',
-        '25.0%   1.00 exp(0.00τi) |d,H⟩',
-        '50.0%   0.71 exp(0.75τi) |u,V⟩ + 0.71 exp(0.25τi) |d,V⟩',
+        '25.0% [] 0.50 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.00τi) |d,H,0⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.50 exp(0.25τi) |d,V,2⟩',
+        '25.0% [0] 1.00 exp(0.00τi) |d,H⟩',
+        '50.0% [2] 0.71 exp(0.75τi) |u,V⟩ + 0.71 exp(0.25τi) |d,V⟩',
       ].join('\n'),
     )
     // crucial remark: as the number of dimensions changes, we need to apply operations in reverse order,
@@ -133,13 +137,13 @@ describe('Measurement', () => {
     expect(stepTwo.toString()).toBe(
       [
         // eslint-disable-next-line max-len
-        '8.6%   0.50 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.00τi) |d,H,0⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.50 exp(0.25τi) |d,V,2⟩',
-        '8.6%   1.00 exp(0.00τi) |d,H⟩',
-        '17.2%   0.71 exp(0.75τi) |u,V⟩ + 0.71 exp(0.25τi) |d,V⟩',
-        '6.3%   1.00 exp(0.00τi) |d,0⟩',
-        '9.4%   0.58 exp(0.75τi) |u,2⟩ + 0.58 exp(0.50τi) |d,1⟩ + 0.58 exp(0.25τi) |d,2⟩',
-        '25.0%   1.00 exp(0.00τi) |d⟩',
-        '25.0%   0.71 exp(0.75τi) |u⟩ + 0.71 exp(0.25τi) |d⟩',
+        '8.6% [] 0.50 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.00τi) |d,H,0⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.50 exp(0.25τi) |d,V,2⟩',
+        '8.6% [0] 1.00 exp(0.00τi) |d,H⟩',
+        '17.2% [2] 0.71 exp(0.75τi) |u,V⟩ + 0.71 exp(0.25τi) |d,V⟩',
+        '6.3% [H] 1.00 exp(0.00τi) |d,0⟩',
+        '9.4% [V] 0.58 exp(0.75τi) |u,2⟩ + 0.58 exp(0.50τi) |d,1⟩ + 0.58 exp(0.25τi) |d,2⟩',
+        '25.0% [0&H] 1.00 exp(0.00τi) |d⟩',
+        '25.0% [2&V] 0.71 exp(0.75τi) |u⟩ + 0.71 exp(0.25τi) |d⟩',
       ].join('\n'),
     )
   })

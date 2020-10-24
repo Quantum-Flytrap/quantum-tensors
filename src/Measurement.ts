@@ -1,8 +1,8 @@
 import Vector from './Vector'
 import { Cx } from './Complex'
 
-interface INamedVector<T> {
-  name: T[]
+interface INamedVector {
+  name: string[]
   vector: Vector
 }
 
@@ -11,20 +11,20 @@ interface INamedVector<T> {
  * Results are labeled by names of types T.
  * Supports successive measurements, to deal with many particles.
  */
-export default class Measurement<T> {
-  states: INamedVector<T>[]
+export default class Measurement {
+  states: INamedVector[]
 
-  constructor(states: INamedVector<T>[]) {
+  constructor(states: INamedVector[]) {
     this.states = states
   }
 
   /**
    * Create measurement from a single state. Normalizes it.
    * @param vector Vector to start with.
-   * @param name Vector name.
+   * @param name An optional vector name.
    */
-  static fromVector<T>(vector: Vector, name: T[] = []): Measurement<T> {
-    return new Measurement<T>([{ name, vector: vector.normalize() }])
+  static fromVector(vector: Vector, name: string[] = []): Measurement {
+    return new Measurement([{ name, vector: vector.normalize() }])
   }
 
   /**
@@ -33,7 +33,7 @@ export default class Measurement<T> {
    * @param measurements An array of projections.
    * @returns An array of projected states. Their norm squared is the probability.
    */
-  projectiveMeasurement(coordIndices: number[], projections: INamedVector<T>[]): Measurement<T> {
+  projectiveMeasurement(coordIndices: number[], projections: INamedVector[]): Measurement {
     const newStates = this.states.flatMap((state) => {
       return projections.map((projection) => ({
         name: [...state.name, ...projection.name],
@@ -47,7 +47,7 @@ export default class Measurement<T> {
       vector: vector.mulConstant(noDetectionAmplitude),
     }))
     const allStates = oldStates.concat(newStates).filter((state) => state.vector.normSquared() > 1e-8)
-    return new Measurement<T>(allStates)
+    return new Measurement(allStates)
   }
 
   /**
@@ -57,7 +57,8 @@ export default class Measurement<T> {
     return this.states
       .map((state) => {
         const percent = 100 * state.vector.normSquared()
-        return `${percent.toFixed(1)}%   ${state.vector.normalize().toKetString()}`
+        const name = state.name.join('&')
+        return `${percent.toFixed(1)}% [${name}] ${state.vector.normalize().toKetString()}`
       })
       .join('\n')
   }
@@ -65,7 +66,7 @@ export default class Measurement<T> {
   /**
    * Randomly selects outcome, according to probabilities.
    */
-  pickRandom(): Measurement<T> {
+  pickRandom(): Measurement {
     const probs = this.states.map((state) => state.vector.normSquared())
     const p = Math.random()
     let acc = 0
