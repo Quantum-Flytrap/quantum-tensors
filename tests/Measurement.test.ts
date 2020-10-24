@@ -63,7 +63,30 @@ describe('Measurement', () => {
     ]
     const measured = m.projectiveMeasurement([0, 1], projections)
     expect(measured.toString()).toBe(
-      ['50.0% [] 0.71 exp(0.00τi) |0,1,H⟩ + 0.71 exp(0.50τi) |1,0,V⟩', '50.0% [0&1] 1.00 exp(0.00τi) |H⟩'].join('\n'),
+      ['50.0% [] 1.00 exp(0.50τi) |1,0,V⟩', '50.0% [0&1] 1.00 exp(0.00τi) |H⟩'].join('\n'),
+    )
+  })
+
+  it('probabilistic measurement', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['01H', Cx(1)],
+        ['10V', Cx(-1)],
+      ],
+      [Dimension.qubit(), Dimension.qubit(), Dimension.polarization()],
+    ).normalize()
+    const m = new Measurement([{ name: [], vector }])
+    const projections = [
+      { name: ['H'], vector: Vector.indicator([Dimension.polarization()], 'H').mulByReal(Math.SQRT1_2) },
+      { name: ['V'], vector: Vector.indicator([Dimension.polarization()], 'V').mulByReal(Math.SQRT1_2) },
+    ]
+    const measured = m.projectiveMeasurement([2], projections)
+    expect(measured.toString()).toBe(
+      [
+        '50.0% [] 0.71 exp(0.00τi) |0,1,H⟩ + 0.71 exp(0.50τi) |1,0,V⟩',
+        '25.0% [H] 1.00 exp(0.00τi) |0,1⟩',
+        '25.0% [V] 1.00 exp(0.50τi) |1,0⟩',
+      ].join('\n'),
     )
   })
 
@@ -120,13 +143,12 @@ describe('Measurement', () => {
     ]
     const projectionsTwo = [
       { name: ['H'], vector: Vector.indicator([Dimension.polarization()], 'H') },
-      { name: ['V'], vector: Vector.indicator([Dimension.polarization()], 'V').mulConstant(Cx(Math.SQRT1_2)) },
+      { name: ['V'], vector: Vector.indicator([Dimension.polarization()], 'V').mulByReal(Math.SQRT1_2) },
     ]
     const stepOne = m.projectiveMeasurement([2], projectionsOne)
     expect(stepOne.toString()).toBe(
       [
-        // eslint-disable-next-line max-len
-        '25.0% [] 0.50 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.00τi) |d,H,0⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.50 exp(0.25τi) |d,V,2⟩',
+        '25.0% [] 1.00 exp(0.50τi) |d,V,1⟩',
         '25.0% [0] 1.00 exp(0.00τi) |d,H⟩',
         '50.0% [2] 0.71 exp(0.75τi) |u,V⟩ + 0.71 exp(0.25τi) |d,V⟩',
       ].join('\n'),
@@ -136,12 +158,9 @@ describe('Measurement', () => {
     const stepTwo = stepOne.projectiveMeasurement([1], projectionsTwo)
     expect(stepTwo.toString()).toBe(
       [
-        // eslint-disable-next-line max-len
-        '8.6% [] 0.50 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.00τi) |d,H,0⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.50 exp(0.25τi) |d,V,2⟩',
-        '8.6% [0] 1.00 exp(0.00τi) |d,H⟩',
-        '17.2% [2] 0.71 exp(0.75τi) |u,V⟩ + 0.71 exp(0.25τi) |d,V⟩',
-        '6.3% [H] 1.00 exp(0.00τi) |d,0⟩',
-        '9.4% [V] 0.58 exp(0.75τi) |u,2⟩ + 0.58 exp(0.50τi) |d,1⟩ + 0.58 exp(0.25τi) |d,2⟩',
+        '12.5% [] 1.00 exp(0.50τi) |d,V,1⟩',
+        '25.0% [2] 0.71 exp(0.75τi) |u,V⟩ + 0.71 exp(0.25τi) |d,V⟩',
+        '12.5% [V] 1.00 exp(0.50τi) |d,1⟩',
         '25.0% [0&H] 1.00 exp(0.00τi) |d⟩',
         '25.0% [2&V] 0.71 exp(0.75τi) |u⟩ + 0.71 exp(0.25τi) |d⟩',
       ].join('\n'),

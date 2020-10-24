@@ -1,5 +1,5 @@
 import Vector from './Vector'
-import { Cx } from './Complex'
+import Operator from './Operator'
 
 interface INamedVector {
   name: string[]
@@ -40,13 +40,22 @@ export default class Measurement {
         vector: projection.vector.innerPartial(coordIndices, state.vector),
       }))
     })
-    const detectionProbability = newStates.map((state) => state.vector.normSquared()).reduce((a, b) => a + b, 0)
-    const noDetectionAmplitude = Cx(Math.sqrt(1 - detectionProbability))
-    const oldStates = this.states.map(({ name, vector }) => ({
-      name,
-      vector: vector.mulConstant(noDetectionAmplitude),
-    }))
-    const allStates = oldStates.concat(newStates).filter((state) => state.vector.normSquared() > 1e-8)
+    const projOnMeasured = Operator.add(projections.map((projection) => Operator.projectionOn(projection.vector)))
+    const notMeasured = this.states.map(({ name, vector }) => {
+      // non-normalized projection does:
+      // |v⟩ -> P |v⟩
+      // we want to have
+      // |v⟩ -> √P |v⟩
+      // hence this scalePOVM factor (as it is hard to square operators)
+      const projectedVec = vector.sub(projOnMeasured.mulVecPartial(coordIndices, vector))
+      const scalePOVM = Math.sqrt(projectedVec.inner(vector).abs()) / projectedVec.norm
+      return {
+        name,
+        vector: projectedVec.mulByReal(scalePOVM),
+      }
+    })
+
+    const allStates = notMeasured.concat(newStates).filter((state) => state.vector.normSquared() > 1e-8)
     return new Measurement(allStates)
   }
 
