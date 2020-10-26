@@ -67,11 +67,16 @@ export function mirror(angle: number): Operator {
  * @returns Operator with dimensions [dimDir, dimPol].
  * @todo CHECK reflection phase.
  */
-export function beamSplitter(angle: number): Operator {
-  return Operator.outer([ops.reflectFromPlaneDirection(angle), ops.reflectPhaseFromDenser()])
-    .mulConstant(Cx(0, 1)) // TODO: check phase here
-    .add(ops.beamsplitterTransmittionDirections(angle).outer(idPol))
-    .mulConstant(ops.isqrt2)
+export function beamSplitter(angle: number, split = 0.5): Operator {
+  const reflect = ops
+    .reflectFromPlaneDirection(angle)
+    .outer(ops.reflectPhaseFromDenser())
+    .mulConstant(Cx(0.0, Math.sqrt(split)))
+  const transmit = ops
+    .beamsplitterTransmittionDirections(angle)
+    .outer(idPol)
+    .mulConstant(Cx(Math.sqrt(1 - split), 0.0))
+  return reflect.add(transmit)
 }
 
 /**
@@ -186,9 +191,9 @@ function cellLocalOperator(cell: ICell): Operator {
     case Elem.Absorber:
       return attenuator(Math.sqrt(cell.strength ?? 0.5))
     case Elem.BeamSplitter:
-      return beamSplitter(cell.rotation)
+      return beamSplitter(cell.rotation, cell.split ?? 0.5)
     case Elem.CoatedBeamSplitter:
-      return beamSplitter(cell.rotation)
+      return beamSplitter(cell.rotation, cell.split ?? 0.5)
     case Elem.CornerCube:
       return cornerCube()
     case Elem.Detector:

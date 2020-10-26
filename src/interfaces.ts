@@ -132,6 +132,7 @@ export interface ICell {
   rotation: number
   polarization: number
   strength?: number
+  split?: number
 }
 
 /**
