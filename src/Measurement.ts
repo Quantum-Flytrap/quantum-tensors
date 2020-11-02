@@ -6,6 +6,11 @@ interface INamedVector {
   vector: Vector
 }
 
+interface INamedOperator {
+  name: string[]
+  operator: Operator
+}
+
 /**
  * Class for performing measurements.
  * Results are labeled by names of types T.
@@ -33,14 +38,32 @@ export default class Measurement {
    * @param measurements An array of projections.
    * @returns An array of projected states. Their norm squared is the probability.
    */
-  projectiveMeasurement(coordIndices: number[], projections: INamedVector[]): Measurement {
-    const newStates = this.states.flatMap((state) => {
+  projectiveMeasurement(
+    coordIndices: number[],
+    projections: INamedVector[],
+    povms: INamedOperator[] = [],
+  ): Measurement {
+    const newStatesProj = this.states.flatMap((state) => {
       return projections.map((projection) => ({
         name: [...state.name, ...projection.name],
         vector: projection.vector.innerPartial(coordIndices, state.vector),
       }))
     })
-    const projOnMeasured = Operator.add(projections.map((projection) => Operator.projectionOn(projection.vector)))
+    const newStatesPOVM = this.states.flatMap((state) => {
+      return povms.map((povm) => {
+        const projectedVec = povm.operator.mulVecPartial(coordIndices, state.vector)
+        const scalePOVM = Math.sqrt(projectedVec.inner(state.vector).abs()) / projectedVec.norm
+        return {
+          name: [...state.name, ...povm.name],
+          vector: projectedVec.mulByReal(scalePOVM),
+        }
+      })
+    })
+    const projOnMeasured = Operator.add(
+      projections
+        .map((projection) => Operator.projectionOn(projection.vector))
+        .concat(povms.map((povm) => povm.operator)),
+    )
     const notMeasured = this.states.map(({ name, vector }) => {
       // non-normalized projection does:
       // |v⟩ -> P |v⟩
@@ -55,7 +78,10 @@ export default class Measurement {
       }
     })
 
-    const allStates = notMeasured.concat(newStates).filter((state) => state.vector.normSquared() > 1e-8)
+    const allStates = notMeasured
+      .concat(newStatesProj)
+      .concat(newStatesPOVM)
+      .filter((state) => state.vector.normSquared() > 1e-8)
     return new Measurement(allStates)
   }
 
