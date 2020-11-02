@@ -1,12 +1,12 @@
 import Vector from './Vector'
 import Operator from './Operator'
 
-interface INamedVector {
+export interface INamedVector {
   name: string[]
   vector: Vector
 }
 
-interface INamedOperator {
+export interface INamedOperator {
   name: string[]
   operator: Operator
 }
@@ -36,6 +36,7 @@ export default class Measurement {
    * A projective, destructive measurement.
    * @param coordIndices Coordinates to be measured.
    * @param measurements An array of projections.
+   * @param povms An array of positive operators.
    * @returns An array of projected states. Their norm squared is the probability.
    */
   projectiveMeasurement(
