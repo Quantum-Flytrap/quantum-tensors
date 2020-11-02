@@ -196,6 +196,28 @@ export default class Photons {
     return Vector.indicator(dimensions, state).outer(polStates[pol])
   }
 
+  static allDirectionsVec(): INamedVector[] {
+    const dirs = ['>', '^', '<', 'v']
+    const pols = ['H', 'V']
+    return dirs.flatMap((dir) =>
+      pols.map((pol) => ({
+        name: [`${dir}${pol}`],
+        vector: Vector.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]),
+      })),
+    )
+  }
+
+  static allDirectionsOps(): INamedOperator[] {
+    const dirs = ['>', '^', '<', 'v']
+    const pols = ['H', 'V']
+    return dirs.flatMap((dir) =>
+      pols.map((pol) => ({
+        name: [`${dir}${pol}`],
+        operator: Operator.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]),
+      })),
+    )
+  }
+
   /**
    * Add one more photon to the state, using {@link Photons.vectorFromIndicator}.
    *
@@ -338,9 +360,13 @@ export default class Photons {
   }
 
   measure(): Measurement {
-    const ensamble = Measurement.fromVector(this.vector)
+    let ensamble = Measurement.fromVector(this.vector)
     for (let i = this.nPhotons - 1; i >= 0; i--) {
-      ensamble.projectiveMeasurement(this.vectorIndicesForParticle(i), this.measurementVecs, this.measurementOps)
+      ensamble = ensamble.projectiveMeasurement(
+        this.vectorIndicesForParticle(0),
+        this.measurementVecs,
+        this.measurementOps,
+      )
     }
     return ensamble
   }

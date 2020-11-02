@@ -276,6 +276,33 @@ describe('Photons', () => {
     expect(photons.ketString()).toBe('(0.00 +0.50i) |2,2,v,H⟩ + (0.35 +0.00i) |4,0,>,H⟩')
   })
 
+  it('measurement: proj', () => {
+    // 50% absorption filters
+    // >.\.X..
+    // .......
+    // .......
+    // .......
+
+    const photons = Photons.emptySpace(7, 4)
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
+    const operations: IXYOperator[] = [{ x: 2, y: 0, op: Elements.beamSplitter(135) }]
+    photons.updateOperators(operations)
+    photons.updateMeasurements([{ x: 4, y: 0, nVecs: Photons.allDirectionsVec() }])
+
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.00 +0.71i) |2,0,v,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,2,v,H⟩ + (0.71 +0.00i) |4,0,>,H⟩')
+    const measurement = photons.measure()
+    expect(photons.measurementVecs.length).toBe(8)
+    expect(photons.measurementVecs[0].name[0]).toBe('4-0->H')
+    expect(photons.measurementVecs[0].vector.toKetString()).toBe('1.00 exp(0.00τi) |4,0,>,H⟩')
+    expect(measurement.toString()).toBe('50.0% [] 1.00 exp(0.25τi) |2,2,v,H⟩\n50.0% [4-0->H] 1.00 exp(0.00τi) |⟩')
+  })
+
   it('performance propagation: size 100x100', () => {
     const photons = Photons.emptySpace(100, 100)
     photons.addPhotonFromIndicator(0, 0, '>', 'H')
