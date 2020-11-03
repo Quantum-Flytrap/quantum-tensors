@@ -196,13 +196,13 @@ export default class Photons {
     return Vector.indicator(dimensions, state).outer(polStates[pol])
   }
 
-  static allDirectionsVec(): INamedVector[] {
+  static allDirectionsVec(factor = 1): INamedVector[] {
     const dirs = ['>', '^', '<', 'v']
     const pols = ['H', 'V']
     return dirs.flatMap((dir) =>
       pols.map((pol) => ({
         name: [`${dir}${pol}`],
-        vector: Vector.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]),
+        vector: Vector.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]).mulByReal(factor),
       })),
     )
   }
