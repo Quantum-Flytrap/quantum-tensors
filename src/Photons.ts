@@ -196,6 +196,10 @@ export default class Photons {
     return Vector.indicator(dimensions, state).outer(polStates[pol])
   }
 
+  /**
+   * Generates a DirPol basis for completem projective, destructive measurement.
+   * @param factor Multiplicative factor. Use Math.SQRT1_2 for 50% of detection.
+   */
   static allDirectionsVec(factor = 1): INamedVector[] {
     const dirs = ['>', '^', '<', 'v']
     const pols = ['H', 'V']
@@ -207,6 +211,9 @@ export default class Photons {
     )
   }
 
+  /**
+   * Generates a DirPol projections for completem projective, non-destructive measurement.
+   */
   static allDirectionsOps(): INamedOperator[] {
     const dirs = ['>', '^', '<', 'v']
     const pols = ['H', 'V']
@@ -337,6 +344,14 @@ export default class Photons {
     return this
   }
 
+  /**
+   * @see {@link localizeOperator}
+   * @param sizeX
+   * @param sizeY
+   * @param x
+   * @param y
+   * @param vec
+   */
   static localizeVector(sizeX: number, sizeY: number, x: number, y: number, vec: Vector): Vector {
     const dimX = Dimension.position(sizeX, 'x')
     const dimY = Dimension.position(sizeY, 'y')
@@ -359,6 +374,9 @@ export default class Photons {
     return Operator.outer([Operator.indicator([dimX, dimY], [`${op.x}`, `${op.y}`]), op.op])
   }
 
+  /**
+   * Perform measurement given measurement projections and positive operators.
+   */
   measure(): Measurement {
     let ensamble = Measurement.fromVector(this.vector)
     for (let i = this.nPhotons - 1; i >= 0; i--) {
