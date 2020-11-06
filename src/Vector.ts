@@ -5,6 +5,7 @@ import {
   checkCoordsSizesCompability,
   indicesComplement,
   isPermutation,
+  // eslint-disable-next-line comma-dangle
   coordsFromIndex,
 } from './helpers'
 import Complex, { Cx } from './Complex'
