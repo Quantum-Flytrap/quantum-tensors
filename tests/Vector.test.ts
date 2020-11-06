@@ -377,4 +377,56 @@ describe('Sparse Complex Vector', () => {
       '1.00 exp(0.00τi) |u,>⟩ + 1.00 exp(0.00τi) |u,^⟩ + 1.00 exp(0.00τi) |u,<⟩ + 1.00 exp(0.00τi) |u,v⟩ + 1.00 exp(0.00τi) |d,>⟩ + 1.00 exp(0.00τi) |d,^⟩ + 1.00 exp(0.00τi) |d,<⟩ + 1.00 exp(0.00τi) |d,v⟩',
     )
   })
+
+  it('random, dense vector', () => {
+    const rand = Vector.random([Dimension.spin(), Dimension.polarization()])
+    // expect(rand.toKetString()).toEqual('')
+    // e.g.: '0.57 exp(0.66τi) |u,H⟩ + 0.16 exp(0.17τi) |u,V⟩ + 0.24 exp(0.02τi) |d,H⟩ + 0.77 exp(0.49τi) |d,V⟩'
+    expect(rand.entries.length).toEqual(4)
+  })
+
+  it('random vector from a subspace', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['dV1', Cx(-1)],
+        ['dH0', Cx(1)],
+        ['dV2', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    )
+    const rand = vector.randomOnSubspace()
+    // expect(rand.toKetString()).toEqual('')
+    // e.g.: '0.62 exp(0.23τi) |d,H,0⟩ + 0.58 exp(0.69τi) |d,V,1⟩ + 0.53 exp(0.93τi) |d,V,2⟩'
+    expect(rand.entries.length).toEqual(3)
+  })
+
+  it('random vector from a partial subspace', () => {
+    const vector = Vector.fromSparseCoordNames(
+      [
+        ['dV1', Cx(-1)],
+        ['dH0', Cx(1)],
+        ['dV2', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.polarization(), Dimension.position(3)],
+    )
+    const rand0 = vector.randomOnPartialSubspace([0])
+    // expect(rand0.toKetString()).toEqual('')
+    // e.g.: '1.00 exp(0.12τi) |d⟩'
+    expect(rand0.entries.length).toEqual(1)
+
+    const rand2 = vector.randomOnPartialSubspace([2])
+    // expect(rand2.toKetString()).toEqual('')
+    // e.g.: '0.61 exp(0.69τi) |0⟩ + 0.10 exp(0.12τi) |1⟩ + 0.79 exp(0.10τi) |2⟩'
+    expect(rand2.entries.length).toEqual(3)
+
+    const rand12 = vector.randomOnPartialSubspace([1, 2])
+    //expect(rand12.toKetString()).toEqual('')
+    // e.g.: '0.44 exp(0.65τi) |H,0⟩ + 0.68 exp(0.49τi) |V,1⟩ + 0.59 exp(0.79τi) |V,2⟩'
+    expect(rand12.entries.length).toEqual(3)
+
+    const rand01 = vector.randomOnPartialSubspace([0, 1])
+    // expect(rand01.toKetString()).toEqual('')
+    // e.g.: '0.46 exp(0.67τi) |d,H⟩ + 0.89 exp(0.68τi) |d,V⟩'
+    expect(rand01.entries.length).toEqual(2)
+  })
 })

@@ -145,4 +145,10 @@ describe('Complex', () => {
     expect(Complex.fromPolar(1, 0.3333 * Math.PI).toColor()).toEqual('#ffff00')
     expect(Complex.fromPolar(1, 0.6666 * Math.PI).toColor()).toEqual('#00ff00')
   })
+
+  it('should generate a random complex number', () => {
+    // it is effectively unlikely to get exactly 0
+    // we don't test for actual randomness here
+    expect(Complex.randomGaussian().isZero()).toBeFalsy()
+  })
 })

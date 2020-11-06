@@ -479,6 +479,7 @@ export default class Vector {
 
   /**
    * Vector with only ones.
+   * Completely dense!
    * @param dimensions
    */
   static ones(dimensions: Dimension[]): Vector {
@@ -487,6 +488,44 @@ export default class Vector {
     const values: Complex[] = Array(size).fill(Cx(1, 0))
     const entries = values.map((v, i) => new VectorEntry(coordsFromIndex(i, sizes), v))
     return new Vector(entries, dimensions)
+  }
+
+  /**
+   * A normalized vector, from uniform distribution of U(n).
+   * Completely dense!
+   * @param dimensions
+   */
+  static random(dimensions: Dimension[]): Vector {
+    const sizes = dimensions.map((dim) => dim.size)
+    const size = sizes.reduce((a, b) => a * b, 1)
+    const entries = _.range(size).map((i) => new VectorEntry(coordsFromIndex(i, sizes), Complex.randomGaussian()))
+    return new Vector(entries, dimensions).normalize()
+  }
+
+  /**
+   * A normalized vector, from uniform distribution of U(n),
+   * restricted only to indices of vector.
+   * Think of it as {@link Vector.random} optimized for inner products with the vector.
+   */
+  randomOnSubspace(): Vector {
+    const entries = this.entries.map((entry) => new VectorEntry(entry.coord, Complex.randomGaussian()))
+    return new Vector(entries, this.dimensions).normalize()
+  }
+
+  /**
+   * A normalized vector, from uniform distribution of U(n),
+   * restricted only to indices of vector,
+   * on a tensor component.
+   * Think of it as {@link Vector.random} optimized for partial inner products with the vector, on a selected subspace.
+   * @param coordIndices coordinates we want to keep
+   */
+  randomOnPartialSubspace(coordIndices: number[]): Vector {
+    const contractionDimensions = _.at(this.dimensions, coordIndices)
+
+    const partialCoords = this.entries.map((entry) => _.at(entry.coord, coordIndices))
+    const partialCoordsUniq = _.uniqBy(partialCoords, (coord) => coord.join(','))
+    const entries = partialCoordsUniq.map((coord) => new VectorEntry(coord, Complex.randomGaussian()))
+    return new Vector(entries, contractionDimensions).normalize()
   }
 
   /**
@@ -514,7 +553,6 @@ export default class Vector {
     const entries = [new VectorEntry(coords, Cx(1))]
     return new Vector(entries, dimensions)
   }
-
 
   /**
    *
