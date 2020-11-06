@@ -7,6 +7,19 @@ import Dimension from './Dimension'
 import { polStates } from './Ops'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
+import Measurement, { INamedVector, INamedOperator } from './Measurement'
+
+export interface IXYNamedVectors {
+  x: number
+  y: number
+  nVecs: INamedVector[]
+}
+
+export interface IXYNamedOperators {
+  x: number
+  y: number
+  nOps: INamedOperator[]
+}
 
 /**
  * Photons class.
@@ -21,6 +34,8 @@ export default class Photons {
   vector: Vector
   operators: IXYOperator[]
   cachedDiffU: Operator
+  measurementVecs: INamedVector[]
+  measurementOps: INamedOperator[]
   readonly dimX: Dimension
   readonly dimY: Dimension
 
@@ -32,9 +47,18 @@ export default class Photons {
    * @param vector Vector with [x1, y1, dir1, pol1, ..., xn, yn, dirn, poln].
    * @param operators A list of IXYOperator derived from elements from the board.
    */
-  constructor(sizeX: number, sizeY: number, vector: Vector, operators: IXYOperator[] = []) {
+  constructor(
+    sizeX: number,
+    sizeY: number,
+    vector: Vector,
+    operators: IXYOperator[] = [],
+    measurementVecs: INamedVector[] = [],
+    measurementOps: INamedOperator[] = [],
+  ) {
     this.vector = vector
     this.operators = operators
+    this.measurementVecs = measurementVecs
+    this.measurementOps = measurementOps
     this.cachedDiffU = Photons.singlePhotonInteractionDiff(sizeX, sizeY, operators)
     this.dimX = Dimension.position(sizeX, 'x')
     this.dimY = Dimension.position(sizeY, 'y')
@@ -47,6 +71,21 @@ export default class Photons {
   updateOperators(operators: IXYOperator[]): void {
     this.operators = operators
     this.cachedDiffU = Photons.singlePhotonInteractionDiff(this.sizeX, this.sizeY, operators)
+  }
+
+  updateMeasurements(xyVecs: IXYNamedVectors[], xyOps: IXYNamedOperators[] = []): void {
+    this.measurementVecs = xyVecs.flatMap((xyVec) =>
+      xyVec.nVecs.map((nVec) => ({
+        name: [`${xyVec.x}-${xyVec.y}-${nVec.name[0]}`],
+        vector: Photons.localizeVector(this.sizeX, this.sizeY, xyVec.x, xyVec.y, nVec.vector),
+      })),
+    )
+    this.measurementOps = xyOps.flatMap((xyOp) =>
+      xyOp.nOps.map((nOp) => ({
+        name: [`${xyOp.x}-${xyOp.y}-${nOp.name[0]}`],
+        operator: Photons.localizeOperator(this.sizeX, this.sizeY, { x: xyOp.x, y: xyOp.y, op: nOp.operator }),
+      })),
+    )
   }
 
   /**
@@ -158,6 +197,35 @@ export default class Photons {
   }
 
   /**
+   * Generates a DirPol basis for completem projective, destructive measurement.
+   * @param factor Multiplicative factor. Use Math.SQRT1_2 for 50% of detection.
+   */
+  static allDirectionsVec(factor = 1): INamedVector[] {
+    const dirs = ['>', '^', '<', 'v']
+    const pols = ['H', 'V']
+    return dirs.flatMap((dir) =>
+      pols.map((pol) => ({
+        name: [`${dir}${pol}`],
+        vector: Vector.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]).mulByReal(factor),
+      })),
+    )
+  }
+
+  /**
+   * Generates a DirPol projections for completem projective, non-destructive measurement.
+   */
+  static allDirectionsOps(): INamedOperator[] {
+    const dirs = ['>', '^', '<', 'v']
+    const pols = ['H', 'V']
+    return dirs.flatMap((dir) =>
+      pols.map((pol) => ({
+        name: [`${dir}${pol}`],
+        operator: Operator.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]),
+      })),
+    )
+  }
+
+  /**
    * Add one more photon to the state, using {@link Photons.vectorFromIndicator}.
    *
    * @param posX Position of the photon, x.
@@ -179,7 +247,7 @@ export default class Photons {
           `Old photon:\n${this.vector}\nand new photon:\n${newPhoton}`
         )
       }
-      this.vector = Vector.add([oldPhotons.outer(newPhoton), newPhoton.outer(oldPhotons)]).mulConstant(Cx(Math.SQRT1_2))
+      this.vector = Vector.add([oldPhotons.outer(newPhoton), newPhoton.outer(oldPhotons)]).mulByReal(Math.SQRT1_2)
     } else {
       throw `Adding 3 or more particles not yet implemented. We already have: ${this.nPhotons} photons.`
     }
@@ -277,6 +345,20 @@ export default class Photons {
   }
 
   /**
+   * @see {@link localizeOperator}
+   * @param sizeX
+   * @param sizeY
+   * @param x
+   * @param y
+   * @param vec
+   */
+  static localizeVector(sizeX: number, sizeY: number, x: number, y: number, vec: Vector): Vector {
+    const dimX = Dimension.position(sizeX, 'x')
+    const dimY = Dimension.position(sizeY, 'y')
+    return Vector.indicator([dimX, dimY], [`${x}`, `${y}`]).outer(vec)
+  }
+
+  /**
    * Create an operator for a particular place, projecting only on the particular position.
    * @param sizeX Board size, x.
    * @param sizeY Board size, y.
@@ -293,6 +375,22 @@ export default class Photons {
   }
 
   /**
+   * Perform measurement given measurement projections and positive operators.
+   */
+  measure(): Measurement {
+    let ensamble = Measurement.fromVector(this.vector)
+    for (let i = this.nPhotons - 1; i >= 0; i--) {
+      ensamble = ensamble.projectiveMeasurement(
+        this.vectorIndicesForParticle(0),
+        this.measurementVecs,
+        this.measurementOps,
+      )
+    }
+    return ensamble
+  }
+
+  /**
+   * @deprecated
    * Measure the absolute absorbtion on a given tile.
    * @param posX Position x.
    * @param posY Position y.
@@ -310,6 +408,7 @@ export default class Photons {
   }
 
   /**
+   * @deprecated
    * Demo of measurement of one particle
    * So far the basis is FIXED, so it won't give corrent results with operators absorbing in a basis
    * that does not commute with this basis.

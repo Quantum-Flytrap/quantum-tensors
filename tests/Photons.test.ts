@@ -276,6 +276,189 @@ describe('Photons', () => {
     expect(photons.ketString()).toBe('(0.00 +0.50i) |2,2,v,H⟩ + (0.35 +0.00i) |4,0,>,H⟩')
   })
 
+  it('measurement: proj', () => {
+    // 100% absorption filters
+    // >.\.X..
+    // .......
+    // .......
+    // .......
+
+    const photons = Photons.emptySpace(7, 4)
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
+    const operations: IXYOperator[] = [{ x: 2, y: 0, op: Elements.beamSplitter(135) }]
+    photons.updateOperators(operations)
+    photons.updateMeasurements([{ x: 4, y: 0, nVecs: Photons.allDirectionsVec() }])
+
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.00 +0.71i) |2,0,v,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,2,v,H⟩ + (0.71 +0.00i) |4,0,>,H⟩')
+    const measurement = photons.measure()
+    expect(photons.measurementVecs.length).toBe(8)
+    expect(photons.measurementVecs[0].name[0]).toBe('4-0->H')
+    expect(photons.measurementVecs[0].vector.toKetString()).toBe('1.00 exp(0.00τi) |4,0,>,H⟩')
+    expect(measurement.toString()).toBe(
+      ['50.0% [] 1.00 exp(0.25τi) |2,2,v,H⟩', '50.0% [4-0->H] 1.00 exp(0.00τi) |⟩'].join('\n'),
+    )
+  })
+
+  it('measurement: non-destructive', () => {
+    // 100% detection, no absorbtion
+    // >.\.M..
+    // .......
+    // .......
+    // .......
+
+    const photons = Photons.emptySpace(7, 4)
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
+    const operations: IXYOperator[] = [{ x: 2, y: 0, op: Elements.beamSplitter(135) }]
+    photons.updateOperators(operations)
+    photons.updateMeasurements([], [{ x: 4, y: 0, nOps: Photons.allDirectionsOps() }])
+
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.00 +0.71i) |2,0,v,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,2,v,H⟩ + (0.71 +0.00i) |4,0,>,H⟩')
+    const measurement = photons.measure()
+    expect(photons.measurementOps.length).toBe(8)
+    expect(photons.measurementOps[0].name[0]).toBe('4-0->H')
+    expect(photons.measurementOps[0].operator.toString()).toBe(
+      [
+        // eslint-disable-next-line max-len
+        'Operator with 1 entries of max size [[7,4,4,2], [7,4,4,2]] with dimensions [[x,y,direction,polarization], [x,y,direction,polarization]]',
+        '(1.00 +0.00i) |4,0,>,H⟩⟨4,0,>,H|',
+        '',
+      ].join('\n'),
+    )
+    expect(measurement.toString()).toBe(
+      ['50.0% [] 1.00 exp(0.25τi) |2,2,v,H⟩', '50.0% [4-0->H] 1.00 exp(0.00τi) |4,0,>,H⟩'].join('\n'),
+    )
+  })
+
+  it('measurement: non-destructive', () => {
+    // 100% detection, no absorbtion + 50% attenuation
+    // >.\.M..
+    // .......
+    // ..A....
+    // .......
+
+    const photons = Photons.emptySpace(7, 4)
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
+    const operations: IXYOperator[] = [{ x: 2, y: 0, op: Elements.beamSplitter(135) }]
+    photons.updateOperators(operations)
+    photons.updateMeasurements(
+      [{ x: 2, y: 2, nVecs: Photons.allDirectionsVec(Math.SQRT1_2) }],
+      [{ x: 4, y: 0, nOps: Photons.allDirectionsOps() }],
+    )
+
+    expect(photons.ketString()).toBe('(1.00 +0.00i) |0,0,>,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.71 +0.00i) |2,0,>,H⟩ + (0.00 +0.71i) |2,0,v,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,2,v,H⟩ + (0.71 +0.00i) |4,0,>,H⟩')
+    const measurement = photons.measure()
+    expect(measurement.toString()).toBe(
+      [
+        '25.0% [] 1.00 exp(0.25τi) |2,2,v,H⟩',
+        '25.0% [2-2-vH] 1.00 exp(0.25τi) |⟩',
+        '50.0% [4-0->H] 1.00 exp(0.00τi) |4,0,>,H⟩',
+      ].join('\n'),
+    )
+  })
+
+  it('measurement: pick random', () => {
+    // 100% detection, no absorbtion + 50% attenuation
+    // >.\.M..
+    // .......
+    // ..A....
+    // .......
+
+    const photons = Photons.emptySpace(7, 4)
+    photons.addPhotonFromIndicator(0, 0, '>', 'H')
+    const operations: IXYOperator[] = [{ x: 2, y: 0, op: Elements.beamSplitter(135) }]
+    photons.updateOperators(operations)
+    photons.updateMeasurements(
+      [{ x: 2, y: 2, nVecs: Photons.allDirectionsVec(Math.SQRT1_2) }],
+      [{ x: 4, y: 0, nOps: Photons.allDirectionsOps() }],
+    )
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,2,v,H⟩ + (0.71 +0.00i) |4,0,>,H⟩')
+    const measurement = photons.measure()
+    const randomRes = measurement.pickRandom()
+    expect(randomRes.states.length).toBe(1)
+    expect(randomRes.states[0].vector.normSquared()).toBeCloseTo(1)
+  })
+
+  it('measurement: Hong-Ou-Mandel', () => {
+    // ..v..
+    // .....
+    // >.\..
+    // ..A..
+
+    const photons = Photons.emptySpace(4, 4)
+      .addPhotonFromIndicator(0, 2, '>', 'H')
+      .addPhotonFromIndicator(2, 0, 'v', 'H')
+    expect(photons.nPhotons).toBe(2)
+
+    const operations: IXYOperator[] = [{ x: 2, y: 2, op: Elements.beamSplitter(135) }]
+    photons.updateOperators(operations)
+    photons.updateMeasurements([{ x: 2, y: 3, nVecs: Photons.allDirectionsVec() }])
+    expect(photons.ketString()).toBe('(0.71 +0.00i) |0,2,>,H,2,0,v,H⟩ + (0.71 +0.00i) |2,0,v,H,0,2,>,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,3,v,H,2,3,v,H⟩ + (0.00 +0.71i) |3,2,>,H,3,2,>,H⟩')
+    const measurement = photons.measure()
+    expect(measurement.toString()).toBe(
+      ['50.0% [] 1.00 exp(0.25τi) |3,2,>,H,3,2,>,H⟩', '50.0% [2-3-vH&2-3-vH] 1.00 exp(0.25τi) |⟩'].join('\n'),
+    )
+  })
+
+  it('measurement: Hong-Ou-Mandel at 50% detection', () => {
+    // 50% absorbtion
+    // ..v..
+    // .....
+    // >.\..
+    // ..A..
+
+    const photons = Photons.emptySpace(4, 4)
+      .addPhotonFromIndicator(0, 2, '>', 'H')
+      .addPhotonFromIndicator(2, 0, 'v', 'H')
+    expect(photons.nPhotons).toBe(2)
+
+    const operations: IXYOperator[] = [{ x: 2, y: 2, op: Elements.beamSplitter(135) }]
+    photons.updateOperators(operations)
+    photons.updateMeasurements([{ x: 2, y: 3, nVecs: Photons.allDirectionsVec(Math.SQRT1_2) }])
+    expect(photons.ketString()).toBe('(0.71 +0.00i) |0,2,>,H,2,0,v,H⟩ + (0.71 +0.00i) |2,0,v,H,0,2,>,H⟩')
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    photons.propagatePhotons().actOnSinglePhotons()
+    expect(photons.ketString()).toBe('(0.00 +0.71i) |2,3,v,H,2,3,v,H⟩ + (0.00 +0.71i) |3,2,>,H,3,2,>,H⟩')
+    const measurement = photons.measure()
+    expect(measurement.toString()).toBe(
+      [
+        '67.5% [] 0.24 exp(0.25τi) |2,3,v,H,2,3,v,H⟩ + 0.97 exp(0.25τi) |3,2,>,H,3,2,>,H⟩',
+        '12.5% [2-3-vH] 1.00 exp(0.25τi) |2,3,v,H⟩',
+        '7.5% [2-3-vH] 1.00 exp(0.25τi) |2,3,v,H⟩',
+        '12.5% [2-3-vH&2-3-vH] 1.00 exp(0.25τi) |⟩',
+      ].join('\n'),
+    )
+    // WARNING: I am not sure if the result is correct
+    // expected 62.5% + (12.5% + 12.5%) + 12.5%
+    // maybe I still does not understand something with multiple boson absorption, though
+  })
+
   it('performance propagation: size 100x100', () => {
     const photons = Photons.emptySpace(100, 100)
     photons.addPhotonFromIndicator(0, 0, '>', 'H')

@@ -140,6 +140,15 @@ export default class Vector {
   }
 
   /**
+   * Multiplies vector by a real number.
+   * @param x A factor.
+   * @returns x v
+   */
+  mulByReal(x: number): Vector {
+    return this.mulConstant(Cx(x))
+  }
+
+  /**
    * Adds to vectors.
    * @param v2 The other vector.
    *
@@ -323,6 +332,15 @@ export default class Vector {
     const dimensions = _.at(this.dimensions, order)
     const entries = this.entries.map((entry) => new VectorEntry(_.at(entry.coord, order), entry.value))
     return new Vector(entries, dimensions)
+  }
+
+  /**
+   * Is it close to zero?
+   * @param eps Euclidean distance tolerance.
+   * @return Checks v ~= 0
+   */
+  isCloseToZero(eps = 1e-6): boolean {
+    return Math.sqrt(this.normSquared()) < eps
   }
 
   /**
