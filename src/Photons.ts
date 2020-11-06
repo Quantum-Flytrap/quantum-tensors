@@ -21,6 +21,14 @@ export interface IXYNamedOperators {
   nOps: INamedOperator[]
 }
 
+export interface IPhotonPolarization {
+  x: number
+  y: number
+  direction: number
+  h: Complex
+  v: Complex
+}
+
 /**
  * Photons class.
  * A state of many photons, each with with dimensions:
@@ -532,22 +540,8 @@ export default class Photons {
     return this
   }
 
-  // propagateAndInteract(opsWithPos: IXYOperator[]): void {
-  //   this.propagatePhotons()
-  //   const absorptions = opsWithPos
-  //     .map(({ x, y, op }): any => {
-  //       return {
-  //         x,
-  //         y,
-  //         probability: this.measureAbsorptionAtOperator(x, y, op),
-  //       }
-  //      }
-  //     )
-  //     .filter((d): boolean => d.probability > this.probThreshold)
-  //   this.actOnSinglePhotons(opsWithPos)
-  // }
-
   /**
+   * @deprecated
    * Combine H and V polarization, to
    * Right now kind od dirty, but should work
    * @returns
@@ -560,7 +554,22 @@ export default class Photons {
     if (this.nPhotons !== 1) {
       throw `Right now implemented only for 1 photon. Here we have ${this.nPhotons} photons.`
     }
-    const aggregated = _.chain(this.vector.entries)
+    return Photons.onePhotonByPolarization(this.vector).map(({ x, y, direction, h, v }) => ({
+      x,
+      y,
+      direction,
+      are: h.re,
+      aim: h.im,
+      bre: v.re,
+      bim: v.im,
+    }))
+  }
+
+  static onePhotonByPolarization(v: Vector): IPhotonPolarization[] {
+    if (v.dimensions.length !== 4) {
+      throw `Right now implemented only for 1 photon, 4 dimensions. Here we have ${v.dimensions.length} dimensions.`
+    }
+    return _.chain(v.entries)
       .groupBy((entry) => _.at(entry.coord, [0, 1, 2]))
       .values()
       .map((entries) => {
@@ -571,19 +580,16 @@ export default class Photons {
         entries.forEach((entry) => {
           amplitudes[entry.coord[3]] = entry.value
         })
+        const [h, v] = amplitudes
         return {
-          x: x,
-          y: y,
+          x,
+          y,
           direction: 90 * dir,
-          are: amplitudes[0].re,
-          aim: amplitudes[0].im,
-          bre: amplitudes[1].re,
-          bim: amplitudes[1].im,
+          h,
+          v,
         }
       })
       .value()
-
-    return aggregated
   }
 
   /**
