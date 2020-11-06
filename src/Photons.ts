@@ -565,6 +565,11 @@ export default class Photons {
     }))
   }
 
+  /**
+   * Turns vector of a single photon in an array of amplitudes,
+   * grouped by polarization.
+   * @param v Vector for one photon.
+   */
   static onePhotonByPolarization(v: Vector): IPhotonPolarization[] {
     if (v.dimensions.length !== 4) {
       throw `Right now implemented only for 1 photon, 4 dimensions. Here we have ${v.dimensions.length} dimensions.`
@@ -590,6 +595,23 @@ export default class Photons {
         }
       })
       .value()
+  }
+
+  /**
+   * Sampling states for (possibly entangled) particles.
+   * A proof-of-concept, everything may change (including its mathematics).
+   * For product (i.e. pure, non-entangled) states the result is deterministic, up to the phase.
+   */
+  sampleTwoPhotonState(): [IPhotonPolarization[], IPhotonPolarization[]] {
+    if (this.nPhotons !== 2) {
+      throw `Requires exactly 2 photons. Here we have ${this.nPhotons} photons.`
+    }
+    const coordA = [0, 1, 2, 3]
+    const coordB = [4, 5, 6, 7]
+    const randA = this.vector.randomOnPartialSubspace(coordA)
+    const resB = randA.innerPartial(coordA, this.vector).normalize()
+    const resA = resB.innerPartial(coordB, this.vector).normalize()
+    return [Photons.onePhotonByPolarization(resA), Photons.onePhotonByPolarization(resB)]
   }
 
   /**
