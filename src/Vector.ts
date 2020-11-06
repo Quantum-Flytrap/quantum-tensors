@@ -1,6 +1,12 @@
 /* eslint-disable-next-line */
 import _ from 'lodash'
-import { coordsToIndex, checkCoordsSizesCompability, indicesComplement, isPermutation } from './helpers'
+import {
+  coordsToIndex,
+  checkCoordsSizesCompability,
+  indicesComplement,
+  isPermutation,
+  coordsFromIndex,
+} from './helpers'
 import Complex, { Cx } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
@@ -472,6 +478,18 @@ export default class Vector {
   }
 
   /**
+   * Vector with only ones.
+   * @param dimensions
+   */
+  static ones(dimensions: Dimension[]): Vector {
+    const sizes = dimensions.map((dim) => dim.size)
+    const size = sizes.reduce((a, b) => a * b, 1)
+    const values: Complex[] = Array(size).fill(Cx(1, 0))
+    const entries = values.map((v, i) => new VectorEntry(coordsFromIndex(i, sizes), v))
+    return new Vector(entries, dimensions)
+  }
+
+  /**
    * Scalar.
    * @z
    */
@@ -496,6 +514,7 @@ export default class Vector {
     const entries = [new VectorEntry(coords, Cx(1))]
     return new Vector(entries, dimensions)
   }
+
 
   /**
    *

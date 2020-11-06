@@ -369,4 +369,12 @@ describe('Sparse Complex Vector', () => {
     ])
     expect(sum.toDense()).toEqual([Cx(5, 2), Cx(0, 1)])
   })
+
+  it('vector of ones', () => {
+    const ones = Vector.ones([Dimension.spin(), Dimension.direction()])
+    expect(ones.toKetString()).toEqual(
+      // eslint-disable-next-line max-len
+      '1.00 exp(0.00τi) |u,>⟩ + 1.00 exp(0.00τi) |u,^⟩ + 1.00 exp(0.00τi) |u,<⟩ + 1.00 exp(0.00τi) |u,v⟩ + 1.00 exp(0.00τi) |d,>⟩ + 1.00 exp(0.00τi) |d,^⟩ + 1.00 exp(0.00τi) |d,<⟩ + 1.00 exp(0.00τi) |d,v⟩',
+    )
+  })
 })
