@@ -244,6 +244,17 @@ export default class Complex {
   static fromPolar(r: number, phi: number): Complex {
     return new Complex(r * Math.cos(phi), r * Math.sin(phi))
   }
+
+  /**
+   * Generates a random complex with Gaussian distribution
+   * (with zero mean and unit variance)
+   * using https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform.
+   */
+  static randomGaussian(): Complex {
+    const u = Math.random()
+    const v = Math.random()
+    return Complex.fromPolar(Math.sqrt(-2 * Math.log(u)), 2 * Math.PI * v)
+  }
 }
 
 /**
