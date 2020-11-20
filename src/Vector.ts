@@ -8,7 +8,7 @@ import {
   // eslint-disable-next-line comma-dangle
   coordsFromIndex,
 } from './helpers'
-import Complex, { Cx } from './Complex'
+import Complex, { Cx, ComplexFormat } from './Complex'
 import VectorEntry from './VectorEntry'
 import Dimension from './Dimension'
 import Basis from './Basis'
@@ -374,7 +374,7 @@ export default class Vector {
    * Vector with 3 entries of max size [2,2] with dimensions [spin,polarization]
    * (0.00 +2.00i) |u,H⟩ + (-1.00 -1.00i) |d,H⟩ + (0.50 +2.50i) |d,V⟩
    */
-  toString(complexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
+  toString(complexFormat: ComplexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
     const valueStr = this.sortedEntries()
       .map((entry) => {
         const coordStr = entry.coord.map((i: number, dim: number) => this.coordNames[dim][i])
@@ -399,7 +399,7 @@ export default class Vector {
    *
    * @returns A ket string, e.g. 0.71 exp(0.00τi) |3,1,>,V⟩ + 0.71 exp(1.00τi) |2,2,v,V⟩.
    */
-  toKetString(complexFormat = 'polarTau', precision = 2): string {
+  toKetString(complexFormat: ComplexFormat = 'polarTau', precision = 2): string {
     return this.toString(complexFormat, precision, ' + ', false)
   }
 

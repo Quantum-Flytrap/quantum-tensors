@@ -7,7 +7,7 @@ import Operator from './Operator'
 import Dimension from './Dimension'
 import Simulation from './Simulation'
 import { polStates } from './Ops'
-import Complex, { Cx } from './Complex'
+import Complex, { Cx, ComplexFormat } from './Complex'
 
 // Cached identity operator. Can be reused between frames as it is immutable.
 const idDirPol = Operator.identity([Dimension.direction(), Dimension.polarization()])
@@ -399,7 +399,7 @@ export default class Frame {
    *
    * @returns A ket string, e.g. (0.71 +0.00i) |3,1,>,V⟩ + (0.00 +0.71i) |2,2,v,V⟩.
    */
-  ketString(complexFormat = 'cartesian', precision = 2): string {
+  ketString(complexFormat: ComplexFormat = 'cartesian', precision = 2): string {
     return this.vector.toString(complexFormat, precision, ' + ', false)
   }
 

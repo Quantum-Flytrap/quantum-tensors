@@ -1,7 +1,7 @@
 /* eslint-disable-next-line */
 import _, { entries } from 'lodash'
 import { coordsToIndex, checkCoordsSizesCompability, isPermutation, indicesComplement, joinCoordsFunc } from './helpers'
-import Complex, { Cx } from './Complex'
+import Complex, { Cx, ComplexFormat } from './Complex'
 import VectorEntry from './VectorEntry'
 import OperatorEntry from './OperatorEntry'
 import Vector from './Vector'
@@ -416,7 +416,7 @@ export default class Operator {
    * Operator with 4 entiresof max size [[2,2], [2,2]] with dimensions [[polarization,spin], [polarization,spin]]
    * (1.00 +0.00i) |H,u⟩⟨H,u| + (1.00 +0.00i) |H,d⟩⟨H,d| + (1.00 +0.00i) |V,u⟩⟨V,u| + (1.00 +0.00i) |V,d⟩⟨V,d|
    */
-  toString(complexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
+  toString(complexFormat: ComplexFormat = 'cartesian', precision = 2, separator = ' + ', intro = true): string {
     const valueStr = this.entries
       // .filter((entry: OperatorEntry): boolean => entry.isOne())
       .map((entry) => {

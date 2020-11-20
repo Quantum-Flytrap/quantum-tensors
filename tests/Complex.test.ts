@@ -135,9 +135,6 @@ describe('Complex', () => {
     expect(z1.toString('cartesian', 1)).toEqual('(1.0 -1.0i)')
     expect(z1.toString('polar')).toEqual('1.41 exp(5.50i)')
     expect(z1.toString('polarTau', 4)).toEqual('1.4142 exp(0.8750τi)')
-    expect(() => z1.toString('notAnOption')).toThrowError(
-      "complexFormat 'notAnOption' is not in ['cartesian', 'polar', 'polarTau'].",
-    )
   })
 
   it('should generate color for a complex number', () => {
