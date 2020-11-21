@@ -5,7 +5,7 @@ import Vector from './Vector'
 import Operator from './Operator'
 import Dimension from './Dimension'
 import { polStates } from './Ops'
-import Complex, { Cx } from './Complex'
+import Complex, { Cx, ComplexFormat } from './Complex'
 import VectorEntry from './VectorEntry'
 import Measurement, { INamedVector, INamedOperator } from './Measurement'
 
@@ -646,7 +646,7 @@ export default class Photons {
    *
    * @returns A ket string, e.g. (0.71 +0.00i) |3,1,>,V⟩ + (0.00 +0.71i) |2,2,v,V⟩.
    */
-  ketString(complexFormat = 'cartesian', precision = 2): string {
+  ketString(complexFormat: ComplexFormat = 'cartesian', precision = 2): string {
     return this.vector.toString(complexFormat, precision, ' + ', false)
   }
 }

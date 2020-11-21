@@ -1,6 +1,8 @@
 import { TAU } from './Constants'
 import { hslToHex } from './helpers'
 
+export type ComplexFormat = 'cartesian' | 'polar' | 'polarTau'
+
 /**
  * Complex number class
  * https://en.wikipedia.org/wiki/Complex_number
@@ -213,7 +215,7 @@ export default class Complex {
    * @param precision float display precision
    * @returns string with appropriate format
    */
-  toString(complexFormat = 'cartesian', precision = 2): string {
+  toString(complexFormat: ComplexFormat = 'cartesian', precision = 2): string {
     switch (complexFormat) {
       case 'cartesian':
         return `(${this.re.toFixed(precision)} ${this.im >= 0 ? '+' : ''}${this.im.toFixed(precision)}i)`
