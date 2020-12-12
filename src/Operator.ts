@@ -340,6 +340,19 @@ export default class Operator {
   }
 
   /**
+   * Trace of the operator, Tr[X].
+   * @returns Tr[X]
+   * @see https://en.wikipedia.org/wiki/Trace_(linear_algebra)
+   */
+  trace(): Complex {
+    Dimension.checkDimensions(this.dimensionsIn, this.dimensionsOut)
+    return this.entries
+      .filter((entry) => entry.coordOut.toString() === entry.coordIn.toString())
+      .map((entry) => entry.value)
+      .reduce((a, b) => a.add(b), Cx(0))
+  }
+
+  /**
    * Changing order of dimensions for an operator, from [0, 1, 2, ...] to something else.
    * @param orderOut  E.g. [2, 0, 1]
    * @param orderIn  E.g. [2, 0, 1] (be default, same as orderOut)
@@ -547,7 +560,7 @@ export default class Operator {
     if (denseArray.length !== totalSizeOut || denseArray[0].length !== totalSizeIn) {
       throw new Error(
         `Dimension inconsistency: array is [${denseArray.length}, ${denseArray[0].length}] ` +
-          `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`,
+        `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`,
       )
     }
 
