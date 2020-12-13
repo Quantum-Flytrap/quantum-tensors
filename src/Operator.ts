@@ -353,6 +353,30 @@ export default class Operator {
   }
 
   /**
+   * Partial trace of the operator, X_B = Tr_A[X_AB].
+   * @param coordIndices Dimension indices to be reduced.
+   * @returns X_B = Tr_A[X_AB]
+   */
+  partialTrace(coordIndices: number[]): Operator {
+    Dimension.checkDimensions(this.dimensionsIn, this.dimensionsOut)
+    const complementIndices = indicesComplement(coordIndices, this.dimensionsIn.length)
+    const takeI = (coords: readonly number[]): number[] => _.at(coords, coordIndices)
+    const takeCI = (coords: readonly number[]): number[] => _.at(coords, complementIndices)
+    const newEntries = _(this.entries)
+      .filter((entry) => takeI(entry.coordOut).toString() === takeI(entry.coordIn).toString())
+      .map((entry): [number[], number[], Complex] => [takeCI(entry.coordOut), takeCI(entry.coordIn), entry.value])
+      .groupBy(([coordOut, coordIn, _value]) => `${coordOut.join('|')},${coordIn.join('|')}`)
+      .values()
+      .map((entries) => {
+        const [coordOut, coordIn] = entries[0]
+        const total = entries.map(([_coordOut, _coordIn, val]) => val).reduce((a, b) => a.add(b), Cx(0))
+        return new OperatorEntry(coordOut, coordIn, total)
+      })
+      .value()
+    return new Operator(newEntries, _.at(this.dimensionsOut, complementIndices))
+  }
+
+  /**
    * Changing order of dimensions for an operator, from [0, 1, 2, ...] to something else.
    * @param orderOut  E.g. [2, 0, 1]
    * @param orderIn  E.g. [2, 0, 1] (be default, same as orderOut)

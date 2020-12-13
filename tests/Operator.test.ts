@@ -496,4 +496,31 @@ describe('Sparse Complex Operator', () => {
     expect(op.trace().re).toBeCloseTo(-0.5)
     expect(op.trace().im).toBeCloseTo(5.5)
   })
+
+  it('partial trace', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uV', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+        ['uV', 'uH', Cx(1.5, -1.5)],
+        ['uV', 'uV', Cx(-0.5, 3.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    const ptA = op.partialTrace([1])
+    expect(ptA.toString()).toEqual(
+      [
+        'Operator with 2 entries of max size [[2], [2]] with dimensions [[spin], [spin]]',
+        '(0.00 +2.00i) |d⟩⟨d| + (-0.50 +3.50i) |u⟩⟨u|\n',
+      ].join('\n'),
+    )
+    const ptB = op.partialTrace([0])
+    expect(ptB.toString()).toEqual(
+      [
+        'Operator with 3 entries of max size [[2], [2]] with dimensions [[polarization], [polarization]]',
+        '(0.00 +2.00i) |H⟩⟨H| + (1.50 -1.50i) |V⟩⟨H| + (-0.50 +3.50i) |V⟩⟨V|\n',
+      ].join('\n'),
+    )
+  })
 })
