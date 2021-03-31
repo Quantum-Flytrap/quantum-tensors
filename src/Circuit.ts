@@ -104,6 +104,40 @@ export default class Circuit {
     return this.applyGate(Gates.H(), [i])
   }
 
+  /**
+   * Apply the Pauli I gate
+   * 
+   * @param i - position of the qubit to apply the gate
+   * @returns circuit with the Pauli I gate applied
+   */
+  I(i: number): Circuit {
+    return this.applyGate(Gates.I(), [i])
+  }
+
+  /**
+   * Apply the S gate
+   * 
+   * @see https://en.wikipedia.org/wiki/Quantum_logic_gate
+   * 
+   * @param i - position of the qubit to apply the gate
+   * @returns circuit with the S gate applied
+   */
+  S(i: number): Circuit {
+    return this.applyGate(Gates.S(), [i])
+  }
+
+  /**
+   * Apply the T gate
+   * 
+   * @see https://en.wikipedia.org/wiki/Quantum_logic_gate
+   * 
+   * @param i - position of the qubit to apply the gate
+   * @returns circuit with the T gate applied
+   */
+  T(i: number): Circuit {
+    return this.applyGate(Gates.T(), [i])
+  }
+
   CNOT(control: number, target: number): Circuit {
     return this.applyGate(Gates.CX(), [control, target])
   }
