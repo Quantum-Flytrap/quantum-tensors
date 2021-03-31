@@ -340,6 +340,57 @@ export default class Operator {
   }
 
   /**
+   * Trace of the operator, Tr[X].
+   * @returns Tr[X]
+   * @see https://en.wikipedia.org/wiki/Trace_(linear_algebra)
+   */
+  trace(): Complex {
+    Dimension.checkDimensions(this.dimensionsIn, this.dimensionsOut)
+    return this.entries
+      .filter((entry) => entry.coordOut.toString() === entry.coordIn.toString())
+      .map((entry) => entry.value)
+      .reduce((a, b) => a.add(b), Cx(0))
+  }
+
+  /**
+   * Partial trace of the operator, X_B = Tr_A[X_AB].
+   * @param coordIndices Dimension indices to be reduced.
+   * @returns X_B = Tr_A[X_AB]
+   */
+  partialTrace(coordIndices: number[]): Operator {
+    Dimension.checkDimensions(this.dimensionsIn, this.dimensionsOut)
+    const complementIndices = indicesComplement(coordIndices, this.dimensionsIn.length)
+    const takeI = (coords: readonly number[]): number[] => _.at(coords, coordIndices)
+    const takeCI = (coords: readonly number[]): number[] => _.at(coords, complementIndices)
+    const newEntries = _(this.entries)
+      .filter((entry) => takeI(entry.coordOut).toString() === takeI(entry.coordIn).toString())
+      .map((entry): [number[], number[], Complex] => [takeCI(entry.coordOut), takeCI(entry.coordIn), entry.value])
+      .groupBy(([coordOut, coordIn, _value]) => `${coordOut.join('|')},${coordIn.join('|')}`)
+      .values()
+      .map((entries) => {
+        const [coordOut, coordIn] = entries[0]
+        const total = entries.map(([_coordOut, _coordIn, val]) => val).reduce((a, b) => a.add(b), Cx(0))
+        return new OperatorEntry(coordOut, coordIn, total)
+      })
+      .value()
+    return new Operator(newEntries, _.at(this.dimensionsOut, complementIndices))
+  }
+
+  /**
+   * Renyi-2 entanglement entropy for subsystem split A-B.
+   * @param v Normalized vector representing a pure state.
+   * @param coordIndices Indices related to a subsystem (either A or B).
+   * @returns - log_2 Tr[rho_A^2]
+   * @see https://en.wikipedia.org/wiki/Entropy_of_entanglement
+   * @note It can be optimized if we omit creating the full density matrix.
+   */
+  static entanglementRenyi2(v: Vector, coordIndices: number[]): number {
+    const rhoAB = Operator.projectionOn(v)
+    const rhoB = rhoAB.partialTrace(coordIndices)
+    return -Math.log2(rhoB.mulOp(rhoB).trace().re)
+  }
+
+  /**
    * Changing order of dimensions for an operator, from [0, 1, 2, ...] to something else.
    * @param orderOut  E.g. [2, 0, 1]
    * @param orderIn  E.g. [2, 0, 1] (be default, same as orderOut)

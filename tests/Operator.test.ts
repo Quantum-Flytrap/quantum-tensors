@@ -51,7 +51,7 @@ describe('Sparse Complex Operator', () => {
     )
     expect(opX.toString()).toBe(
       'Operator with 2 entries of max size [[2], [2]] with dimensions [[polarization], [polarization]]\n' +
-        '(1.00 +0.00i) |V⟩⟨H| + (1.00 +0.00i) |H⟩⟨V|\n',
+      '(1.00 +0.00i) |V⟩⟨H| + (1.00 +0.00i) |H⟩⟨V|\n',
     )
 
     const opFromSparse = Operator.fromSparseCoordNames(
@@ -425,7 +425,7 @@ describe('Sparse Complex Operator', () => {
     expect(rotatorRotated.dimensionsIn[1].coordString).toEqual('LR')
     expect(rotatorRotated.toString('polarTau', 2, ' + ', false)).toEqual(
       '1.00 exp(0.88τi) |^,L⟩⟨^,L| + 1.00 exp(0.13τi) |^,R⟩⟨^,R|' +
-        ' + 1.00 exp(0.13τi) |v,L⟩⟨v,L| + 1.00 exp(0.88τi) |v,R⟩⟨v,R|',
+      ' + 1.00 exp(0.13τi) |v,L⟩⟨v,L| + 1.00 exp(0.88τi) |v,R⟩⟨v,R|',
     )
   })
 
@@ -447,15 +447,15 @@ describe('Sparse Complex Operator', () => {
     )
     expect(op.contractLeft([1], vec).toString()).toBe(
       'Operator with 3 entries of max size [[2], [2,2]] with dimensions [[spin], [spin,polarization]]\n' +
-        '(0.00 +4.00i) |d⟩⟨d,H| + (-2.00 -2.00i) |d⟩⟨u,V| + (0.50 +2.50i) |d⟩⟨u,H|\n',
+      '(0.00 +4.00i) |d⟩⟨d,H| + (-2.00 -2.00i) |d⟩⟨u,V| + (0.50 +2.50i) |d⟩⟨u,H|\n',
     )
     expect(op.contractRight([1], vec).toString()).toBe(
       'Operator with 3 entries of max size [[2,2], [2]] with dimensions [[spin,polarization], [spin]]\n' +
-        '(-1.00 -1.00i) |d,H⟩⟨u| + (0.00 +4.00i) |d,H⟩⟨d| + (1.00 +5.00i) |d,V⟩⟨u|\n',
+      '(-1.00 -1.00i) |d,H⟩⟨u| + (0.00 +4.00i) |d,H⟩⟨d| + (1.00 +5.00i) |d,V⟩⟨u|\n',
     )
     expect(op.contractLeft([1], vec).contractRight([1], vec).toString()).toBe(
       'Operator with 2 entries of max size [[2], [2]] with dimensions [[spin], [spin]]\n' +
-        '(-1.00 +3.00i) |d⟩⟨u| + (0.00 +8.00i) |d⟩⟨d|\n',
+      '(-1.00 +3.00i) |d⟩⟨u| + (0.00 +8.00i) |d⟩⟨d|\n',
     )
   })
 
@@ -475,5 +475,115 @@ describe('Sparse Complex Operator', () => {
         '(0.50 +0.00i) |u⟩⟨u| + (0.00 -0.50i) |u⟩⟨d| + (0.00 +0.50i) |d⟩⟨u| + (0.50 +0.00i) |d⟩⟨d|\n',
       ].join('\n'),
     )
+  })
+
+  it('trace for identity operator', () => {
+    const op = Operator.identity([Dimension.spin(), Dimension.direction(), Dimension.position(3)])
+    expect(op.trace().re).toBeCloseTo(24)
+    expect(op.trace().im).toBeCloseTo(0)
+  })
+
+  it('trace', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uV', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+        ['uV', 'uV', Cx(-0.5, 3.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    expect(op.trace().re).toBeCloseTo(-0.5)
+    expect(op.trace().im).toBeCloseTo(5.5)
+  })
+
+  it('partial trace', () => {
+    const op = Operator.fromSparseCoordNames(
+      [
+        ['dH', 'dH', Cx(0, 2)],
+        ['dH', 'uV', Cx(-1, -1)],
+        ['dV', 'uH', Cx(0.5, 2.5)],
+        ['uV', 'uH', Cx(1.5, -1.5)],
+        ['uV', 'uV', Cx(-0.5, 3.5)],
+      ],
+      [Dimension.spin(), Dimension.polarization()],
+    )
+    const ptA = op.partialTrace([1])
+    expect(ptA.toString()).toEqual(
+      [
+        'Operator with 2 entries of max size [[2], [2]] with dimensions [[spin], [spin]]',
+        '(0.00 +2.00i) |d⟩⟨d| + (-0.50 +3.50i) |u⟩⟨u|\n',
+      ].join('\n'),
+    )
+    const ptB = op.partialTrace([0])
+    expect(ptB.toString()).toEqual(
+      [
+        'Operator with 3 entries of max size [[2], [2]] with dimensions [[polarization], [polarization]]',
+        '(0.00 +2.00i) |H⟩⟨H| + (1.50 -1.50i) |V⟩⟨H| + (-0.50 +3.50i) |V⟩⟨V|\n',
+      ].join('\n'),
+    )
+  })
+
+  it('entanglement entropy Renyi 2', () => {
+    const vec0 = Vector.fromSparseCoordNames(
+      [
+        ['uu', Cx(1, 0)],
+        ['du', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.spin()],
+    ).normalize()
+    expect(Operator.entanglementRenyi2(vec0, [0])).toBeCloseTo(0)
+
+    const vec1 = Vector.fromSparseCoordNames(
+      [
+        ['uu', Cx(1, 0)],
+        ['dd', Cx(0, 1)],
+      ],
+      [Dimension.spin(), Dimension.spin()],
+    ).normalize()
+    expect(Operator.entanglementRenyi2(vec1, [0])).toBeCloseTo(1)
+
+    const vec2 = Vector.fromSparseCoordNames(
+      [
+        ['>3', Cx(1, 0)],
+        ['^0', Cx(0, 1)],
+        ['<1', Cx(0, -1)],
+      ],
+      [Dimension.direction(), Dimension.position(5)],
+    ).normalize()
+    expect(Operator.entanglementRenyi2(vec2, [0])).toBeCloseTo(Math.log2(3))
+
+    const vec3 = Vector.fromSparseCoordNames(
+      [
+        ['>3', Cx(1, 0)],
+        ['>0', Cx(0, 1)],
+        ['<1', Cx(-1, 0)],
+        ['<2', Cx(0, -1)],
+      ],
+      [Dimension.direction(), Dimension.position(5)],
+    ).normalize()
+    expect(Operator.entanglementRenyi2(vec3, [0])).toBeCloseTo(1)
+
+    const vec4 = Vector.fromSparseCoordNames(
+      [
+        ['>3u', Cx(1, 0)],
+        ['>0u', Cx(0, 1)],
+        ['<1d', Cx(-1, 0)],
+        ['<2d', Cx(0, -1)],
+      ],
+      [Dimension.direction(), Dimension.position(5), Dimension.spin()],
+    ).normalize()
+    expect(Operator.entanglementRenyi2(vec4, [0, 2])).toBeCloseTo(1)
+
+    const vec5 = Vector.fromSparseCoordNames(
+      [
+        ['>3u', Cx(1, 0)],
+        ['>0d', Cx(0, 1)],
+        ['<1u', Cx(-1, 0)],
+        ['<2d', Cx(0, -1)],
+      ],
+      [Dimension.direction(), Dimension.position(5), Dimension.spin()],
+    ).normalize()
+    expect(Operator.entanglementRenyi2(vec5, [0, 2])).toBeCloseTo(2)
   })
 })
