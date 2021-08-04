@@ -34,7 +34,7 @@ export interface IPhotonPolarization {
  * A state of many photons, each with with dimensions:
  * x, y, direction, polarization
  * @see {@link @Dimension.position}, {@link @Dimension.direction}, {@link @Dimension.polarization}
- * Designed so that it will work with https://github.com/stared/quantum-game-2 board.
+ * Designed so that it will work with https://github.com/Quantum-Game/quantum-game-2 board.
  * @todo Think deeply about which things should change in-plance, and which: modify this object.
  * @todo A lot of things with interfaces to make them consistent.
  */

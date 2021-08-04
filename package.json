@@ -11,7 +11,7 @@
     "README.md",
     "imgs"
   ],
-  "repository": "https://github.com/Quantum-Game/quantum-tensors",
+  "repository": "https://github.com/Quantum-Flytrap/quantum-tensors",
   "author": "Piotr Migdal",
   "license": "MIT",
   "devDependencies": {
