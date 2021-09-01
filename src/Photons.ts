@@ -7,7 +7,7 @@ import Dimension from './Dimension'
 import { polStates } from './Ops'
 import Complex, { Cx, ComplexFormat } from './Complex'
 import VectorEntry from './VectorEntry'
-import Measurement, { INamedVector, INamedOperator } from './Measurement'
+import Measurement, { INamedVector, IWeightedProjection } from './Measurement'
 
 export interface IXYNamedVectors {
   x: number
@@ -18,7 +18,7 @@ export interface IXYNamedVectors {
 export interface IXYNamedOperators {
   x: number
   y: number
-  nOps: INamedOperator[]
+  nOps: IWeightedProjection[]
 }
 
 export interface IPhotonPolarization {
@@ -43,7 +43,7 @@ export default class Photons {
   operators: IXYOperator[]
   cachedDiffU: Operator
   measurementVecs: INamedVector[]
-  measurementOps: INamedOperator[]
+  measurementOps: IWeightedProjection[]
   readonly dimX: Dimension
   readonly dimY: Dimension
 
@@ -61,7 +61,7 @@ export default class Photons {
     vector: Vector,
     operators: IXYOperator[] = [],
     measurementVecs: INamedVector[] = [],
-    measurementOps: INamedOperator[] = [],
+    measurementOps: IWeightedProjection[] = [],
   ) {
     this.vector = vector
     this.operators = operators
@@ -91,6 +91,7 @@ export default class Photons {
     this.measurementOps = xyOps.flatMap((xyOp) =>
       xyOp.nOps.map((nOp) => ({
         name: [`${xyOp.x}-${xyOp.y}-${nOp.name[0]}`],
+        weight: 1,
         operator: Photons.localizeOperator(this.sizeX, this.sizeY, { x: xyOp.x, y: xyOp.y, op: nOp.operator }),
       })),
     )
@@ -222,12 +223,13 @@ export default class Photons {
   /**
    * Generates a DirPol projections for completem projective, non-destructive measurement.
    */
-  static allDirectionsOps(): INamedOperator[] {
+  static allDirectionsOps(): IWeightedProjection[] {
     const dirs = ['>', '^', '<', 'v']
     const pols = ['H', 'V']
     return dirs.flatMap((dir) =>
       pols.map((pol) => ({
         name: [`${dir}${pol}`],
+        weight: 1,
         operator: Operator.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]),
       })),
     )

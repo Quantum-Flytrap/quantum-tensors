@@ -6,8 +6,9 @@ export interface INamedVector {
   vector: Vector
 }
 
-export interface INamedOperator {
+export interface IWeightedProjection {
   name: string[]
+  weight: number
   operator: Operator
 }
 
@@ -35,14 +36,16 @@ export default class Measurement {
   /**
    * A projective, destructive measurement.
    * @param coordIndices Coordinates to be measured.
-   * @param measurements An array of projections.
+   * @param measurements An array of vector projections.
    * @param povms An array of positive operators.
+   * To make √M managable, they need to be be weighted arbitrary-dim projection operators.
    * @returns An array of projected states. Their norm squared is the probability.
+   * @todo Separate this measurement (with "other" but requiring orthogonality) to two.
    */
   projectiveMeasurement(
     coordIndices: number[],
     projections: INamedVector[],
-    povms: INamedOperator[] = [],
+    povms: IWeightedProjection[] = [],
   ): Measurement {
     const newStatesProj = this.states.flatMap((state) => {
       return projections.map((projection) => ({
@@ -52,30 +55,24 @@ export default class Measurement {
     })
     const newStatesPOVM = this.states.flatMap((state) => {
       return povms.map((povm) => {
-        const projectedVec = povm.operator.mulVecPartial(coordIndices, state.vector)
-        const scalePOVM = Math.sqrt(projectedVec.inner(state.vector).abs()) / projectedVec.norm
+        const projectedVec = povm.operator.mulVecPartial(coordIndices, state.vector).mulByReal(Math.sqrt(povm.weight))
         return {
           name: [...state.name, ...povm.name],
-          vector: projectedVec.mulByReal(scalePOVM),
+          vector: projectedVec,
         }
       })
     })
+    // |psi> -> |psi> + Σi(( √(1-w_i) - 1) P_i) |psi>
     const projOnMeasured = Operator.add(
       projections
-        .map((projection) => Operator.projectionOn(projection.vector))
-        .concat(povms.map((povm) => povm.operator)),
+        .map((projection) => Operator.projectionOn(projection.vector.normalize()).mulByReal(Math.sqrt(1 - projection.vector.normSquared()) - 1))
+        .concat(povms.map((povm) => povm.operator.mulByReal(Math.sqrt(1 - povm.weight) - 1))),
     )
     const notMeasured = this.states.map(({ name, vector }) => {
-      // non-normalized projection does:
-      // |v⟩ -> P |v⟩
-      // we want to have
-      // |v⟩ -> √P |v⟩
-      // hence this scalePOVM factor (as it is hard to square operators)
-      const projectedVec = vector.sub(projOnMeasured.mulVecPartial(coordIndices, vector))
-      const scalePOVM = Math.sqrt(projectedVec.inner(vector).abs()) / projectedVec.norm
+      const projectedVec = vector.add(projOnMeasured.mulVecPartial(coordIndices, vector))
       return {
         name,
-        vector: projectedVec.mulByReal(scalePOVM),
+        vector: projectedVec,
       }
     })
 
