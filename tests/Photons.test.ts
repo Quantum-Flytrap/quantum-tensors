@@ -1,3 +1,4 @@
+import { performance } from 'perf_hooks';
 import Dimension from '../src/Dimension'
 import Photons from '../src/Photons'
 import * as Elements from '../src/Elements'
