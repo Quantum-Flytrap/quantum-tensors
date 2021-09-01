@@ -93,10 +93,19 @@ export default class Dimension {
    * Create dimension for qubit (an abstract two-level system)
    * @note Equivalent to {@link Dimension.position}(2, 'qubit')
    * @param basis denote basis, ['0', '1'], ['+', '-'] or ['+i', '-i']
-   * @returns qubit dimensions
+   * @returns qubit dimension
    */
   static qubit(basis = ['0', '1']): Dimension {
     return new Dimension('qubit', 2, basis)
+  }
+
+  /**
+   * Create dimensions for n qubits.
+   * @param n Number of qubits. 
+   * @returns Qubit dimensions.
+   */
+  static qubits(n: number): Dimension[] {
+    return _.range(n).map(() => Dimension.qubit())
   }
 
   /**
