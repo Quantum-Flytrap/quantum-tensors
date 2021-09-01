@@ -188,6 +188,15 @@ export default class Operator {
   }
 
   /**
+   * Multiplies operator by a real number.
+   * @param x A factor.
+   * @returns x M
+   */
+  mulByReal(x: number): Operator {
+    return this.mulConstant(Cx(x))
+  }
+
+  /**
    * Subtract operators from each other.
    * @param m2 Another operator with compatible dimensions.
    *
@@ -598,7 +607,7 @@ export default class Operator {
     if (denseArray.length !== totalSizeOut || denseArray[0].length !== totalSizeIn) {
       throw new Error(
         `Dimension inconsistency: array is [${denseArray.length}, ${denseArray[0].length}] ` +
-          `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`,
+        `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`,
       )
     }
 
