@@ -1,4 +1,4 @@
-import Measurement from '../src/Measurement'
+import Measurement, { WeightedProjection } from '../src/Measurement'
 import Vector from '../src/Vector'
 import Dimension from '../src/Dimension'
 import { Cx } from '../src/Complex'
@@ -168,6 +168,18 @@ describe('Measurement', () => {
     )
   })
 
+  it('Weighted projection checks if it is a projection', () => {
+    const opProj = Operator.fromSparseCoordNames([
+      ['H', 'H', Cx(1)],
+    ], [Dimension.polarization()])
+    const opNotProj = Operator.fromSparseCoordNames([
+      ['V', 'H', Cx(0, 1)],
+      ['H', 'V', Cx(0, -1)],
+    ], [Dimension.polarization()])
+    expect(() => WeightedProjection.new(['x'], opProj)).not.toThrowError()
+    expect(() => WeightedProjection.new(['x'], opNotProj)).toThrowError('WeightedProjection x is not a projection.')
+  })
+
   it('POVM measurement all', () => {
     const vector = Vector.fromSparseCoordNames(
       [
@@ -178,8 +190,8 @@ describe('Measurement', () => {
     ).normalize()
     const m = new Measurement([{ name: [], vector }])
     const povms = [
-      { name: ['H'], weight: 1, operator: Operator.indicator([Dimension.polarization()], 'H') },
-      { name: ['V'], weight: 1, operator: Operator.indicator([Dimension.polarization()], 'V') },
+      WeightedProjection.new(['H'], Operator.indicator([Dimension.polarization()], 'H')),
+      WeightedProjection.new(['V'], Operator.indicator([Dimension.polarization()], 'V')),
     ]
     const measured = m.projectiveMeasurement([2], [], povms)
     expect(measured.toString()).toBe(
@@ -196,8 +208,8 @@ describe('Measurement', () => {
     ).normalize()
     const m = new Measurement([{ name: [], vector }])
     const povms = [
-      { name: ['H'], weight: 0.5, operator: Operator.indicator([Dimension.polarization()], 'H') },
-      { name: ['V'], weight: 1, operator: Operator.indicator([Dimension.polarization()], 'V') },
+      WeightedProjection.new(['H'], Operator.indicator([Dimension.polarization()], 'H'), 0.5),
+      WeightedProjection.new(['V'], Operator.indicator([Dimension.polarization()], 'V'), 1.0),
     ]
     const measured = m.projectiveMeasurement([2], [], povms)
     expect(measured.toString()).toBe(
@@ -224,8 +236,8 @@ describe('Measurement', () => {
       { name: ['0'], vector: Vector.indicator([Dimension.position(3)], '0') },
     ]
     const povms = [
-      { name: ['1nondest'], weight: 0.5, operator: Operator.indicator([Dimension.position(3)], '1') },
-      { name: ['2nondest'], weight: 0.25, operator: Operator.indicator([Dimension.position(3)], '2') },
+      WeightedProjection.new(['1nondest'], Operator.indicator([Dimension.position(3)], '1'), 0.5),
+      WeightedProjection.new(['2nondest'], Operator.indicator([Dimension.position(3)], '2'), 0.25),
     ]
     const measured = m.projectiveMeasurement([2], projections, povms)
     expect(measured.toString()).toBe(

@@ -6,10 +6,70 @@ export interface INamedVector {
   vector: Vector
 }
 
-export interface IWeightedProjection {
+/**
+ * Class for creating and using weighted projections M=wP for POVMs. 
+ */
+
+export class WeightedProjection {
   name: string[]
   weight: number
   operator: Operator
+
+  constructor(name: string[], operator: Operator, weight: number) {
+    this.name = name
+    this.operator = operator
+    this.weight = weight
+  }
+
+  /**
+   * Created a weighted projection
+   * @param name Name (it will be displayed in measurement results)
+   * @param operator A projective operator (P^2=P)
+   * @param weight Weight w, so that M=wP
+   * @param check Check if P is indeed a projection
+   * @returns 
+   */
+  static new(name: string[], operator: Operator, weight = 1., check = true): WeightedProjection {
+    if (check && !operator.isCloseToProjection()) {
+      throw Error(`WeightedProjection ${name.join('&')} is not a projection.`)
+    }
+    return new WeightedProjection(name, operator, weight)
+  }
+
+  /**
+   * Turn a vector (|v|^2 = probability) into an measurement operator.
+   * M = |v><v|
+   * @param name Name to assing
+   * @param vector A (non-normalized) pure state 
+   * @returns 
+   */
+  static fromVector(name: string[], vector: Vector): WeightedProjection {
+    const operator = Operator.projectionOn(vector.normalize())
+    return WeightedProjection.new(name, operator, vector.normSquared())
+  }
+
+  /**
+   * |psi> -> √w P |psi>
+   * @param vector Vector to act on
+   * @param coordIndices Indices to act on
+   * @returns 
+   */
+  actOnPureState(vector: Vector, coordIndices: number[]): Vector {
+    return this.operator.mulVecPartial(coordIndices, vector).mulByReal(Math.sqrt(this.weight))
+  }
+
+  /**
+   * |psi> -> √w P |psi> and append measurement to named vector name
+   * @param namedVector Named vector to act on
+   * @param coordIndices Indices to act on
+   * @returns 
+   */
+  actOnNamedVector(namedVector: INamedVector, coordIndices: number[]): INamedVector {
+    return {
+      name: [...namedVector.name, ...this.name],
+      vector: this.actOnPureState(namedVector.vector, coordIndices)
+    }
+  }
 }
 
 /**
@@ -45,7 +105,7 @@ export default class Measurement {
   projectiveMeasurement(
     coordIndices: number[],
     projections: INamedVector[],
-    povms: IWeightedProjection[] = [],
+    povms: WeightedProjection[] = [],
   ): Measurement {
     const newStatesProj = this.states.flatMap((state) => {
       return projections.map((projection) => ({
@@ -53,15 +113,7 @@ export default class Measurement {
         vector: projection.vector.innerPartial(coordIndices, state.vector),
       }))
     })
-    const newStatesPOVM = this.states.flatMap((state) => {
-      return povms.map((povm) => {
-        const projectedVec = povm.operator.mulVecPartial(coordIndices, state.vector).mulByReal(Math.sqrt(povm.weight))
-        return {
-          name: [...state.name, ...povm.name],
-          vector: projectedVec,
-        }
-      })
-    })
+    const newStatesPOVM = this.states.flatMap((state) => povms.map((povm) => povm.actOnNamedVector(state, coordIndices)))
     // |psi> -> |psi> + Σi(( √(1-w_i) - 1) P_i) |psi>
     const projOnMeasured = Operator.add(
       projections
