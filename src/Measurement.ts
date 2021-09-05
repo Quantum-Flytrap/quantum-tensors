@@ -48,6 +48,17 @@ export class WeightedProjection {
     return WeightedProjection.new(name, operator, vector.normSquared())
   }
 
+  scaledOperator(): Operator {
+    return this.operator.mulByReal(this.weight)
+  }
+
+  transformationOperator(): Operator {
+    return this.operator.mulByReal(Math.sqrt(this.weight))
+  }
+
+  remainingShift(): Operator {
+    return this.operator.mulByReal(Math.sqrt(1 - this.weight) - 1)
+  }
   /**
    * |psi> -> √w P |psi>
    * @param vector Vector to act on
@@ -93,6 +104,22 @@ export default class Measurement {
     return new Measurement([{ name, vector: vector.normalize() }])
   }
 
+  destructiveMeasurement(coordIndices: number[], projections: INamedVector[]): Measurement {
+    const newStates = this.states.flatMap((state) => projections.map((projection) => ({
+      name: [...state.name, ...projection.name],
+      vector: projection.vector.innerPartial(coordIndices, state.vector),
+    })))
+    return new Measurement(newStates)
+  }
+
+  nondemolitionMeasurement(coordIndices: number[], povms: WeightedProjection[], check = true): Measurement {
+    if (check && !Operator.add(povms.map((povm) => povm.scaledOperator())).isCloseToIdentity()) {
+      throw Error('POVMs do not add up to identity, fix or use projectiveMeasurement instead.')
+    }
+    const newStates = this.states.flatMap((state) => povms.map((povm) => povm.actOnNamedVector(state, coordIndices)))
+    return new Measurement(newStates)
+  }
+
   /**
    * A projective, destructive measurement.
    * @param coordIndices Coordinates to be measured.
@@ -107,18 +134,13 @@ export default class Measurement {
     projections: INamedVector[],
     povms: WeightedProjection[] = [],
   ): Measurement {
-    const newStatesProj = this.states.flatMap((state) => {
-      return projections.map((projection) => ({
-        name: [...state.name, ...projection.name],
-        vector: projection.vector.innerPartial(coordIndices, state.vector),
-      }))
-    })
-    const newStatesPOVM = this.states.flatMap((state) => povms.map((povm) => povm.actOnNamedVector(state, coordIndices)))
+    const newStatesProj = this.destructiveMeasurement(coordIndices, projections).states
+    const newStatesPOVM = this.nondemolitionMeasurement(coordIndices, povms, false).states
     // |psi> -> |psi> + Σi(( √(1-w_i) - 1) P_i) |psi>
     const projOnMeasured = Operator.add(
       projections
-        .map((projection) => Operator.projectionOn(projection.vector.normalize()).mulByReal(Math.sqrt(1 - projection.vector.normSquared()) - 1))
-        .concat(povms.map((povm) => povm.operator.mulByReal(Math.sqrt(1 - povm.weight) - 1))),
+        .map((projection) => WeightedProjection.fromVector([], projection.vector).remainingShift())
+        .concat(povms.map((povm) => povm.remainingShift())),
     )
     const notMeasured = this.states.map(({ name, vector }) => {
       const projectedVec = vector.add(projOnMeasured.mulVecPartial(coordIndices, vector))
