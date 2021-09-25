@@ -6,7 +6,6 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
-    'prettier/@typescript-eslint',
     'plugin:prettier/recommended',
   ],
   settings: {
@@ -19,7 +18,6 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/no-this-alias': 'off',
-    '@typescript-eslint/interface-name-prefix': ['error', 'always'],
     '@typescript-eslint/member-delimiter-style': [
       'off',
       {
