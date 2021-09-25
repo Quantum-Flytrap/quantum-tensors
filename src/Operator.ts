@@ -386,20 +386,6 @@ export default class Operator {
   }
 
   /**
-   * Renyi-2 entanglement entropy for subsystem split A-B.
-   * @param v Normalized vector representing a pure state.
-   * @param coordIndices Indices related to a subsystem (either A or B).
-   * @returns - log_2 Tr[rho_A^2]
-   * @see https://en.wikipedia.org/wiki/Entropy_of_entanglement
-   * @note It can be optimized if we omit creating the full density matrix.
-   */
-  static entanglementRenyi2(v: Vector, coordIndices: number[]): number {
-    const rhoAB = Operator.projectionOn(v)
-    const rhoB = rhoAB.partialTrace(coordIndices)
-    return -Math.log2(rhoB.mulOp(rhoB).trace().re)
-  }
-
-  /**
    * Changing order of dimensions for an operator, from [0, 1, 2, ...] to something else.
    * @param orderOut  E.g. [2, 0, 1]
    * @param orderIn  E.g. [2, 0, 1] (be default, same as orderOut)
