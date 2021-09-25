@@ -188,6 +188,15 @@ export default class Operator {
   }
 
   /**
+   * Multiplies operator by a real number.
+   * @param x A factor.
+   * @returns x M
+   */
+  mulByReal(x: number): Operator {
+    return this.mulConstant(Cx(x))
+  }
+
+  /**
    * Subtract operators from each other.
    * @param m2 Another operator with compatible dimensions.
    *
@@ -374,20 +383,6 @@ export default class Operator {
       })
       .value()
     return new Operator(newEntries, _.at(this.dimensionsOut, complementIndices))
-  }
-
-  /**
-   * Renyi-2 entanglement entropy for subsystem split A-B.
-   * @param v Normalized vector representing a pure state.
-   * @param coordIndices Indices related to a subsystem (either A or B).
-   * @returns - log_2 Tr[rho_A^2]
-   * @see https://en.wikipedia.org/wiki/Entropy_of_entanglement
-   * @note It can be optimized if we omit creating the full density matrix.
-   */
-  static entanglementRenyi2(v: Vector, coordIndices: number[]): number {
-    const rhoAB = Operator.projectionOn(v)
-    const rhoB = rhoAB.partialTrace(coordIndices)
-    return -Math.log2(rhoB.mulOp(rhoB).trace().re)
   }
 
   /**
@@ -598,7 +593,7 @@ export default class Operator {
     if (denseArray.length !== totalSizeOut || denseArray[0].length !== totalSizeIn) {
       throw new Error(
         `Dimension inconsistency: array is [${denseArray.length}, ${denseArray[0].length}] ` +
-          `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`,
+        `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`,
       )
     }
 

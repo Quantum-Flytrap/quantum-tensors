@@ -1,6 +1,7 @@
 export { default as Dimension } from './Dimension'
 export { default as Vector } from './Vector'
 export { default as Operator } from './Operator'
+export { default as Entanglement } from './Entanglement'
 export { default as Photons } from './Photons'
 export { default as Frame } from './Frame'
 export { default as Simulation } from './Simulation'

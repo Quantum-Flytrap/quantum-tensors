@@ -1,4 +1,4 @@
-import Measurement from '../src/Measurement'
+import Measurement, { WeightedProjection } from '../src/Measurement'
 import Vector from '../src/Vector'
 import Dimension from '../src/Dimension'
 import { Cx } from '../src/Complex'
@@ -168,6 +168,18 @@ describe('Measurement', () => {
     )
   })
 
+  it('Weighted projection checks if it is a projection', () => {
+    const opProj = Operator.fromSparseCoordNames([
+      ['H', 'H', Cx(1)],
+    ], [Dimension.polarization()])
+    const opNotProj = Operator.fromSparseCoordNames([
+      ['V', 'H', Cx(0, 1)],
+      ['H', 'V', Cx(0, -1)],
+    ], [Dimension.polarization()])
+    expect(() => WeightedProjection.new(['x'], opProj)).not.toThrowError()
+    expect(() => WeightedProjection.new(['x'], opNotProj)).toThrowError('WeightedProjection x is not a projection.')
+  })
+
   it('POVM measurement all', () => {
     const vector = Vector.fromSparseCoordNames(
       [
@@ -178,8 +190,8 @@ describe('Measurement', () => {
     ).normalize()
     const m = new Measurement([{ name: [], vector }])
     const povms = [
-      { name: ['H'], operator: Operator.indicator([Dimension.polarization()], 'H') },
-      { name: ['V'], operator: Operator.indicator([Dimension.polarization()], 'V') },
+      WeightedProjection.new(['H'], Operator.indicator([Dimension.polarization()], 'H')),
+      WeightedProjection.new(['V'], Operator.indicator([Dimension.polarization()], 'V')),
     ]
     const measured = m.projectiveMeasurement([2], [], povms)
     expect(measured.toString()).toBe(
@@ -196,8 +208,8 @@ describe('Measurement', () => {
     ).normalize()
     const m = new Measurement([{ name: [], vector }])
     const povms = [
-      { name: ['H'], operator: Operator.indicator([Dimension.polarization()], 'H').mulConstant(Cx(0.5)) },
-      { name: ['V'], operator: Operator.indicator([Dimension.polarization()], 'V') },
+      WeightedProjection.new(['H'], Operator.indicator([Dimension.polarization()], 'H'), 0.5),
+      WeightedProjection.new(['V'], Operator.indicator([Dimension.polarization()], 'V'), 1.0),
     ]
     const measured = m.projectiveMeasurement([2], [], povms)
     expect(measured.toString()).toBe(
@@ -222,18 +234,16 @@ describe('Measurement', () => {
     const m = new Measurement([{ name: [], vector }])
     const projections = [
       { name: ['0'], vector: Vector.indicator([Dimension.position(3)], '0') },
-      { name: ['1'], vector: Vector.indicator([Dimension.position(3)], '1').mulByReal(Math.SQRT1_2) },
     ]
     const povms = [
-      { name: ['1nondest'], operator: Operator.indicator([Dimension.position(3)], '1').mulConstant(Cx(0.5)) },
-      { name: ['2nondest'], operator: Operator.indicator([Dimension.position(3)], '2').mulConstant(Cx(0.25)) },
+      WeightedProjection.new(['1nondest'], Operator.indicator([Dimension.position(3)], '1'), 0.5),
+      WeightedProjection.new(['2nondest'], Operator.indicator([Dimension.position(3)], '2'), 0.25),
     ]
     const measured = m.projectiveMeasurement([2], projections, povms)
     expect(measured.toString()).toBe(
       [
-        '37.5% [] 0.71 exp(0.75τi) |u,V,2⟩ + 0.71 exp(0.25τi) |d,V,2⟩',
+        '50.0% [] 0.61 exp(0.75τi) |u,V,2⟩ + 0.50 exp(0.50τi) |d,V,1⟩ + 0.61 exp(0.25τi) |d,V,2⟩',
         '25.0% [0] 1.00 exp(0.00τi) |d,H⟩',
-        '12.5% [1] 1.00 exp(0.50τi) |d,V⟩',
         '12.5% [1nondest] 1.00 exp(0.50τi) |d,V,1⟩',
         '12.5% [2nondest] 0.71 exp(0.75τi) |u,V,2⟩ + 0.71 exp(0.25τi) |d,V,2⟩',
       ].join('\n'),

@@ -1,3 +1,4 @@
+import { performance } from 'perf_hooks';
 import Dimension from '../src/Dimension'
 import Photons from '../src/Photons'
 import * as Elements from '../src/Elements'
@@ -448,9 +449,9 @@ describe('Photons', () => {
     const measurement = photons.measure()
     expect(measurement.toString()).toBe(
       [
-        '67.5% [] 0.24 exp(0.25τi) |2,3,v,H,2,3,v,H⟩ + 0.97 exp(0.25τi) |3,2,>,H,3,2,>,H⟩',
+        '62.5% [] 0.45 exp(0.25τi) |2,3,v,H,2,3,v,H⟩ + 0.89 exp(0.25τi) |3,2,>,H,3,2,>,H⟩',
         '12.5% [2-3-vH] 1.00 exp(0.25τi) |2,3,v,H⟩',
-        '7.5% [2-3-vH] 1.00 exp(0.25τi) |2,3,v,H⟩',
+        '12.5% [2-3-vH] 1.00 exp(0.25τi) |2,3,v,H⟩',
         '12.5% [2-3-vH&2-3-vH] 1.00 exp(0.25τi) |⟩',
       ].join('\n'),
     )

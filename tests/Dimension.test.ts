@@ -98,4 +98,10 @@ describe('Dimension', () => {
       'Dimensions array order mismatch...',
     )
   })
+
+  it('creating many qubits at once', () => {
+    const qubits1 = [Dimension.qubit(), Dimension.qubit(), Dimension.qubit()];
+    const qubits2 = Dimension.qubits(3);
+    expect(() => Dimension.checkDimensions(qubits1, qubits2)).not.toThrow();
+  })
 })
