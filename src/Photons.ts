@@ -89,10 +89,12 @@ export default class Photons {
       })),
     )
     this.measurementOps = xyOps.flatMap((xyOp) =>
-      xyOp.nOps.map((nOp) => WeightedProjection.new(
-        [`${xyOp.x}-${xyOp.y}-${nOp.name[0]}`],
-        Photons.localizeOperator(this.sizeX, this.sizeY, { x: xyOp.x, y: xyOp.y, op: nOp.operator })
-      )),
+      xyOp.nOps.map((nOp) =>
+        WeightedProjection.new(
+          [`${xyOp.x}-${xyOp.y}-${nOp.name[0]}`],
+          Photons.localizeOperator(this.sizeX, this.sizeY, { x: xyOp.x, y: xyOp.y, op: nOp.operator }),
+        ),
+      ),
     )
   }
 
@@ -226,10 +228,12 @@ export default class Photons {
     const dirs = ['>', '^', '<', 'v']
     const pols = ['H', 'V']
     return dirs.flatMap((dir) =>
-      pols.map((pol) => WeightedProjection.new(
-        [`${dir}${pol}`],
-        Operator.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]),
-      )),
+      pols.map((pol) =>
+        WeightedProjection.new(
+          [`${dir}${pol}`],
+          Operator.indicator([Dimension.direction(), Dimension.polarization()], [dir, pol]),
+        ),
+      ),
     )
   }
 

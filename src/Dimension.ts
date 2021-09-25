@@ -101,7 +101,7 @@ export default class Dimension {
 
   /**
    * Create dimensions for n qubits.
-   * @param n Number of qubits. 
+   * @param n Number of qubits.
    * @returns Qubit dimensions.
    */
   static qubits(n: number): Dimension[] {

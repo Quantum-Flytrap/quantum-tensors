@@ -427,20 +427,16 @@ export default class Frame {
   get ketComponents(): IKetComponentFrame[] {
     const ns = _.range(this.nPhotons)
     return this.vector.entries
-      .map(
-        (entry: VectorEntry): IKetComponentFrame => {
-          const particleCoords = ns.map(
-            (i: number): IParticleCoord => {
-              const [x, y, dir, pol] = entry.coord.slice(4 * i, 4 * i + 4)
-              return { kind: 'photon', x, y, dir, pol }
-            },
-          )
-          return {
-            amplitude: entry.value,
-            particleCoords,
-          }
-        },
-      )
+      .map((entry: VectorEntry): IKetComponentFrame => {
+        const particleCoords = ns.map((i: number): IParticleCoord => {
+          const [x, y, dir, pol] = entry.coord.slice(4 * i, 4 * i + 4)
+          return { kind: 'photon', x, y, dir, pol }
+        })
+        return {
+          amplitude: entry.value,
+          particleCoords,
+        }
+      })
       .filter((ketComponent: IKetComponentFrame): boolean => ketComponent.amplitude.r ** 2 > this.probThreshold)
   }
 
@@ -484,15 +480,13 @@ export default class Frame {
     this.probPropagated = this.probability
 
     this.absorptions = this.sim.operators
-      .map(
-        (operator: IXYOperator): IAbsorption => {
-          return {
-            x: operator.x,
-            y: operator.y,
-            probability: this.measureAbsorptionAtOperator(operator),
-          }
-        },
-      )
+      .map((operator: IXYOperator): IAbsorption => {
+        return {
+          x: operator.x,
+          y: operator.y,
+          probability: this.measureAbsorptionAtOperator(operator),
+        }
+      })
       .filter((d): boolean => d.probability > this.probThreshold)
     if (this.probBefore - this.probPropagated > this.probThreshold) {
       this.absorptions.push({

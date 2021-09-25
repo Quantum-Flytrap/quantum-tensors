@@ -593,7 +593,7 @@ export default class Operator {
     if (denseArray.length !== totalSizeOut || denseArray[0].length !== totalSizeIn) {
       throw new Error(
         `Dimension inconsistency: array is [${denseArray.length}, ${denseArray[0].length}] ` +
-        `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`,
+          `and dimensions total sizes are [${totalSizeOut}, ${totalSizeIn}]`,
       )
     }
 

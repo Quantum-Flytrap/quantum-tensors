@@ -7,9 +7,8 @@ export interface INamedVector {
 }
 
 /**
- * Class for creating and using weighted projections M=wP for POVMs. 
+ * Class for creating and using weighted projections M=wP for POVMs.
  */
-
 export class WeightedProjection {
   name: string[]
   weight: number
@@ -27,9 +26,9 @@ export class WeightedProjection {
    * @param operator A projective operator (P^2=P)
    * @param weight Weight w, so that M=wP
    * @param check Check if P is indeed a projection
-   * @returns 
+   * @returns
    */
-  static new(name: string[], operator: Operator, weight = 1., check = true): WeightedProjection {
+  static new(name: string[], operator: Operator, weight = 1, check = true): WeightedProjection {
     if (check && !operator.isCloseToProjection()) {
       throw Error(`WeightedProjection ${name.join('&')} is not a projection.`)
     }
@@ -40,8 +39,8 @@ export class WeightedProjection {
    * Turn a vector (|v|^2 = probability) into an measurement operator.
    * M = |v><v|
    * @param name Name to assing
-   * @param vector A (non-normalized) pure state 
-   * @returns 
+   * @param vector A (non-normalized) pure state
+   * @returns
    */
   static fromVector(name: string[], vector: Vector): WeightedProjection {
     const operator = Operator.projectionOn(vector.normalize())
@@ -63,7 +62,7 @@ export class WeightedProjection {
    * |psi> -> √w P |psi>
    * @param vector Vector to act on
    * @param coordIndices Indices to act on
-   * @returns 
+   * @returns
    */
   actOnPureState(vector: Vector, coordIndices: number[]): Vector {
     return this.operator.mulVecPartial(coordIndices, vector).mulByReal(Math.sqrt(this.weight))
@@ -73,12 +72,12 @@ export class WeightedProjection {
    * |psi> -> √w P |psi> and append measurement to named vector name
    * @param namedVector Named vector to act on
    * @param coordIndices Indices to act on
-   * @returns 
+   * @returns
    */
   actOnNamedVector(namedVector: INamedVector, coordIndices: number[]): INamedVector {
     return {
       name: [...namedVector.name, ...this.name],
-      vector: this.actOnPureState(namedVector.vector, coordIndices)
+      vector: this.actOnPureState(namedVector.vector, coordIndices),
     }
   }
 }
@@ -105,10 +104,12 @@ export default class Measurement {
   }
 
   destructiveMeasurement(coordIndices: number[], projections: INamedVector[]): Measurement {
-    const newStates = this.states.flatMap((state) => projections.map((projection) => ({
-      name: [...state.name, ...projection.name],
-      vector: projection.vector.innerPartial(coordIndices, state.vector),
-    })))
+    const newStates = this.states.flatMap((state) =>
+      projections.map((projection) => ({
+        name: [...state.name, ...projection.name],
+        vector: projection.vector.innerPartial(coordIndices, state.vector),
+      })),
+    )
     return new Measurement(newStates)
   }
 

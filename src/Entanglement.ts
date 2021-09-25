@@ -1,8 +1,10 @@
 import Vector from './Vector'
 import Operator from './Operator'
 
+/**
+ * Class for measuring entanglement.
+ */
 export default class Entanglement {
-  constructor() { }
   /**
    * Renyi-2 entanglement entropy for subsystem split A-B.
    * @param v Normalized vector representing a pure state.
