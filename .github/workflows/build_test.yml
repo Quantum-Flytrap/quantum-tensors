@@ -1,5 +1,4 @@
-name: Yarn package test
-
+name: Build and test
 on: [push]
 
 jobs:

@@ -1,4 +1,4 @@
-name: Build and publish documentation
+name: Publish documentation
 
 on: [push]
 
