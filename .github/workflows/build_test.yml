@@ -1,0 +1,22 @@
+name: Build and test
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Install
+        run: yarn
+      - name: Build
+        run: yarn build
+      - name: Test
+        run: yarn test
+      - name: Lint
+        run: yarn lint
+      - name: Build docs # but not publish
+        run: yarn build-docs
+      - uses: codecov/codecov-action@v2
