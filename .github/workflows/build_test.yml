@@ -17,4 +17,6 @@ jobs:
         run: yarn test
       - name: Lint
         run: yarn lint
+      - name: Build docs # but not publish
+        run: yarn build-docs
       - uses: codecov/codecov-action@v2
